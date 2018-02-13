@@ -1,0 +1,10 @@
+name: Monitoring TestSuite
+testcases:
+- name: GET {{.APP_HOST}}/unsecured/ping
+  steps:
+    - type: http
+      method: GET
+      url: "{{.APP_HOST}}/unsecured/ping"
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.body ShouldEqual '"OK"'

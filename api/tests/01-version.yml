@@ -1,0 +1,9 @@
+name: Monitoring TestSuite
+testcases:
+- name: GET {{.APP_HOST}}/unsecured/version
+  steps:
+    - type: http
+      method: GET
+      url: "{{.APP_HOST}}/unsecured/version"
+      assertions:
+      - result.statuscode ShouldEqual 200

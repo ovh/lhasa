@@ -1,0 +1,27 @@
+<div class="mdl-grid">
+  <div class="mdl-cell mdl-cell--4-col demo-card-wide mdl-card mdl-shadow--2dp" *ngFor="let app of applications">
+
+    <div class="mdl-card__supporting-text mdl-card--border mdl-color-text--grey-600">
+      {{ app.type  | uppercase }}
+    </div>
+  
+    <div class="mdl-card__title">
+        <img src="{{ app.avatarurl }}" width="50"/>
+        <h4>{{ app.domain }}/{{ app.name }}</h4>
+    </div>
+    <div class="mdl-card__supporting-text">
+        <b>Description:</b> 
+        {{ (app.description.length>200)? (app.description | slice:0:200)+"...":(app.description) }}
+    </div>
+    <div class="mdl-card__actions mdl-card--border">
+      <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" routerLink="{{ app.id }}" >
+        More info...
+      </a>
+    </div>
+    <div class="mdl-card__menu">
+      <small>{{ app.language }}</small>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

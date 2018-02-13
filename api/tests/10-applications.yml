@@ -1,0 +1,99 @@
+name: Applications Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v0'
+  appsroute: '{{.baseroute}}/applications'
+testcases:
+- name: Reset the Database
+  steps:
+    - type: http
+      method: POST
+      url: "{{.baseroute}}/flushdb"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+- name: Add an Application
+  steps:
+    - type: http
+      method: POST
+      url: "{{.appsroute}}"
+      body: '{"name": "agora", "type": "service", "language": "python"}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+      - result.bodyjson.id ShouldBeGreaterThanOrEqualTo 0
+      - result.bodyjson.name ShouldEqual "agora"
+
+- name: Get an Application
+  steps:
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/{{.Add an Application.result.bodyjson.id}}"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.type ShouldEqual service
+      - result.bodyjson.name ShouldEqual agora
+
+
+- name: List Applications
+  steps:
+    - type: http
+      method: GET
+      url: "{{.appsroute}}?start=0&size=1"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.size ShouldEqual 1
+      - result.bodyjson.start ShouldEqual 0
+      - result.bodyjson.results.results0.type ShouldEqual service
+      - result.bodyjson.results.results0.name ShouldEqual agora
+
+- name: Delete an Application
+  steps:
+    - type: http
+      method: DELETE
+      url: "{{.appsroute}}/{{.Add an Application.result.bodyjson.id}}"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.body ShouldEqual '"application deleted"'
+
+- name: List Applications
+  steps:
+    - type: http
+      method: GET
+      url: "{{.appsroute}}?start=0&size=1"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.results.__len__ ShouldEqual 0
+
+- name: Add an Application
+  steps:
+    - type: http
+      method: POST
+      url: "{{.appsroute}}"
+      body: '{"name": "agora", "type": "service", "language": "python", "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae nisl. Etiam mollis viverra justo, convallis pellentesque mauris vestibulum ac."}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+
+- name: Add an Application2
+  steps:
+    - type: http
+      method: POST
+      url: "{{.appsroute}}"
+      body: '{"name": "cds", "type": "service", "language": "go", "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae."}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+      
+- name: Add an Application3
+  steps:
+    - type: http
+      method: POST
+      url: "{{.appsroute}}"
+      body: '{"name": "batch_mailer", "type": "cronjob", "language": "perl", "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae."}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201

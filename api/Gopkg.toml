@@ -1,0 +1,17 @@
+required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
+
+[[constraint]]
+  name = "github.com/gin-gonic/gin"
+  version = "^1.2.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/loopfz/gadgeto"
+
+[[constraint]]
+  name = "github.com/jinzhu/gorm"
+  version = "^1.0"
+
+[[constraint]]
+  name = "github.com/gin-gonic/contrib"
+  branch = "master"
