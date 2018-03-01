@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ovh/lhasa/api/models"
+	"github.com/ovh/lhasa/api/v0/models"
 )
 
 // listResponseLinks is a subobject served in a LIST reponse to implement HATEOAS

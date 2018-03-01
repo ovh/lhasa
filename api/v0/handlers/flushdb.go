@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ovh/lhasa/api/models"
+	"github.com/ovh/lhasa/api/v0/models"
 )
 
 // FlushDBHandler empties the Database for testing purposes

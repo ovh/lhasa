@@ -9,6 +9,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/alecthomas/template"
+  packages = [".","parse"]
+  revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/alecthomas/units"
+  packages = ["."]
+  revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+
+[[projects]]
+  branch = "master"
   name = "github.com/fsamin/go-dump"
   packages = ["."]
   revision = "6e06b7fed23aeed808b4d60e8a085f9b9c4b45af"
@@ -26,22 +38,15 @@
   revision = "dccbb4a462e965297e21372a9ad3ea05e0df3e5f"
 
 [[projects]]
+  branch = "master"
   name = "github.com/gin-gonic/gin"
-  packages = [
-    ".",
-    "binding",
-    "render"
-  ]
-  revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
-  version = "v1.2"
+  packages = [".","binding","json","render"]
+  revision = "5d3f30cfc81f9109850fa9043a19783cbbde68a5"
 
 [[projects]]
   branch = "master"
   name = "github.com/golang/lint"
-  packages = [
-    ".",
-    "golint"
-  ]
+  packages = [".","golint"]
   revision = "6aaf7c34af0f4c36a57e0c429bace4d706d8e931"
 
 [[projects]]
@@ -52,13 +57,9 @@
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
-  packages = [
-    ".",
-    "dialects/postgres",
-    "dialects/sqlite"
-  ]
-  revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
-  version = "v1.0"
+  packages = [".","dialects/postgres","dialects/sqlite"]
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
 
 [[projects]]
   branch = "master"
@@ -67,25 +68,27 @@
   revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
 
 [[projects]]
+  name = "github.com/json-iterator/go"
+  packages = ["."]
+  revision = "3353055b2a1a5ae1b6a8dfde887a524e7088f3a2"
+  version = "1.1.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/juju/errors"
+  packages = ["."]
+  revision = "c7d06af17c68cd34c835053720b21f6549d9b0ee"
+
+[[projects]]
   branch = "master"
   name = "github.com/lib/pq"
-  packages = [
-    ".",
-    "hstore",
-    "oid"
-  ]
+  packages = [".","hstore","oid"]
   revision = "88edab0803230a3898347e77b474f8c1820a1f20"
 
 [[projects]]
   branch = "master"
   name = "github.com/loopfz/gadgeto"
-  packages = [
-    "tonic",
-    "tonic/utils/bootstrap",
-    "tonic/utils/swag",
-    "tonic/utils/swag/doc",
-    "tonic/utils/swag/swagger"
-  ]
+  packages = ["tonic","tonic/utils/bootstrap","tonic/utils/jujerr","tonic/utils/swag","tonic/utils/swag/doc","tonic/utils/swag/swagger"]
   revision = "b828171521202147c4951311796f5faa8aa75f73"
 
 [[projects]]
@@ -119,6 +122,18 @@
   revision = "56cca451570bb0366b29f30e1aeb5cf9736a1e18"
 
 [[projects]]
+  name = "github.com/modern-go/concurrent"
+  packages = ["."]
+  revision = "938152ca6a933f501bb238954eebd3cbcbf489ff"
+  version = "1.0.2"
+
+[[projects]]
+  name = "github.com/modern-go/reflect2"
+  packages = ["."]
+  revision = "1df9eeb2bb81f327b96228865c5687bc2194af3f"
+  version = "1.0.0"
+
+[[projects]]
   name = "github.com/ovh/venom"
   packages = ["."]
   revision = "2155f620902cb381c136a12acac605356145a4a0"
@@ -132,11 +147,7 @@
 
 [[projects]]
   name = "github.com/smartystreets/assertions"
-  packages = [
-    ".",
-    "internal/go-render/render",
-    "internal/oglematchers"
-  ]
+  packages = [".","internal/go-render/render","internal/oglematchers"]
   revision = "ff1918e1e5a13a74014644ae7c1e0ba2f791364d"
   version = "1.8.0"
 
@@ -155,21 +166,20 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
+  packages = ["unix","windows"]
   revision = "d4266bc12aae0b4128952c889b769442fce5d2f1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/tools"
-  packages = [
-    "go/gcexportdata",
-    "go/gcimporter15",
-    "go/types/typeutil"
-  ]
+  packages = ["go/gcexportdata","go/gcimporter15","go/types/typeutil"]
   revision = "c84da9fa1c1dbcae4557e8c8509abeb814ed9632"
+
+[[projects]]
+  name = "gopkg.in/alecthomas/kingpin.v2"
+  packages = ["."]
+  revision = "947dcec5ba9c011838740e680966fd7087a71d0d"
+  version = "v2.2.6"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
@@ -192,6 +202,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c9a9b83bb1eb2cefcb43e25b334471b501cf2fdfc562ef1847f27827faf60f62"
+  inputs-digest = "ca360dbb3f3b862c6b85b92ddef5dc6f1f213fb93330aeb4c0a5ca1b2b94d498"
   solver-name = "gps-cdcl"
   solver-version = 1

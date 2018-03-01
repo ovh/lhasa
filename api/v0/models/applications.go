@@ -4,12 +4,6 @@ import (
 	"github.com/ovh/lhasa/api/db"
 )
 
-// Migrate the DB schema if the model changed
-func init() {
-	// FIXME: warn if automigration failed
-	db.DB().AutoMigrate(&Application{})
-}
-
 // Application defines the model properties of an application
 type Application struct {
 	ID            int    `json:"id" gorm:"primary_key;auto_increment"`
@@ -20,6 +14,11 @@ type Application struct {
 	RepositoryURL string `json:"repositoryurl" validate:"url"`
 	AvatarURL     string `json:"avatarurl" validate:"url"`
 	Description   string `json:"description" sql:"type:text;"`
+}
+
+// MigrateApplications runs automated gorm migrations
+func MigrateApplications() error {
+	return db.DB().AutoMigrate(&Application{}).Error
 }
 
 // ListApplications provides a paginated list of potentially filtered applications

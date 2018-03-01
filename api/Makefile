@@ -32,8 +32,7 @@ install: $(GO_DEP)
 	dep ensure
 
 server: vet lint install
-
-	go build -i -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}/cmd
+	go build -i -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}/cmd/appcatalog
 
 test: install
 	@go test -short ${PKG_LIST}
@@ -43,7 +42,7 @@ test-coverage: $(GO_COV_MERGE) $(TARGET_DIR)
 	@go tool cover -html=$(TARGET_DIR)/cover.out -o=$(TARGET_DIR)/cover.html
 
 integration-test: server
-	{ ./${OUT} & }; \
+	{ ./${OUT} --auto-migrate & }; \
 	pid=$$!; \
 	sleep 3; \
 	APP_HOST=http://localhost:8081 venom run --output-dir=$(TARGET_DIR) tests/; \

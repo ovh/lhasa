@@ -1,4 +1,4 @@
-package main
+package routers
 
 import (
 	"net/http"
@@ -6,39 +6,32 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/loopfz/gadgeto/tonic"
+	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
 	"github.com/loopfz/gadgeto/tonic/utils/swag"
 	"github.com/ovh/lhasa/api/handlers"
+	"github.com/ovh/lhasa/api/v0"
+	"github.com/ovh/lhasa/api/v1"
+	"github.com/ovh/lhasa/api/v1/repositories"
 )
-
-var version string
 
 // redirect unknown routes to angular
 func redirect(c *gin.Context) {
 	c.File("./webui/index.html")
 }
 
-func main() {
-
+//NewRouter creates a new and configured gin router
+func NewRouter(applicationRepository, applicationVersionRepository *repositories.ApplicationRepository, version string) *gin.Engine {
 	router := gin.Default()
+
+	tonic.SetErrorHook(handlers.RestErrorHook(jujerr.ErrHook))
 	// redirect root routes to angular assets
 	router.Use(static.Serve("/", static.LocalFile("./webui", true)))
 
 	// redirect unknown routes to angular
 	router.NoRoute(redirect)
 
-	// authenticated is the main API route group
-	authenticated := router.Group("/api/v0")
-
-	// flushdb flushes the the database for testing purposes
-	// TODO: deactivate this route in production
-	authenticated.POST("/flushdb", tonic.Handler(handlers.FlushDBHandler, http.StatusOK))
-
-	applicationsRoute := authenticated.Group("/applications")
-
-	applicationsRoute.GET("/", tonic.Handler(handlers.ListApplicationsHandler, http.StatusOK))
-	applicationsRoute.POST("/", tonic.Handler(handlers.CreateApplicationHandler, http.StatusCreated))
-	applicationsRoute.GET("/:id", tonic.Handler(handlers.DetailApplicationHandler, http.StatusOK))
-	applicationsRoute.DELETE("/:id", tonic.Handler(handlers.DeleteApplicationHandler, http.StatusOK))
+	v0.Register(router.Group("/api/v0"))
+	v1.Register(router.Group("/api/v1"), applicationRepository, applicationVersionRepository)
 
 	// unsecured group does not check incoming signatures
 	unsecured := router.Group("/unsecured")
@@ -49,5 +42,5 @@ func main() {
 	// auto-generated swagger documentation
 	unsecured.GET("/swagger.json", swag.Swagger(router, ""))
 
-	panic(router.Run(":8081"))
+	return router
 }

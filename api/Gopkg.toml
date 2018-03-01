@@ -2,7 +2,7 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 
 [[constraint]]
   name = "github.com/gin-gonic/gin"
-  version = "^1.2.0"
+  branch = "master"
 
 [[constraint]]
   branch = "master"
@@ -10,8 +10,16 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 
 [[constraint]]
   name = "github.com/jinzhu/gorm"
-  version = "^1.0"
+  version = "~1.9"
 
 [[constraint]]
   name = "github.com/gin-gonic/contrib"
   branch = "master"
+
+[[constraint]]
+  name = "gopkg.in/alecthomas/kingpin.v2"
+  version = "~2.2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/juju/errors"
