@@ -23,3 +23,8 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[constraint]]
   branch = "master"
   name = "github.com/juju/errors"
+
+[[override]]
+  name = "github.com/satori/go.uuid"
+  branch = "master"
+

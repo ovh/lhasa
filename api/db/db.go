@@ -8,12 +8,36 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // This is required by GORM to enable postgresql support
 	_ "github.com/jinzhu/gorm/dialects/sqlite"   // This is required by GORM to enable sqlite support
+
+	dbconfig "github.com/ovh/lhasa/api/dbconfig"
+)
+
+const (
+	defaultTimeout = 5
+	maxOpenConns   = 10
+	maxIdleConns   = 3
+	// DBSecretAlias db alias
+	DBSecretAlias = "appcatalog-db"
 )
 
 var db = dbconnect()
 
 func dbconnect() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./test.db")
+	// Init vault
+	connConfigStr, err := autovault.Secrets().Alias(DBSecretAlias)
+	if err != nil {
+		panic(err)
+	}
+	connConfig, err := dbconfig.FromJSON(connConfigStr)
+	if err != nil {
+		panic(err)
+	}
+	connStr, err := connConfig.GetRW()
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := gorm.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}

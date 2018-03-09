@@ -19,7 +19,7 @@ type ApplicationRepository struct {
 // NewApplicationVersionAwareRepository creates a version aware application repository
 func NewApplicationVersionAwareRepository(db *gorm.DB) *ApplicationRepository {
 	repository := NewApplicationRepository(
-		db.Group("name, domain").Having("max(id) = id"),
+		db.Group("id, name, domain").Having("max(id) = id"),
 	)
 	repository.countDB = db.Group("name, domain")
 	return repository

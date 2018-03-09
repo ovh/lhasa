@@ -1,0 +1,6 @@
+[
+    {
+        "alias": "appcatalog-db",
+        "value": "{\"writers\":[{\"host\":\"mypg\",\"port\":5432}],\"database\":\"mypg\",\"user\":\"postgres\",\"password\":\"postgres\",\"type\":\"postgresql\"}"
+    }
+]
