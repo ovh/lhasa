@@ -7,7 +7,7 @@ package db
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // This is required by GORM to enable postgresql support
-	_ "github.com/jinzhu/gorm/dialects/sqlite"   // This is required by GORM to enable sqlite support
+	"github.com/sirupsen/logrus"
 
 	dbconfig "github.com/ovh/lhasa/api/dbconfig"
 )
@@ -16,39 +16,41 @@ const (
 	defaultTimeout = 5
 	maxOpenConns   = 10
 	maxIdleConns   = 3
-	// DBSecretAlias db alias
-	DBSecretAlias = "appcatalog-db"
 )
 
-var db = dbconnect()
+var db *gorm.DB
 
-func dbconnect() *gorm.DB {
+func connectFromVault(log *logrus.Logger, vaultAlias string) *gorm.DB {
 	// Init vault
-	connConfigStr, err := autovault.Secrets().Alias(DBSecretAlias)
+	connConfigStr, err := autovault.Secrets().Alias(vaultAlias)
 	if err != nil {
-		panic(err)
+		log.WithError(err).Fatalf("cannot read alias %s from vault", vaultAlias)
 	}
-	connConfig, err := dbconfig.FromJSON(connConfigStr)
+	connConfig, err := fromJSON(connConfigStr)
 	if err != nil {
-		panic(err)
+		log.WithError(err).Fatalf("cannot read JSON DBConfig from vault secret %s", vaultAlias)
 	}
 	connStr, err := connConfig.GetRW()
 	if err != nil {
-		panic(err)
+		log.WithError(err).Fatalf("cannot get a RW database from vault secret %s", vaultAlias)
 	}
 
+	return NewFromGormString(connStr, log, vaultAlias)
+}
+
+// NewFromGormString creates a gorm db handler from a connection string
+func NewFromGormString(connStr string, log *logrus.Logger, vaultAlias string) *gorm.DB {
 	db, err := gorm.Open("postgres", connStr)
 	if err != nil {
-		panic(err)
+		log.WithError(err).Fatalf("cannot open database from vault secret %s with gorm", vaultAlias)
 	}
-	// Close the database after usage
-
 	return db
 }
 
-// DB provides the database handle to its callers
-func DB() *gorm.DB {
+// NewFromVault provides the database handle to its callers
+func NewFromVault(log *logrus.Logger, logMode bool, vaultAlias string) *gorm.DB {
+	db = connectFromVault(log, vaultAlias)
+	db.LogMode(logMode)
+	db.SetLogger(gorm.Logger{LogWriter: log})
 	return db
-	// FIXME: Depending on the database keepalive config, we may
-	// need Implement reconnection in case of connection loss
 }

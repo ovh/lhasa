@@ -4,7 +4,7 @@ testcases:
   steps:
     - type: http
       method: GET
-      url: "{{.APP_HOST}}/unsecured/ping"
+      url: "{{.APP_HOST}}/unsecured/mon"
       assertions:
       - result.statuscode ShouldEqual 200
       - result.body ShouldEqual '"OK"'

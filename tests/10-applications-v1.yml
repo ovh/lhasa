@@ -1,0 +1,142 @@
+name: Applications Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v1'
+  appsroute: '{{.baseroute}}/applications'
+testcases:
+- name: Reset the Database
+  steps:
+    - type: http
+      method: DELETE
+      url: '{{.APP_HOST}}/api/v1/applications'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+
+- name: Add an Application
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/1"
+      body: '{"domain": "agora", "name":"api", "version":"1", "manifest":{"description":"Sample app"}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+
+- name: Update an Application
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/1"
+      body: '{"domain": "agora", "name":"api", "version":"1", "manifest":{"description":"Sample app"}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+
+- name: Get an Application
+  steps:
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/1"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.name ShouldEqual api
+      - result.bodyjson.domain ShouldEqual agora
+      - result.bodyjson.version ShouldEqual 1
+
+
+- name: List Applications
+  steps:
+    - type: http
+      method: GET
+      url: "{{.appsroute}}"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 206
+      - result.bodyjson.pagemetadata.totalelements ShouldEqual 1
+      - result.bodyjson.pagemetadata.totalpages ShouldEqual 1
+      - result.bodyjson.pagemetadata.number ShouldEqual 0
+      - result.bodyjson.content.content0.name ShouldEqual api
+      - result.bodyjson.content.content0.domain ShouldEqual agora
+
+- name: Delete an Application
+  steps:
+    - type: http
+      method: DELETE
+      url: "{{.appsroute}}/agora/api/1"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+
+- name: List Applications
+  steps:
+    - type: http
+      method: GET
+      url: "{{.appsroute}}"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 206
+      - result.bodyjson.content.__len__ ShouldEqual 0
+
+- name: Add an Application
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/1"
+      body: |
+        {
+          "domain": "agora",
+          "name": "api",
+          "version": "1",
+          "manifest": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae nisl. Etiam mollis viverra justo, convallis pellentesque mauris vestibulum ac."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+
+- name: Add an Application2
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/cds/cds/1"
+      body: |
+        {
+          "domain": "cds",
+          "name": "cds",
+          "version": "1",
+          "manifest": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+      
+- name: Add an Application3
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/batch_mailer/batch_mailer/1"
+      body: |
+        {
+          "domain": "batch_mailer",
+          "name": "batch_mailer",
+          "version": "1",
+          "manifest": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+
+- name: Delete a non existent application
+  steps:
+    - type: http
+      method: DELETE
+      url: "{{.appsroute}}/batch_mailer/batch_mailer/2"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 404

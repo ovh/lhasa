@@ -7,26 +7,26 @@ import (
 	"strings"
 )
 
-// DatabaseInstance host and port
-type DatabaseInstance struct {
+// databaseInstance host and port
+type databaseInstance struct {
 	Port int    `json:"port"`
 	Host string `json:"host"`
 	Ssl  string `json:"sslmode"`
 }
 
-// DatabaseCredentials credentials
-type DatabaseCredentials struct {
-	Readers  []DatabaseInstance `json:"readers"`
-	Writers  []DatabaseInstance `json:"writers"`
+// databaseCredentials credentials
+type databaseCredentials struct {
+	Readers  []databaseInstance `json:"readers"`
+	Writers  []databaseInstance `json:"writers"`
 	Database string             `json:"database"`
 	Password string             `json:"password"`
 	User     string             `json:"user"`
 	Type     string             `json:"type"`
 }
 
-// FromJSON unmarshall creds
-func FromJSON(creds string) (*DatabaseCredentials, error) {
-	dc := &DatabaseCredentials{}
+// fromJSON unmarshall creds
+func fromJSON(creds string) (*databaseCredentials, error) {
+	dc := &databaseCredentials{}
 	err := json.Unmarshal([]byte(creds), &dc)
 	if err != nil {
 		return nil, ErrUnmarshal
@@ -52,16 +52,16 @@ var (
 )
 
 // GetRW get a read/write database
-func (dc *DatabaseCredentials) GetRW() (string, error) {
+func (dc *databaseCredentials) GetRW() (string, error) {
 	return dc.getConnStr(dc.Writers)
 }
 
 // GetRO get a read only database
-func (dc *DatabaseCredentials) GetRO() (string, error) {
+func (dc *databaseCredentials) GetRO() (string, error) {
 	return dc.getConnStr(dc.Readers)
 }
 
-func (dc *DatabaseCredentials) getConnStr(instances []DatabaseInstance) (string, error) {
+func (dc *databaseCredentials) getConnStr(instances []databaseInstance) (string, error) {
 	dbType, err := dc.getType()
 	if err != nil {
 		return "", err
@@ -73,7 +73,7 @@ func (dc *DatabaseCredentials) getConnStr(instances []DatabaseInstance) (string,
 	return buildConnStr(dbType, dc, i), nil
 }
 
-func (dc *DatabaseCredentials) getType() (Type, error) {
+func (dc *databaseCredentials) getType() (Type, error) {
 	switch strings.ToLower(dc.Type) {
 	case "postgresql":
 		return PostgreSQL, nil
@@ -81,7 +81,7 @@ func (dc *DatabaseCredentials) getType() (Type, error) {
 	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
 }
 
-func (dc *DatabaseCredentials) getSslDefaultMode(value string) (string, error) {
+func (dc *databaseCredentials) getSslDefaultMode(value string) (string, error) {
 	if len(value) > 0 {
 		return value, nil
 	}
@@ -92,14 +92,14 @@ func (dc *DatabaseCredentials) getSslDefaultMode(value string) (string, error) {
 	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
 }
 
-func getRandom(instances []DatabaseInstance) (*DatabaseInstance, error) {
+func getRandom(instances []databaseInstance) (*databaseInstance, error) {
 	if len(instances) == 0 {
 		return nil, ErrNoInstanceFound
 	}
 	return &instances[0], nil // TODO rnd
 }
 
-func buildConnStr(fmtStr Type, dc *DatabaseCredentials, i *DatabaseInstance) string {
+func buildConnStr(fmtStr Type, dc *databaseCredentials, i *databaseInstance) string {
 	// build sslmode with default value according do bdd type
 	var sslmode, _ = dc.getSslDefaultMode(i.Ssl)
 	return fmt.Sprintf(string(fmtStr), dc.User, dc.Password, i.Host, i.Port, dc.Database, sslmode)

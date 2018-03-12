@@ -41,26 +41,6 @@ test-coverage: $(GO_COV_MERGE) $(TARGET_DIR)
 	@$(GO_COV_MERGE) ./**/*.coverprofile > $(TARGET_DIR)/cover.out
 	@go tool cover -html=$(TARGET_DIR)/cover.out -o=$(TARGET_DIR)/cover.html
 
-integration-test: server
-	ls -lrt ${VAULT_FILE}
-	{ VAULT_FILE=${VAULT_FILE_DIST} ./${OUT} --auto-migrate ${DEBUG} & }; \
-	pid=$$!; \
-	sleep 3; \
-	APP_HOST=http://localhost:8081 venom run --output-dir=$(TARGET_DIR) tests/; \
-	r=$$?; \
-	kill $$pid; \
-	exit $$r
-
-integration-test-local: server
-	ls -lrt ${VAULT_FILE}
-	{ VAULT_FILE=${VAULT_FILE_LOCAL} ./${OUT} --auto-migrate ${DEBUG} & }; \
-	pid=$$!; \
-	sleep 3; \
-	APP_HOST=http://localhost:8081 venom run --output-dir=$(TARGET_DIR) tests/; \
-	r=$$?; \
-	kill $$pid; \
-	exit $$r
-
 vet: install
 	@go vet ${PKG_LIST}
 

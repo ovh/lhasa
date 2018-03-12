@@ -1,6 +1,0 @@
-[
-    {
-        "alias": "appcatalog-db",
-        "value": "{\"writers\":[{\"host\":\"mypg\",\"port\":5432,\"sslmode\":\"require\"}],\"database\":\"mypg\",\"user\":\"postgres\",\"password\":\"postgres\",\"type\":\"postgresql\"}"
-    }
-]

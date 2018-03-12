@@ -10,6 +10,7 @@ This project is currently at very early stage and under active development. It i
 
 * Rayene Ben Rayana <rayene.ben-rayana@corp.ovh.com>
 * Fabien Meurillon <fabien.meurillon@corp.ovh.com>
+* Yannick Roffin <yannick.roffin@corp.ovh.com>
 
 ## How to build
 

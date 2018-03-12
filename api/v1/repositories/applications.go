@@ -12,24 +12,13 @@ const (
 
 // ApplicationRepository is a repository manager for applications
 type ApplicationRepository struct {
-	db      *gorm.DB
-	countDB *gorm.DB
-}
-
-// NewApplicationVersionAwareRepository creates a version aware application repository
-func NewApplicationVersionAwareRepository(db *gorm.DB) *ApplicationRepository {
-	repository := NewApplicationRepository(
-		db.Group("id, name, domain").Having("max(id) = id"),
-	)
-	repository.countDB = db.Group("name, domain")
-	return repository
+	db *gorm.DB
 }
 
 // NewApplicationRepository creates an application repository
 func NewApplicationRepository(db *gorm.DB) *ApplicationRepository {
 	return &ApplicationRepository{
-		db:      db,
-		countDB: db,
+		db: db,
 	}
 }
 
@@ -38,10 +27,7 @@ func (repo *ApplicationRepository) Migrate() error {
 	if err := repo.db.AutoMigrate(models.Application{}).Error; err != nil {
 		return err
 	}
-	if err := repo.db.AutoMigrate(models.PersonInfo{}).Error; err != nil {
-		return err
-	}
-	return repo.db.AutoMigrate(models.DependencyInfo{}).Error
+	return repo.db.AutoMigrate(models.Dependency{}).Error
 }
 
 // FindAll returns all entities of the repository type
@@ -68,7 +54,7 @@ func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, cr
 	page.Content = applications
 
 	count := 0
-	if err := repo.countDB.Model(&models.Application{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := repo.db.Model(&models.Application{}).Where(criterias).Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count
@@ -100,10 +86,8 @@ func getIndexedField(field string, application models.Application) (string, erro
 	case "profile":
 	case "domain":
 		return application.Domain, nil
-	case "type":
-		return application.Type, nil
 	}
-	return "", repositories.NewUnsupportedIndexError(field, "version", "domain", "type")
+	return "", repositories.NewUnsupportedIndexError(field, "version", "domain")
 }
 
 // Save persists an application to the database
@@ -113,14 +97,9 @@ func (repo *ApplicationRepository) Save(application interface{}) error {
 		return err
 	}
 
-	oldapp, err := repo.findOneByUnscoped(map[string]interface{}{"domain": app.Domain, "name": app.Name, "version": app.Version})
-	if err != nil && !gorm.IsRecordNotFoundError(err) {
-		return err
-	}
-	if gorm.IsRecordNotFoundError(err) {
+	if app.ID == 0 {
 		return repo.db.Create(app).Error
 	}
-	app.ID = oldapp.ID
 	return repo.db.Unscoped().Save(app).Error
 }
 
@@ -148,10 +127,13 @@ func (repo *ApplicationRepository) FindByID(id interface{}) (interface{}, error)
 	return app, nil
 }
 
-// findOneByUnscoped gives the details of a particular application, even if soft deleted
-func (repo *ApplicationRepository) findOneByUnscoped(criterias map[string]interface{}) (models.Application, error) {
+// FindOneByUnscoped gives the details of a particular application, even if soft deleted
+func (repo *ApplicationRepository) FindOneByUnscoped(criterias map[string]interface{}) (models.Application, error) {
 	app := models.Application{}
 	err := repo.db.Unscoped().Where(criterias).First(&app).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return app, repositories.NewEntityDoesNotExistError(app, criterias)
+	}
 	return app, err
 }
 

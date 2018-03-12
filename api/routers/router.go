@@ -8,8 +8,8 @@ import (
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
 	"github.com/loopfz/gadgeto/tonic/utils/swag"
+	"github.com/sirupsen/logrus"
 	"github.com/ovh/lhasa/api/handlers"
-	"github.com/ovh/lhasa/api/v0"
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/repositories"
 )
@@ -20,8 +20,9 @@ func redirect(c *gin.Context) {
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(applicationRepository, applicationVersionRepository *repositories.ApplicationRepository, version string) *gin.Engine {
+func NewRouter(applicationRepository *repositories.ApplicationRepository, version string, debugMode bool, log *logrus.Logger) *gin.Engine {
 	router := gin.Default()
+	configureGin(log, debugMode)
 
 	tonic.SetErrorHook(handlers.RestErrorHook(jujerr.ErrHook))
 	// redirect root routes to angular assets
@@ -30,17 +31,27 @@ func NewRouter(applicationRepository, applicationVersionRepository *repositories
 	// redirect unknown routes to angular
 	router.NoRoute(redirect)
 
-	v0.Register(router.Group("/api/v0"))
-	v1.Register(router.Group("/api/v1"), applicationRepository, applicationVersionRepository)
+	v1.Register(router.Group("/api/v1"), applicationRepository)
 
 	// unsecured group does not check incoming signatures
 	unsecured := router.Group("/unsecured")
 	// health check route
-	unsecured.GET("/ping", tonic.Handler(handlers.PingHandler, http.StatusOK))
+	unsecured.GET("/mon", tonic.Handler(handlers.PingHandler, http.StatusOK))
 	// API version
 	unsecured.GET("/version", tonic.Handler(handlers.VersionHandler(version), http.StatusOK))
 	// auto-generated swagger documentation
 	unsecured.GET("/swagger.json", swag.Swagger(router, ""))
 
 	return router
+}
+
+func configureGin(log *logrus.Logger, debugMode bool) {
+	if log != nil {
+		gin.DefaultWriter = log.Writer()
+	}
+	ginMode := gin.ReleaseMode
+	if debugMode {
+		ginMode = gin.DebugMode
+	}
+	gin.SetMode(ginMode)
 }

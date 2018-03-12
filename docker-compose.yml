@@ -1,0 +1,8 @@
+version: "3"
+services:
+  db:
+    image: postgres:9.4
+    environment:
+      POSTGRES_PASSWORD: appcatalog
+    ports:
+      - ${PORT}32:5432

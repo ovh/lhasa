@@ -1,11 +1,23 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/ovh/lhasa/api/repositories"
 )
+
+type restErrorCreated string
+
+// Error implements error interface
+func (err restErrorCreated) Error() string {
+	return string(err)
+}
+
+// RestErrorCreated is raised when no error occurs but a resource has been created (tonic single-status code workaround)
+var RestErrorCreated = restErrorCreated("created")
 
 // RestFindByPage returns a filtered and paginated resource list
 func RestFindByPage(repository repositories.PageableRepository) func(c *gin.Context) (*repositories.PagedResources, error) {
@@ -69,6 +81,13 @@ func RestRemoveOneBy(repository repositories.Repository) func(*gin.Context) erro
 	}
 }
 
+// RestRemoveAll removes a whole collection
+func RestRemoveAll(repository repositories.TruncatableRepository) func(*gin.Context) error {
+	return func(c *gin.Context) error {
+		return repository.Truncate()
+	}
+}
+
 // RestCreate replace or create a resource
 func RestCreate(repository repositories.Repository, resource interface{}) func(*gin.Context) error {
 	return func(c *gin.Context) error {
@@ -83,6 +102,8 @@ func RestCreate(repository repositories.Repository, resource interface{}) func(*
 func RestErrorHook(tonicErrorHook tonic.ErrorHook) tonic.ErrorHook {
 	return func(c *gin.Context, err error) (int, interface{}) {
 		switch inner := err.(type) {
+		case restErrorCreated:
+			return http.StatusCreated, nil
 		case repositories.EntityDoesNotExistError:
 			err = errors.NewNotFound(inner, inner.Error())
 		case repositories.UnsupportedIndexError:

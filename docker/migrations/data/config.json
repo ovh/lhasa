@@ -1,0 +1,23 @@
+{
+  "database": "postgres",
+  "environments": [
+    {
+      "dialect": "postgres",
+      "datasource": "postgresql://${USER}:${PASS}@db:5432/${DBNAME}?sslmode=disable",
+      "credsFile": "/data/admin.cfg",
+      "table": "ovh_sql_schema_migrations_admin",
+      "dir": "/data/migrations/admin",
+      "schema": "public",
+      "admin": true
+    },
+    {
+      "dialect": "postgres",
+      "datasource": "postgresql://${USER}:${PASS}@db:5432/${DBNAME}?sslmode=disable",
+      "credsFile": "/data/user.cfg",
+      "table": "ovh_sql_schema_migrations",
+      "dir": "/data/migrations",
+      "schema": "public",
+      "admin": true
+    }
+  ]
+}

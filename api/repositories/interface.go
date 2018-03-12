@@ -154,3 +154,9 @@ func NewUnsupportedIndexError(field string, supported ...string) error {
 		Supported: supported,
 	}
 }
+
+// IsEntityDoesNotExistError returns true if err is an EntityDoesNotExistError
+func IsEntityDoesNotExistError(err error) bool {
+	_, ok := err.(EntityDoesNotExistError)
+	return ok
+}
