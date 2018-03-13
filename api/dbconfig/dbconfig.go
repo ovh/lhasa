@@ -11,6 +11,7 @@ import (
 type DatabaseInstance struct {
 	Port int    `json:"port"`
 	Host string `json:"host"`
+	Ssl  string `json:"sslmode"`
 }
 
 // DatabaseCredentials credentials
@@ -38,7 +39,10 @@ type Type string
 
 var (
 	// PostgreSQL connect string
-	PostgreSQL Type = "user=%s password=%s host=%s port=%d DB.name=%s sslmode=require"
+	PostgreSQL Type = "user=%s password=%s host=%s port=%d DB.name=%s sslmode=%s"
+
+	// PostgreSQLDefaultSslMode default ssl connect string
+	PostgreSQLDefaultSslMode = "require"
 
 	// ErrUnmarshal error
 	ErrUnmarshal = errors.New("Unmarshaling error")
@@ -77,6 +81,17 @@ func (dc *DatabaseCredentials) getType() (Type, error) {
 	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
 }
 
+func (dc *DatabaseCredentials) getSslDefaultMode(value string) (string, error) {
+	if len(value) > 0 {
+		return value, nil
+	}
+	switch strings.ToLower(dc.Type) {
+	case "postgresql":
+		return PostgreSQLDefaultSslMode, nil
+	}
+	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
+}
+
 func getRandom(instances []DatabaseInstance) (*DatabaseInstance, error) {
 	if len(instances) == 0 {
 		return nil, ErrNoInstanceFound
@@ -85,5 +100,7 @@ func getRandom(instances []DatabaseInstance) (*DatabaseInstance, error) {
 }
 
 func buildConnStr(fmtStr Type, dc *DatabaseCredentials, i *DatabaseInstance) string {
-	return fmt.Sprintf(string(fmtStr), dc.User, dc.Password, i.Host, i.Port, dc.Database)
+	// build sslmode with default value according do bdd type
+	var sslmode, _ = dc.getSslDefaultMode(i.Ssl)
+	return fmt.Sprintf(string(fmtStr), dc.User, dc.Password, i.Host, i.Port, dc.Database, sslmode)
 }
