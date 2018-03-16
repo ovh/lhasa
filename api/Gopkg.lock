@@ -20,10 +20,10 @@
   version = "v1.6.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/fsamin/go-dump"
   packages = ["."]
-  revision = "7ae1b0fe42ebe02c8f87574289bad257adcc90c0"
-  version = "1.0.3"
+  revision = "734a5d211d37df9bdd6f6e4981258c0ed34d16ad"
 
 [[projects]]
   branch = "master"
@@ -42,6 +42,12 @@
   name = "github.com/gin-gonic/gin"
   packages = [".","binding","json","render"]
   revision = "5d3f30cfc81f9109850fa9043a19783cbbde68a5"
+
+[[projects]]
+  name = "github.com/gobuffalo/packr"
+  packages = ["."]
+  revision = "3b045e91f1107684685627303665f7e02b1be016"
+  version = "v1.10.6"
 
 [[projects]]
   branch = "master"
@@ -153,6 +159,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/rubenv/sql-migrate"
+  packages = [".","sqlparse"]
+  revision = "081fe17d19ff4e2dd9f5a0c1158e6bcf74da6906"
+
+[[projects]]
+  branch = "master"
   name = "github.com/satori/go.uuid"
   packages = ["."]
   revision = "36e9d2ebbde5e3f13ab2e25625fd453271d6522e"
@@ -218,6 +230,12 @@
   version = "v8.18.2"
 
 [[projects]]
+  name = "gopkg.in/gorp.v1"
+  packages = ["."]
+  revision = "c87af80f3cc5036b55b83d77171e156791085e2e"
+  version = "v1.7.1"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
@@ -226,6 +244,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "96e6b3dada9e7275621e93be3658b3b9c1949887e217ccb0785c8d176266426d"
+  inputs-digest = "9c5ec399e7c9668391ef582621d8a45c389c345a82d381d6c09a1e8a4571cf2e"
   solver-name = "gps-cdcl"
   solver-version = 1

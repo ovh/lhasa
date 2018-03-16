@@ -3,6 +3,7 @@ PKG := github.com/ovh/lhasa/api
 VERSION := $(shell git describe --always --tags --dirty)
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/)
+PACKR = ${GOPATH}/bin/packr
 GO_LINT = ${GOPATH}/bin/golint
 GO_COV_MERGE = ${GOPATH}/bin/gocovmerge
 GO_GOVERALLS = ${GOPATH}/bin/goveralls
@@ -28,10 +29,15 @@ $(GO_GO2XUNIT):
 $(GO_DEP):
 	go get -u github.com/golang/dep/cmd/dep
 
-install: $(GO_DEP)
+$(PACKR):
+	go get -u github.com/gobuffalo/packr/packr
+
+install: $(GO_DEP) $(PACKR)
 	dep ensure
+	packr
 
 server: vet lint install
+	packr
 	go build -i -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}/cmd/appcatalog
 
 test: install
@@ -56,6 +62,7 @@ run: server
 	./${OUT}
 
 clean:
+	@packr clean
 	-@rm ${OUT} ${OUT}-v*
 
 .PHONY: run server static vet lint ensure integration-test

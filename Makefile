@@ -42,12 +42,13 @@ clean:
 integration-test: $(COMPOSE_BIN) $(VENOM_BIN) $(API_BIN)
 	$(COMPOSE_BIN) up -d
 	sleep 10;
-	{ ./${API_BIN} ${DEBUG} & }; \
+	{ ./${API_BIN} ${DEBUG} --auto-migrate & }; \
 	pid=$$!; \
 	sleep 5; \
 	APP_HOST=http://localhost:8081 $(VENOM_BIN) run --strict --output-dir=$(TARGET_DIR) tests/; \
 	r=$$?; \
 	kill $$pid; \
+	./${API_BIN} ${DEBUG} migrate down; \
 	$(COMPOSE_BIN) down; \
 	exit $$r
 

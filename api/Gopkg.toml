@@ -24,7 +24,14 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
   branch = "master"
   name = "github.com/juju/errors"
 
+[[constraint]]
+  branch = "master"
+  name = "github.com/rubenv/sql-migrate"
+
+[[constraint]]
+  name = "github.com/gobuffalo/packr"
+  version = "~1.10"
+
 [[override]]
   name = "github.com/satori/go.uuid"
   branch = "master"
-

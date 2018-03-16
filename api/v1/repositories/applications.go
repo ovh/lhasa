@@ -22,14 +22,6 @@ func NewApplicationRepository(db *gorm.DB) *ApplicationRepository {
 	}
 }
 
-// Migrate run automated gorm migrations
-func (repo *ApplicationRepository) Migrate() error {
-	if err := repo.db.AutoMigrate(models.Application{}).Error; err != nil {
-		return err
-	}
-	return repo.db.AutoMigrate(models.Dependency{}).Error
-}
-
 // FindAll returns all entities of the repository type
 func (repo *ApplicationRepository) FindAll() (interface{}, error) {
 	return repo.FindBy(map[string]interface{}{})

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/ovh/lhasa/api/db"
@@ -17,9 +20,13 @@ var (
 )
 
 const (
-	cmdCodeVersion = "version"
-	cmdCodeMigrate = "migrate"
-	cmdCodeStart   = "start"
+	cmdCodeVersion     = "version"
+	cmdCodeMigrate     = "migrate"
+	cmdCodeMigrateUp   = "up"
+	cmdCodeMigrateDown = "down"
+	cmdCodeStart       = "start"
+
+	dbRetryDuration = 5
 )
 
 var (
@@ -29,11 +36,13 @@ var (
 	flagDebug          = application.Flag("debug", "Enables debug mode (routing and sql logging).").Envar("APPCATALOG_DEBUG_MODE").Bool()
 	flagQuiet          = application.Flag("quiet", "Enables quiet mode.").Short('q').Envar("APPCATALOG_QUIET_MODE").Bool()
 	flagJSONOutput     = application.Flag("json", "Enables JSON output.").Envar("APPCATALOG_JSON_OUTPUT").Bool()
-	flagDBVaultAlias   = cmdStart.Flag("db-vault-alias", "Set vault alias to use").Default("appcatalog-db").Envar("APPCATALOG_DB_VAULT_ALIAS").String()
+	flagDBVaultAlias   = application.Flag("db-vault-alias", "Set vault alias to use").Default("appcatalog-db").Envar("APPCATALOG_DB_VAULT_ALIAS").String()
 
 	cmdVersion = application.Command(cmdCodeVersion, "Shows version number.")
 
-	cmdMigrate = application.Command(cmdCodeMigrate, "Only run migrations and return (not for production use).")
+	cmdMigrate     = application.Command(cmdCodeMigrate, "Only run migrations and return (not for production use).")
+	cmdMigrateUp   = cmdMigrate.Command(cmdCodeMigrateUp, "Runs migrations upward (default).").Default()
+	cmdMigrateDown = cmdMigrate.Command(cmdCodeMigrateDown, "Runs migrations downward.")
 
 	cmdStart      = application.Command(cmdCodeStart, "Starts application.").Default()
 	flagStartPort = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
@@ -48,23 +57,43 @@ func main() {
 		fmt.Println(version)
 		return
 	case cmdCodeMigrate:
-		db := db.NewFromVault(log, *flagDebug, *flagDBVaultAlias)
-		applicationRepository := repositories.NewApplicationRepository(db)
-		runMigrations(applicationRepository, log)
+	case fmt.Sprintf("%s %s", cmdCodeMigrate, cmdCodeMigrateUp):
+		db := waitForDB(log)
+		runMigrationsUp(db.DB(), log)
+		return
+	case fmt.Sprintf("%s %s", cmdCodeMigrate, cmdCodeMigrateDown):
+		db := waitForDB(log)
+		runMigrationsDown(db.DB(), log)
 		return
 	case cmdCodeStart:
-		db := db.NewFromVault(log, *flagDebug, *flagDBVaultAlias)
+		db := waitForDB(log)
 		applicationRepository := repositories.NewApplicationRepository(db)
 		if *flagAutoMigrations {
-			runMigrations(applicationRepository, log)
+			runMigrationsUp(db.DB(), log)
 		}
 		router := routers.NewRouter(applicationRepository, version, *flagDebug, log)
 		panic(router.Run(fmt.Sprintf(":%d", *flagStartPort)))
 	}
 }
 
-func runMigrations(applicationRepository *repositories.ApplicationRepository, log *logrus.Logger) {
-	if err := applicationRepository.Migrate(); err != nil {
+func waitForDB(log *logrus.Logger) *gorm.DB {
+	dbHandle, err := db.NewFromVault(*flagDBVaultAlias, *flagDebug, log)
+	for err != nil {
+		log.WithError(err).Errorf("cannot get DB handle, retrying in %d seconds", dbRetryDuration)
+		time.Sleep(dbRetryDuration * time.Second)
+		dbHandle, err = db.NewFromVault(*flagDBVaultAlias, *flagDebug, log)
+	}
+	return dbHandle
+}
+
+func runMigrationsUp(datasource *sql.DB, log *logrus.Logger) {
+	if err := db.MigrateUp(datasource, log); err != nil {
+		log.WithError(err).Fatalf("cannot run migrations")
+	}
+}
+
+func runMigrationsDown(datasource *sql.DB, log *logrus.Logger) {
+	if err := db.MigrateDown(datasource, log); err != nil {
 		log.WithError(err).Fatalf("cannot run migrations")
 	}
 }

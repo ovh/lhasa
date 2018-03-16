@@ -7,50 +7,44 @@ package db
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // This is required by GORM to enable postgresql support
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	dbconfig "github.com/ovh/lhasa/api/dbconfig"
 )
 
 const (
-	defaultTimeout = 5
-	maxOpenConns   = 10
-	maxIdleConns   = 3
+	maxOpenConns = 10
+	maxIdleConns = 3
 )
 
-var db *gorm.DB
-
-func connectFromVault(log *logrus.Logger, vaultAlias string) *gorm.DB {
+// NewFromVault provides the database handle to its callers
+func NewFromVault(vaultAlias string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
 	// Init vault
 	connConfigStr, err := autovault.Secrets().Alias(vaultAlias)
 	if err != nil {
-		log.WithError(err).Fatalf("cannot read alias %s from vault", vaultAlias)
+		return nil, errors.Wrapf(err, "cannot read alias %s from vault", vaultAlias)
 	}
 	connConfig, err := fromJSON(connConfigStr)
 	if err != nil {
-		log.WithError(err).Fatalf("cannot read JSON DBConfig from vault secret %s", vaultAlias)
+		return nil, errors.Wrapf(err, "cannot read JSON DBConfig from vault secret %s", vaultAlias)
 	}
 	connStr, err := connConfig.GetRW()
 	if err != nil {
-		log.WithError(err).Fatalf("cannot get a RW database from vault secret %s", vaultAlias)
+		return nil, errors.Wrapf(err, "cannot get a RW database from vault secret %s", vaultAlias)
 	}
-
-	return NewFromGormString(connStr, log, vaultAlias)
+	return NewFromGormString(connStr, logMode, log)
 }
 
 // NewFromGormString creates a gorm db handler from a connection string
-func NewFromGormString(connStr string, log *logrus.Logger, vaultAlias string) *gorm.DB {
+func NewFromGormString(connStr string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
 	db, err := gorm.Open("postgres", connStr)
 	if err != nil {
-		log.WithError(err).Fatalf("cannot open database from vault secret %s with gorm", vaultAlias)
+		return nil, err
 	}
-	return db
-}
-
-// NewFromVault provides the database handle to its callers
-func NewFromVault(log *logrus.Logger, logMode bool, vaultAlias string) *gorm.DB {
-	db = connectFromVault(log, vaultAlias)
+	db.DB().SetMaxIdleConns(maxIdleConns)
+	db.DB().SetMaxOpenConns(maxOpenConns)
 	db.LogMode(logMode)
 	db.SetLogger(gorm.Logger{LogWriter: log})
-	return db
+	return db, nil
 }
