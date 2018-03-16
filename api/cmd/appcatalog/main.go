@@ -72,7 +72,6 @@ func runMigrations(applicationRepository *repositories.ApplicationRepository, lo
 func configureLogger(isVerbose, isDebug, isQuiet, isJSON bool) *logrus.Logger {
 	log := logrus.New()
 	log.Level = logrus.WarnLevel
-	log.Out = os.Stderr
 	if isVerbose {
 		log.Level = logrus.InfoLevel
 	}

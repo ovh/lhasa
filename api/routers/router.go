@@ -21,7 +21,8 @@ func redirect(c *gin.Context) {
 
 //NewRouter creates a new and configured gin router
 func NewRouter(applicationRepository *repositories.ApplicationRepository, version string, debugMode bool, log *logrus.Logger) *gin.Engine {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(handlers.LoggingMiddleware(log), gin.Recovery())
 	configureGin(log, debugMode)
 
 	tonic.SetErrorHook(handlers.RestErrorHook(jujerr.ErrHook))
