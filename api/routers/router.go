@@ -32,10 +32,12 @@ func NewRouter(applicationRepository *repositories.ApplicationRepository, versio
 	// redirect unknown routes to angular
 	router.NoRoute(redirect)
 
-	v1.Register(router.Group("/api/v1"), applicationRepository)
+	api := router.Group("/api")
+
+	v1.Register(api.Group("/v1"), applicationRepository)
 
 	// unsecured group does not check incoming signatures
-	unsecured := router.Group("/unsecured")
+	unsecured := api.Group("/unsecured")
 	// health check route
 	unsecured.GET("/mon", tonic.Handler(handlers.PingHandler, http.StatusOK))
 	// API version

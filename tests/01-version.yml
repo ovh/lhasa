@@ -4,6 +4,6 @@ testcases:
   steps:
     - type: http
       method: GET
-      url: "{{.APP_HOST}}/unsecured/version"
+      url: "{{.APP_HOST}}/api/unsecured/version"
       assertions:
       - result.statuscode ShouldEqual 200
