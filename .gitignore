@@ -2,3 +2,6 @@ dist
 test.db
 **/*.png
 vault-file.json
+.vault-file.json
+**/gin-bin
+**/test_results.xml

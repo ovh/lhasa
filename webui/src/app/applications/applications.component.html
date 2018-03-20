@@ -11,7 +11,7 @@
     </div>
     <div class="mdl-card__supporting-text">
         <b>Description:</b> 
-        {{ (app.description.length>200)? (app.description | slice:0:200)+"...":(app.description) }}
+        {{ (app.manifest.description.length>200)? (app.manifest.description | slice:0:200)+"...":(app.manifest.description) }}
     </div>
     <div class="mdl-card__actions mdl-card--border">
       <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" routerLink="{{ app.id }}" >

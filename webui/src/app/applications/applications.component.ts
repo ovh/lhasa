@@ -20,6 +20,10 @@ export class ApplicationsComponent implements OnInit {
 
   getApplications(): void {
     this.applicationsService.listApplications()
-    .subscribe(data => this.applications = data['results']);
+    .subscribe(
+      (data) => {
+        this.applications = data['content']
+      }
+    );
   }
 }

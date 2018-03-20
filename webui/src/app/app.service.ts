@@ -26,9 +26,9 @@ class ApplicationListResponse{
 export class ApplicationsService {
   constructor(private http: HttpClient) { }
   listApplications(): Observable<ApplicationListResponse[]> {
-    return this.http.get<ApplicationListResponse[]>('api/v0/applications');
+    return this.http.get<ApplicationListResponse[]>('api/v1/applications');
   }
   getApplication(app_id): Observable<Application> {
-    return this.http.get<Application>('api/v0/applications/' + app_id);
+    return this.http.get<Application>('api/v1/applications/' + app_id);
   }
 }

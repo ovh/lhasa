@@ -1,7 +1,8 @@
+ARCH = $(shell uname | tr '[:upper:]' '[:lower:]')
 TARGET_DIR = ./dist
-VENOM_BIN = $(TARGET_DIR)/venom
 COMPOSE_BIN = $(TARGET_DIR)/docker-compose
 API_BIN = $(TARGET_DIR)/appcatalog
+VENOM_BIN = $(TARGET_DIR)/venom.$(ARCH)
 
 all: api webui
 
@@ -10,8 +11,8 @@ $(TARGET_DIR):
 	@mkdir -p $(TARGET_DIR)
 
 $(VENOM_BIN): $(TARGET_DIR)
-	$(info Installing venom...)
-	@curl -L -o $(VENOM_BIN) https://github.com/ovh/venom/releases/download/v0.17.0/venom.linux-amd64
+	$(info Installing venom... for $(ARCH))
+	curl -L -o $(VENOM_BIN) https://github.com/ovh/venom/releases/download/v0.17.0/venom.$(ARCH)-amd64
 	@chmod +x $(VENOM_BIN)
 
 $(COMPOSE_BIN): $(TARGET_DIR)
@@ -51,5 +52,8 @@ integration-test: $(COMPOSE_BIN) $(VENOM_BIN) $(API_BIN)
 	./${API_BIN} ${DEBUG} migrate down; \
 	$(COMPOSE_BIN) down; \
 	exit $$r
+
+sample-test: $(VENOM_BIN) $(API_BIN)
+	APP_HOST=http://localhost:8081 $(VENOM_BIN) run --strict --output-dir=$(TARGET_DIR) tests/
 
 .PHONY: all test run clean integration-test api webui
