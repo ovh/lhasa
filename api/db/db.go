@@ -5,6 +5,7 @@ package db
 // Note: This is not the best way to share this variable but
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -68,7 +69,7 @@ func (l dbLogWriter) Println(v ...interface{}) {
 	if len(v) == 5 {
 		file := strings.Split(strings.TrimSuffix(strings.TrimPrefix(v[0].(string), "\u001b[35m("), ")\u001b[0m"), ":")
 		durationStr := strings.TrimSuffix(strings.TrimPrefix(v[2].(string), " \u001b[36;1m["), "]\u001b[0m ")
-		rows := strings.TrimSuffix(strings.TrimPrefix(v[4].(string), " \n\u001b[36;31m["), " rows affected or returned ]\u001b[0m ")
+		rows, _ := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(v[4].(string), " \n\u001b[36;31m["), " rows affected or returned ]\u001b[0m "))
 		duration, _ := time.ParseDuration(durationStr)
 		line, _ := strconv.Atoi(file[1])
 		fields = logrus.Fields{
@@ -78,7 +79,14 @@ func (l dbLogWriter) Println(v ...interface{}) {
 			"full_message": v[3],
 			"rows":         rows,
 		}
-		message = "sql query: " + v[3].(string)[:int(math.Min(50, float64(len(v[3].(string)))))] + "..."
+		switch v[3].(type) {
+		case string:
+			message = fmt.Sprintf("sql query: %s...", v[3].(string)[:int(math.Min(50, float64(len(v[3].(string)))))])
+			l.log.WithFields(fields).Debug(message)
+		case error:
+			l.log.WithFields(fields).WithError(v[3].(error)).Error(message)
+		default:
+			l.log.WithFields(fields).Debug(message)
+		}
 	}
-	l.log.WithFields(fields).Debug(message)
 }

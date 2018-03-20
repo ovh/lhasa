@@ -50,6 +50,7 @@ func init() {
 	}
 }
 
+// NewLogger creates a configured logrus logger instance
 func NewLogger(isVerbose, isDebug, isQuiet, isJSON bool) *logrus.Logger {
 	log := logrus.New()
 	log.Level = logrus.WarnLevel
@@ -74,11 +75,12 @@ type gelfFormatter struct {
 // Format implements logrus formatter
 func (*gelfFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	host, _ := os.Hostname()
+	nanosecond := float64(entry.Time.Nanosecond()) / 1e9
 	gelfEntry := map[string]interface{}{
 		"version":       gelfVersion,
 		"short_message": entry.Message,
 		"level":         toSyslogLevel(entry.Level),
-		"timestamp":     entry.Time.Unix(),
+		"timestamp":     float64(entry.Time.Unix()) + nanosecond,
 		"host":          host,
 	}
 	for key, value := range entry.Data {

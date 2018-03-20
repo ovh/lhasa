@@ -32,8 +32,8 @@ CREATE INDEX idx_applications_tags
 
 CREATE TABLE "dependencies" (
   "id"        BIGSERIAL,
-  "owner_id"  BIGSERIAL,
-  "target_id" BIGSERIAL,
+  "owner_id"  BIGINT NOT NULL DEFAULT 0,
+  "target_id" BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY ("id"),
   FOREIGN KEY ("owner_id") REFERENCES "applications" ON DELETE CASCADE,
   FOREIGN KEY ("target_id") REFERENCES "applications" ON DELETE CASCADE

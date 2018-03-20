@@ -1,0 +1,67 @@
+name: Environments Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v1'
+  envsroute: '{{.baseroute}}/environments'
+testcases:
+- name: Reset the Database
+  steps:
+    - type: http
+      method: DELETE
+      url: '{{.envsroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+
+- name: EnvironmentLifecycle
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.envsroute}}/prodca"
+      body: '{"name": "Prod CA", "properties": {"role": "production", "region": "CA"}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.envsroute}}/prodca"
+      headers:
+      assertions:
+      - result.bodyjson.name ShouldEqual "Prod CA"
+      - result.bodyjson.properties.role ShouldEqual production
+      - result.bodyjson.properties.region ShouldEqual CA
+    - type: http
+      method: PUT
+      url: "{{.envsroute}}/prodca"
+      headers:
+      body: '{"name": "Prod CA", "properties": {"role": "production", "region": "CA", "owner": "me"}}'
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.envsroute}}/prodca"
+      headers:
+      assertions:
+      - result.bodyjson.name ShouldEqual "Prod CA"
+      - result.bodyjson.properties.role ShouldEqual production
+      - result.bodyjson.properties.region ShouldEqual CA
+      - result.bodyjson.properties.owner ShouldEqual me
+    - type: http
+      method: GET
+      url: "{{.envsroute}}"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 206
+      - result.bodyjson.pagemetadata.totalelements ShouldEqual 1
+      - result.bodyjson.pagemetadata.totalpages ShouldEqual 1
+      - result.bodyjson.pagemetadata.number ShouldEqual 0
+    - type: http
+      method: DELETE
+      url: "{{.envsroute}}/prodca"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+    - type: http
+      method: DELETE
+      url: "{{.envsroute}}/prodca"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 410

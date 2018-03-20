@@ -4,10 +4,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/alecthomas/template"
-  packages = [
-    ".",
-    "parse"
-  ]
+  packages = [".","parse"]
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
 
 [[projects]]
@@ -38,30 +35,25 @@
   branch = "master"
   name = "github.com/gin-gonic/contrib"
   packages = ["static"]
-  revision = "dccbb4a462e965297e21372a9ad3ea05e0df3e5f"
+  revision = "9b830a15f6abcf9e160f47ee01fc00691cc1981a"
 
 [[projects]]
   branch = "master"
   name = "github.com/gin-gonic/gin"
-  packages = [
-    ".",
-    "binding",
-    "json",
-    "render"
-  ]
-  revision = "5d3f30cfc81f9109850fa9043a19783cbbde68a5"
+  packages = [".","binding","json","render"]
+  revision = "6d913fc343cfac80d656db5be67a0ffb1323ba0d"
 
 [[projects]]
   name = "github.com/gobuffalo/packr"
   packages = ["."]
-  revision = "3b045e91f1107684685627303665f7e02b1be016"
-  version = "v1.10.6"
+  revision = "3402a167bccf1bdd5c93ca820be9f27bba46261e"
+  version = "v1.10.7"
 
 [[projects]]
   branch = "master"
   name = "github.com/golang/lint"
   packages = ["golint"]
-  revision = "837967239b74207656c3f550e9dc6a944866c490"
+  revision = "85993ffd0a6cd043291f3f63d45d656d97b165bd"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -72,25 +64,12 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [
-    ".",
-    "hcl/ast",
-    "hcl/parser",
-    "hcl/scanner",
-    "hcl/strconv",
-    "hcl/token",
-    "json/parser",
-    "json/scanner",
-    "json/token"
-  ]
-  revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
+  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
+  revision = "f40e974e75af4e271d97ce0fc917af5898ae7bda"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
-  packages = [
-    ".",
-    "dialects/postgres"
-  ]
+  packages = [".","dialects/postgres"]
   revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
   version = "v1.9.1"
 
@@ -103,8 +82,8 @@
 [[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
-  revision = "3353055b2a1a5ae1b6a8dfde887a524e7088f3a2"
-  version = "1.1.2"
+  revision = "ca39e5af3ece67bbcda3d0f4f56a8e24d9f2dad4"
+  version = "1.1.3"
 
 [[projects]]
   branch = "master"
@@ -115,25 +94,14 @@
 [[projects]]
   branch = "master"
   name = "github.com/lib/pq"
-  packages = [
-    ".",
-    "hstore",
-    "oid"
-  ]
-  revision = "88edab0803230a3898347e77b474f8c1820a1f20"
+  packages = [".","hstore","oid"]
+  revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
   branch = "master"
   name = "github.com/loopfz/gadgeto"
-  packages = [
-    "tonic",
-    "tonic/utils/bootstrap",
-    "tonic/utils/jujerr",
-    "tonic/utils/swag",
-    "tonic/utils/swag/doc",
-    "tonic/utils/swag/swagger"
-  ]
-  revision = "a6c0854d9fa4a991d4386e7448e81de934684328"
+  packages = ["tonic","tonic/utils/bootstrap","tonic/utils/jujerr","tonic/utils/swag","tonic/utils/swag/doc","tonic/utils/swag/swagger"]
+  revision = "1ed41876bc309f5ae4328fb2a0008f903473c7b5"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -187,15 +155,12 @@
   branch = "master"
   name = "github.com/pkg/errors"
   packages = ["."]
-  revision = "30136e27e2ac8d167177e8a583aa4c3fea5be833"
+  revision = "816c9085562cd7ee03e7f8188a1cfd942858cded"
 
 [[projects]]
   branch = "master"
   name = "github.com/rubenv/sql-migrate"
-  packages = [
-    ".",
-    "sqlparse"
-  ]
+  packages = [".","sqlparse"]
   revision = "081fe17d19ff4e2dd9f5a0c1158e6bcf74da6906"
 
 [[projects]]
@@ -207,16 +172,12 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "d682213848ed68c0a260ca37d6dd5ace8423f5ba"
-  version = "v1.0.4"
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
 
 [[projects]]
   name = "github.com/smartystreets/assertions"
-  packages = [
-    ".",
-    "internal/go-render/render",
-    "internal/oglematchers"
-  ]
+  packages = [".","internal/go-render/render","internal/oglematchers"]
   revision = "7678a5452ebea5b7090a6b163f844c133f523da2"
   version = "1.8.3"
 
@@ -230,33 +191,25 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "7effd64e1180aa386cd36da9ca55a1e9fc7cf7cb"
+  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/lint"
   packages = ["."]
-  revision = "837967239b74207656c3f550e9dc6a944866c490"
+  revision = "85993ffd0a6cd043291f3f63d45d656d97b165bd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
-  revision = "7dca6fe1f43775aa6d1334576870ff63f978f539"
+  packages = ["unix","windows"]
+  revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/tools"
-  packages = [
-    "go/ast/astutil",
-    "go/gcexportdata",
-    "go/gcimporter15",
-    "go/types/typeutil"
-  ]
-  revision = "059bec968c61383b574810040ba9410712de36c5"
+  packages = ["go/ast/astutil","go/gcexportdata","go/gcimporter15","go/types/typeutil"]
+  revision = "77106db15f689a60e7d4e085d967ac557b918fb2"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -285,12 +238,12 @@
 [[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
-  version = "v2.1.1"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "05a3c0f08902f29668819896aa0b8c6c4891b3e2699a9170e76f5e4df144497c"
+  inputs-digest = "102c949ef8a5f3b00108289d40f9f3929b95ff6d7977e2f6a9cafe9382bb7e53"
   solver-name = "gps-cdcl"
   solver-version = 1

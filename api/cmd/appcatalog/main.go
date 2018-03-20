@@ -12,7 +12,6 @@ import (
 	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/logger"
 	"github.com/ovh/lhasa/api/routers"
-	"github.com/ovh/lhasa/api/v1/repositories"
 )
 
 var (
@@ -45,8 +44,9 @@ var (
 	cmdMigrateUp   = cmdMigrate.Command(cmdCodeMigrateUp, "Runs migrations upward (default).").Default()
 	cmdMigrateDown = cmdMigrate.Command(cmdCodeMigrateDown, "Runs migrations downward.")
 
-	cmdStart      = application.Command(cmdCodeStart, "Starts application.").Default()
-	flagStartPort = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
+	cmdStart            = application.Command(cmdCodeStart, "Starts application.").Default()
+	flagStartPort       = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
+	flagHateoasBasePath = cmdStart.Flag("hateoas-base-path", "Base path to use for Hateoas links").Envar("APPCATALOG_HATEOAS_BASE_PATH").Default("/api").String()
 )
 
 func main() {
@@ -68,11 +68,10 @@ func main() {
 		return
 	case cmdCodeStart:
 		db := waitForDB(log)
-		applicationRepository := repositories.NewApplicationRepository(db)
 		if *flagAutoMigrations {
 			runMigrationsUp(db.DB(), log)
 		}
-		router := routers.NewRouter(applicationRepository, db.DB(), version, *flagDebug, log)
+		router := routers.NewRouter(db, version, *flagHateoasBasePath, *flagDebug, log)
 		panic(router.Run(fmt.Sprintf(":%d", *flagStartPort)))
 	}
 }

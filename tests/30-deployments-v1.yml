@@ -1,0 +1,96 @@
+name: Deployments Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v1'
+  depsroute: '{{.baseroute}}/deployments'
+  envsroute: '{{.baseroute}}/environments'
+  appsroute: '{{.baseroute}}/applications'
+testcases:
+- name: Reset the Database
+  steps:
+    - type: http
+      method: DELETE
+      url: '{{.depsroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+
+- name: DeploymentLifecycle
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/urba/appcatalog/1"
+      body: |
+        {
+          "domain": "urba",
+          "name": "appcatalog",
+          "version": "1",
+          "manifest": {
+            "description": "Great application to manage and plan your information system."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/urba/appcatalog/2"
+      body: |
+        {
+          "domain": "urba",
+          "name": "appcatalog",
+          "version": "2",
+          "manifest": {
+            "description": "Great application to manage and plan your information system."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: PUT
+      url: "{{.envsroute}}/depenv"
+      headers:
+      body: '{"name": "Deployment test env", "properties": {}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/1/deployments"
+      headers:
+      assertions:
+      - result.body ShouldEqual []
+    - type: http
+      method: POST
+      url: "{{.appsroute}}/urba/appcatalog/1/deploy/depenv"
+      headers:
+      body: '{"properties": {"git.commit": "41849c78a31cc2d65fa03d7ddd3b330e3e9ed2ec"}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/1/deployments"
+      headers:
+      assertions:
+      - result.bodyjson.bodyjson0 ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: POST
+      url: "{{.appsroute}}/urba/appcatalog/2/deploy/depenv"
+      headers:
+      body: '{"properties": {"git.commit": "41849c78a31cc2d65fa03d7ddd3b330e3e9ed2ec"}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/1/deployments"
+      headers:
+      assertions:
+      - result.body ShouldEqual []
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/2/deployments"
+      headers:
+      assertions:
+      - result.bodyjson.bodyjson0 ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200

@@ -22,6 +22,11 @@ func NewApplicationRepository(db *gorm.DB) *ApplicationRepository {
 	}
 }
 
+// GetNewEntityInstance returns a new empty instance of the entity managed by this repository
+func (repo *ApplicationRepository) GetNewEntityInstance() repositories.Entity {
+	return &models.Application{}
+}
+
 // FindAll returns all entities of the repository type
 func (repo *ApplicationRepository) FindAll() (interface{}, error) {
 	return repo.FindBy(map[string]interface{}{})
@@ -37,8 +42,8 @@ func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, cr
 	if pageable.Size == 0 {
 		pageable.Size = applicationsDefaultPageSize
 	}
-	page := repositories.Page{Pageable: pageable}
-	var applications []models.Application
+	page := repositories.Page{Pageable: pageable, BasePath: models.ApplicationBasePath}
+	var applications []*models.Application
 
 	if err := repo.db.Where(criterias).Offset(pageable.Page * pageable.Size).Limit(pageable.Size).Find(&applications).Error; err != nil {
 		return page, err
@@ -52,10 +57,10 @@ func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, cr
 	page.TotalElements = count
 
 	if pageable.IndexedBy != "" {
-		currentIndex := map[string][]models.Application{}
+		currentIndex := map[string][]*models.Application{}
 		ids := map[string]bool{}
 		for _, application := range applications {
-			indexedField, err := getIndexedField(pageable.IndexedBy, application)
+			indexedField, err := repo.getIndexedField(pageable.IndexedBy, application)
 			if err != nil {
 				return page, err
 			}
@@ -71,7 +76,7 @@ func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, cr
 	return page, nil
 }
 
-func getIndexedField(field string, application models.Application) (string, error) {
+func (repo *ApplicationRepository) getIndexedField(field string, application *models.Application) (string, error) {
 	switch field {
 	case "version":
 		return application.Version, nil
@@ -83,8 +88,8 @@ func getIndexedField(field string, application models.Application) (string, erro
 }
 
 // Save persists an application to the database
-func (repo *ApplicationRepository) Save(application interface{}) error {
-	app, err := mustBeApplication(application)
+func (repo *ApplicationRepository) Save(application repositories.Entity) error {
+	app, err := repo.mustBeEntity(application)
 	if err != nil {
 		return err
 	}
@@ -100,9 +105,9 @@ func (repo *ApplicationRepository) Truncate() error {
 	return repo.db.Delete(models.Application{}).Error
 }
 
-// Remove deletes the application whose ID is given as a parameter
+// Remove deletes the application whose GetID is given as a parameter
 func (repo *ApplicationRepository) Remove(app interface{}) error {
-	app, err := mustBeApplication(app)
+	app, err := repo.mustBeEntity(app)
 	if err != nil {
 		return err
 	}
@@ -111,42 +116,56 @@ func (repo *ApplicationRepository) Remove(app interface{}) error {
 }
 
 // FindByID gives the details of a particular application
-func (repo *ApplicationRepository) FindByID(id interface{}) (interface{}, error) {
+func (repo *ApplicationRepository) FindByID(id interface{}) (repositories.Entity, error) {
 	app := models.Application{}
 	if err := repo.db.First(&app, id).Error; err != nil {
 		return nil, err
 	}
-	return app, nil
+	return &app, nil
 }
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
-func (repo *ApplicationRepository) FindOneByUnscoped(criterias map[string]interface{}) (models.Application, error) {
+func (repo *ApplicationRepository) FindOneByUnscoped(criterias map[string]interface{}) (repositories.SoftDeletableEntity, error) {
 	app := models.Application{}
 	err := repo.db.Unscoped().Where(criterias).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return app, repositories.NewEntityDoesNotExistError(app, criterias)
+		return &app, repositories.NewEntityDoesNotExistError(app, criterias)
 	}
-	return app, err
+	return &app, err
 }
 
 // FindBy fetch a collection of applications matching each criteria
 func (repo *ApplicationRepository) FindBy(criterias map[string]interface{}) (interface{}, error) {
-	var apps []models.Application
+	var apps []*models.Application
 	err := repo.db.Where(criterias).Find(&apps).Error
 	return apps, err
 }
 
-// FindOneBy fetch the first application matching each criteria
-func (repo *ApplicationRepository) FindOneBy(criterias map[string]interface{}) (interface{}, error) {
+// FindOneByDomainNameVersion fetch the first application matching each criteria
+func (repo *ApplicationRepository) FindOneByDomainNameVersion(domain, name, version string) (*models.Application, error) {
+	app := models.Application{}
+	criterias := map[string]interface{}{
+		"domain":  domain,
+		"name":    name,
+		"version": version,
+	}
+	err := repo.db.First(&app, criterias).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return &app, repositories.NewEntityDoesNotExistError(app, criterias)
+	}
+	return &app, err
+}
+
+func (repo *ApplicationRepository) FindOneBy(criterias map[string]interface{}) (repositories.Entity, error) {
 	app := models.Application{}
 	err := repo.db.Where(criterias).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return app, repositories.NewEntityDoesNotExistError(app, criterias)
+		return &app, repositories.NewEntityDoesNotExistError(app, criterias)
 	}
-	return app, err
+	return &app, err
 }
 
-func mustBeApplication(id interface{}) (*models.Application, error) {
+func (repo *ApplicationRepository) mustBeEntity(id interface{}) (*models.Application, error) {
 	var app *models.Application
 	switch id := id.(type) {
 	case uint:

@@ -44,3 +44,16 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 		}
 	}
 }
+
+// AddToBasePath add a subpath to the BasePath stored in the gin context
+func AddToBasePath(basePath string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		path, ok := c.Get("BasePath")
+		if !ok {
+			c.Set("BasePath", basePath)
+			c.Next()
+			return
+		}
+		c.Set("BasePath", path.(string)+basePath)
+	}
+}

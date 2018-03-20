@@ -3,34 +3,31 @@ package repositories
 import (
 	"fmt"
 	"math"
+	"reflect"
+	"time"
 )
 
-// UnsupportedEntityError is raised when a repository method is called with a wrong type
-type UnsupportedEntityError struct {
-	Expected string
-	Actual   string
+// Entity defines and identifiable REST entity
+type Entity interface {
+	GetID() string
+	SetID(string) error
 }
 
-// UnsupportedIndexError is raised when a impossible indexation was requested
-type UnsupportedIndexError struct {
-	Field     string
-	Supported []string
-}
-
-// EntityDoesNotExistError is raised when a repository try to read a non existing entity
-type EntityDoesNotExistError struct {
-	EntityName string
-	Criteria   map[string]interface{}
+// SoftDeletableEntity defines a soft deletable REST entity
+type SoftDeletableEntity interface {
+	Entity
+	GetDeletedAt() *time.Time
 }
 
 // Repository defines a normal repository
 type Repository interface {
 	FindAll() (interface{}, error)
-	FindByID(interface{}) (interface{}, error)
+	FindByID(interface{}) (Entity, error)
 	FindBy(map[string]interface{}) (interface{}, error)
-	FindOneBy(map[string]interface{}) (interface{}, error)
-	Save(interface{}) error
+	FindOneBy(map[string]interface{}) (Entity, error)
+	Save(Entity) error
 	Remove(interface{}) error
+	GetNewEntityInstance() Entity
 }
 
 // PageableRepository defines a repository that handles pagination
@@ -46,6 +43,12 @@ type TruncatableRepository interface {
 	Truncate() error
 }
 
+// SoftDeletableRepository defines a repository that handles soft delete
+type SoftDeletableRepository interface {
+	Repository
+	FindOneByUnscoped(criterias map[string]interface{}) (SoftDeletableEntity, error)
+}
+
 // Pageable defines pagination criterias
 type Pageable struct {
 	Page      int    `json:"page" form:"page"`
@@ -59,14 +62,15 @@ type Page struct {
 	Content       interface{}
 	TotalElements int      `json:"totalElements"`
 	IDs           []string `json:"ids,omitempty"`
+	BasePath      string   `json:"-"`
 	Pageable      Pageable
 }
 
 // PagedResources defines a REST representation of paged contents
 type PagedResources struct {
-	Content      interface{}  `json:"content"`
-	PageMetadata pageMetadata `json:"pageMetadata"`
-	Links        []pageLink   `json:"_links"`
+	Content      interface{}    `json:"content"`
+	PageMetadata pageMetadata   `json:"pageMetadata"`
+	Links        []ResourceLink `json:"_links"`
 }
 
 type pageMetadata struct {
@@ -78,26 +82,38 @@ type pageMetadata struct {
 	IDs           []string `json:"ids,omitempty"`
 }
 
-type pageLink struct {
+// ResourceLink defines relationship between resources
+type ResourceLink struct {
 	Rel  string `json:"rel"`
 	Href string `json:"href"`
 }
 
-// ToResources convert receiver page to a hatoas representation
+// Resource defines a REST resources links
+type Resource struct {
+	Links []ResourceLink `json:"_links,omitempty" gorm:"-"`
+}
+
+// Resourceable defines a linkable hateoas resource
+type Resourceable interface {
+	ToResource(baseURL string)
+	GetSelfURL(baseURL string) string
+}
+
+// ToResources convert receiver page to a hateoas representation
 func (page Page) ToResources(baseURL string) PagedResources {
 	sortParam := ""
 	if page.Pageable.Sort != "" {
 		sortParam = "&sort=" + page.Pageable.Sort
 	}
-	links := []pageLink{
-		{Href: fmt.Sprintf("%s?page=%d&size=%d%s", baseURL, page.Pageable.Page, page.Pageable.Size, sortParam), Rel: "self"},
+	links := []ResourceLink{
+		{Href: fmt.Sprintf("%s%s?page=%d&size=%d%s", baseURL, page.BasePath, page.Pageable.Page, page.Pageable.Size, sortParam), Rel: "self"},
 	}
 	totalPages := int(math.Ceil(float64(page.TotalElements) / float64(page.Pageable.Size)))
 	if page.Pageable.Page < totalPages-1 {
-		links = append(links, pageLink{Href: fmt.Sprintf("%s?page=%d&size=%d%s", baseURL, page.Pageable.Page+1, page.Pageable.Size, sortParam), Rel: "next"})
+		links = append(links, ResourceLink{Href: fmt.Sprintf("%s%s?page=%d&size=%d%s", baseURL, page.BasePath, page.Pageable.Page+1, page.Pageable.Size, sortParam), Rel: "next"})
 	}
 	if page.Pageable.Page > 0 {
-		links = append(links, pageLink{Href: fmt.Sprintf("%s?page=%d&size=%d%s", baseURL, page.Pageable.Page-1, page.Pageable.Size, sortParam), Rel: "prev"})
+		links = append(links, ResourceLink{Href: fmt.Sprintf("%s%s?page=%d&size=%d%s", baseURL, page.BasePath, page.Pageable.Page-1, page.Pageable.Size, sortParam), Rel: "prev"})
 	}
 	metadata := pageMetadata{
 		Size:          page.Pageable.Size,
@@ -109,6 +125,9 @@ func (page Page) ToResources(baseURL string) PagedResources {
 	if len(page.IDs) > 0 {
 		metadata.IDs = page.IDs
 	}
+
+	reflectValueToResource(reflect.ValueOf(page.Content), baseURL)
+
 	return PagedResources{
 		Content:      page.Content,
 		PageMetadata: metadata,
@@ -116,47 +135,15 @@ func (page Page) ToResources(baseURL string) PagedResources {
 	}
 }
 
-// Error implements error interface for UnsupportedEntityError
-func (err UnsupportedEntityError) Error() string {
-	return fmt.Sprintf("unsupported entity (expected: %s, actual: %s)", err.Expected, err.Actual)
-}
-
-// Error implements error interface for EntityDoesNotExistError
-func (err EntityDoesNotExistError) Error() string {
-	return fmt.Sprintf("entity %s of type %s does not exist", err.Criteria, err.EntityName)
-}
-
-// Error implements error interface for UnsupportedIndexError
-func (err UnsupportedIndexError) Error() string {
-	return fmt.Sprintf("index by %s is not supported (one of %v)", err.Field, err.Supported)
-}
-
-//NewUnsupportedEntityError is a helper to create an UnsupportedEntityError
-func NewUnsupportedEntityError(expected, actual interface{}) error {
-	return UnsupportedEntityError{
-		Expected: fmt.Sprintf("%T", expected),
-		Actual:   fmt.Sprintf("%T", actual),
+func reflectValueToResource(value reflect.Value, baseURL string) {
+	if value.Kind() != reflect.Slice && value.Kind() != reflect.Map {
+		resource, ok := value.Interface().(Resourceable)
+		if ok {
+			resource.ToResource(baseURL)
+		}
+		return
 	}
-}
-
-// NewEntityDoesNotExistError is a helper to create an EntityDoesNotExistError
-func NewEntityDoesNotExistError(entity interface{}, criterias map[string]interface{}) error {
-	return EntityDoesNotExistError{
-		EntityName: fmt.Sprintf("%T", entity),
-		Criteria:   criterias,
+	for i := 0; i < value.Len(); i++ {
+		reflectValueToResource(value.Index(i), baseURL)
 	}
-}
-
-// NewUnsupportedIndexError is a helper to create an UnsupportedIndexError
-func NewUnsupportedIndexError(field string, supported ...string) error {
-	return UnsupportedIndexError{
-		Field:     field,
-		Supported: supported,
-	}
-}
-
-// IsEntityDoesNotExistError returns true if err is an EntityDoesNotExistError
-func IsEntityDoesNotExistError(err error) bool {
-	_, ok := err.(EntityDoesNotExistError)
-	return ok
 }
