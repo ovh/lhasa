@@ -71,7 +71,7 @@ func main() {
 		if *flagAutoMigrations {
 			runMigrationsUp(db.DB(), log)
 		}
-		router := routers.NewRouter(applicationRepository, version, *flagDebug, log)
+		router := routers.NewRouter(applicationRepository, db.DB(), version, *flagDebug, log)
 		panic(router.Run(fmt.Sprintf(":%d", *flagStartPort)))
 	}
 }

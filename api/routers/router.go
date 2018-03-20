@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/contrib/static"
@@ -20,7 +21,7 @@ func redirect(c *gin.Context) {
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(applicationRepository *repositories.ApplicationRepository, version string, debugMode bool, log *logrus.Logger) *gin.Engine {
+func NewRouter(applicationRepository *repositories.ApplicationRepository, db *sql.DB, version string, debugMode bool, log *logrus.Logger) *gin.Engine {
 	router := gin.New()
 	router.Use(handlers.LoggingMiddleware(log), gin.Recovery())
 	configureGin(log, debugMode)
@@ -39,7 +40,7 @@ func NewRouter(applicationRepository *repositories.ApplicationRepository, versio
 	// unsecured group does not check incoming signatures
 	unsecured := api.Group("/unsecured")
 	// health check route
-	unsecured.GET("/mon", tonic.Handler(handlers.PingHandler, http.StatusOK))
+	unsecured.GET("/mon", tonic.Handler(handlers.PingHandler(db), http.StatusOK))
 	// API version
 	unsecured.GET("/version", tonic.Handler(handlers.VersionHandler(version), http.StatusOK))
 	// auto-generated swagger documentation
