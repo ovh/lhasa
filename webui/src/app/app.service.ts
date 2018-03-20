@@ -12,6 +12,11 @@ export class Application{
   repositoryurl: string;
   avatarurl: string;
   description: string;
+  manifest: Manifest
+}
+
+export class Manifest {
+  description: string;
 }
 
 class ApplicationListResponse{

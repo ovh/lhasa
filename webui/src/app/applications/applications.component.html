@@ -9,11 +9,15 @@
         <img src="{{ app.avatarurl }}" width="50"/>
         <h4>{{ app.domain }}/{{ app.name }}</h4>
     </div>
-    <div class="mdl-card__supporting-text">
+    <div class="mdl-card__supporting-text" *ngIf="app.manifest && app.manifest.description" >
         <b>Description:</b> 
         {{ (app.manifest.description.length>200)? (app.manifest.description | slice:0:200)+"...":(app.manifest.description) }}
     </div>
-    <div class="mdl-card__actions mdl-card--border">
+    <div class="mdl-card__supporting-text" *ngIf="!(app.manifest && app.manifest.description)" >
+      <b>Description:</b> 
+      No description
+  </div>
+  <div class="mdl-card__actions mdl-card--border">
       <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" routerLink="{{ app.id }}" >
         More info...
       </a>
