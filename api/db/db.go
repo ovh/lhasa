@@ -45,6 +45,27 @@ func NewFromGormString(connStr string, logMode bool, log *logrus.Logger) (*gorm.
 	db.DB().SetMaxIdleConns(maxIdleConns)
 	db.DB().SetMaxOpenConns(maxOpenConns)
 	db.LogMode(logMode)
-	db.SetLogger(gorm.Logger{LogWriter: log})
+	db.SetLogger(gorm.Logger{LogWriter: dbLogWriter{log}})
 	return db, nil
+}
+
+type dbLogWriter struct {
+	log *logrus.Logger
+}
+
+// Println implements gorm's LogWriter interface
+func (l dbLogWriter) Println(v ...interface{}) {
+	if l.log == nil {
+		return
+	}
+	fields := logrus.Fields{}
+	if len(v) == 5 {
+		fields = logrus.Fields{
+			"file":     v[0],
+			"duration": v[2],
+			"query":    v[3],
+			"count":    v[4],
+		}
+	}
+	l.log.WithFields(fields).Debug(v)
 }

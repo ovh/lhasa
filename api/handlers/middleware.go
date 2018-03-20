@@ -2,13 +2,15 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
 var (
-	headerSource = http.CanonicalHeaderKey("X-Ovh-Gateway-Source")
+	headerSource    = http.CanonicalHeaderKey("X-Ovh-Gateway-Source")
+	requestIDHeader = http.CanonicalHeaderKey("X-Request-Id")
 )
 
 // LoggingMiddleware logs before and after incoming gin requests
@@ -19,15 +21,21 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 			return
 		}
 		fields := logrus.Fields{
-			"method": c.Request.Method,
-			"path":   c.Request.URL.Path,
-			"token":  c.Request.Header.Get(headerSource),
+			"method":     c.Request.Method,
+			"path":       c.Request.URL.Path,
+			"token":      c.Request.Header.Get(headerSource),
+			"request-id": c.Request.Header.Get(requestIDHeader),
 		}
 		log.WithFields(fields).Debug("incoming request")
+		startTime := time.Now()
+		c.Set("logfields", fields)
 
 		c.Next()
 
-		log.WithFields(fields).WithField("status", c.Writer.Status()).Info()
+		log.WithFields(fields).WithFields(logrus.Fields{
+			"status":   c.Writer.Status(),
+			"duration": time.Since(startTime).Seconds(),
+		}).Info()
 
 		for _, err := range c.Errors.Errors() {
 			if err != RestErrorCreated.Error() {
