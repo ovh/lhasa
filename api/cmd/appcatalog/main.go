@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/ovh/lhasa/api/db"
+	"github.com/ovh/lhasa/api/logger"
 	"github.com/ovh/lhasa/api/routers"
 	"github.com/ovh/lhasa/api/v1/repositories"
 )
@@ -50,7 +51,7 @@ var (
 
 func main() {
 	command := kingpin.MustParse(application.Parse(os.Args[1:]))
-	log := configureLogger(*flagVerbose, *flagDebug, *flagQuiet, *flagJSONOutput)
+	log := logger.NewLogger(*flagVerbose, *flagDebug, *flagQuiet, *flagJSONOutput)
 
 	switch command {
 	case cmdCodeVersion:
@@ -96,22 +97,4 @@ func runMigrationsDown(datasource *sql.DB, log *logrus.Logger) {
 	if err := db.MigrateDown(datasource, log); err != nil {
 		log.WithError(err).Fatalf("cannot run migrations")
 	}
-}
-
-func configureLogger(isVerbose, isDebug, isQuiet, isJSON bool) *logrus.Logger {
-	log := logrus.New()
-	log.Level = logrus.WarnLevel
-	if isVerbose {
-		log.Level = logrus.InfoLevel
-	}
-	if isQuiet {
-		log.Level = logrus.FatalLevel
-	}
-	if isDebug {
-		log.Level = logrus.DebugLevel
-	}
-	if isJSON {
-		log.Formatter = &logrus.JSONFormatter{}
-	}
-	return log
 }

@@ -21,10 +21,10 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 			return
 		}
 		fields := logrus.Fields{
-			"method":     c.Request.Method,
-			"path":       c.Request.URL.Path,
-			"token":      c.Request.Header.Get(headerSource),
-			"request-id": c.Request.Header.Get(requestIDHeader),
+			"method":       c.Request.Method,
+			"path":         c.Request.URL.Path,
+			"source_token": c.Request.Header.Get(headerSource),
+			"request_id":   c.Request.Header.Get(requestIDHeader),
 		}
 		log.WithFields(fields).Debug("incoming request")
 		startTime := time.Now()
@@ -35,7 +35,7 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 		log.WithFields(fields).WithFields(logrus.Fields{
 			"status":   c.Writer.Status(),
 			"duration": time.Since(startTime).Seconds(),
-		}).Info()
+		}).Info("done")
 
 		for _, err := range c.Errors.Errors() {
 			if err != RestErrorCreated.Error() {

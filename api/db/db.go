@@ -5,6 +5,10 @@ package db
 // Note: This is not the best way to share this variable but
 
 import (
+	"math"
+	"strings"
+	"time"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // This is required by GORM to enable postgresql support
 	"github.com/pkg/errors"
@@ -59,13 +63,20 @@ func (l dbLogWriter) Println(v ...interface{}) {
 		return
 	}
 	fields := logrus.Fields{}
+	var message interface{} = v
 	if len(v) == 5 {
+		file := strings.Split(strings.TrimSuffix(strings.TrimPrefix(v[0].(string), "\u001b[35m("), ")\u001b[0m"), ":")
+		durationStr := strings.TrimSuffix(strings.TrimPrefix(v[2].(string), " \u001b[36;1m["), "]\u001b[0m ")
+		rows := strings.TrimSuffix(strings.TrimPrefix(v[4].(string), " \n\u001b[36;31m["), " rows affected or returned ]\u001b[0m ")
+		duration, _ := time.ParseDuration(durationStr)
 		fields = logrus.Fields{
-			"file":     v[0],
-			"duration": v[2],
-			"query":    v[3],
-			"count":    v[4],
+			"file":         file[0],
+			"line":         file[1],
+			"duration":     duration.Seconds(),
+			"full_message": v[3],
+			"rows":         rows,
 		}
+		message = "sql query: " + v[3].(string)[:int(math.Min(50, float64(len(v[3].(string)))))] + "..."
 	}
-	l.log.WithFields(fields).Debug(v)
+	l.log.WithFields(fields).Debug(message)
 }
