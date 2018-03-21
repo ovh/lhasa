@@ -15,7 +15,7 @@ const routes: Routes = [
     component: ApplicationsComponent
   },
   {
-    path: 'applications/:app_id',
+    path: 'applications/:domain/:name',
     component: AppdetailComponent
   }
 

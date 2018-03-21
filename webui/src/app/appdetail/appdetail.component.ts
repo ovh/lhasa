@@ -18,13 +18,18 @@ export class AppdetailComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.app = <Application> {}
     this.getAppDetail()
   }
 
   getAppDetail(): void {
-    let app_id = this.route.snapshot.paramMap.get('app_id');
-    this.applicationsService.getApplication(app_id)
-    .subscribe(data => this.app = data);
+    let domain = this.route.snapshot.paramMap.get('domain');
+    let name = this.route.snapshot.paramMap.get('name');
+    this.applicationsService.getApplication(domain, name)
+    .subscribe(
+      (data) => {
+        this.app = data.content[0]
+      });
   }
 
 }

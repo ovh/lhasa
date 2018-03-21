@@ -2,7 +2,7 @@
   <div class="mdl-cell mdl-cell--4-col demo-card-wide mdl-card mdl-shadow--2dp" *ngFor="let app of applications">
 
     <div class="mdl-card__supporting-text mdl-card--border mdl-color-text--grey-600">
-      {{ app.type  | uppercase }}
+      {{ app.domain  | uppercase }}
     </div>
   
     <div class="mdl-card__title">
@@ -16,9 +16,9 @@
     <div class="mdl-card__supporting-text" *ngIf="!(app.manifest && app.manifest.description)" >
       <b>Description:</b> 
       No description
-  </div>
+    </div>
   <div class="mdl-card__actions mdl-card--border">
-      <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" routerLink="{{ app.id }}" >
+      <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" routerLink="/applications/{{ app.domain }}/{{ app.name }}" >
         More info...
       </a>
     </div>
