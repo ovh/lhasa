@@ -6,6 +6,7 @@ package db
 
 import (
 	"math"
+	"strconv"
 	"strings"
 	"time"
 
@@ -69,9 +70,10 @@ func (l dbLogWriter) Println(v ...interface{}) {
 		durationStr := strings.TrimSuffix(strings.TrimPrefix(v[2].(string), " \u001b[36;1m["), "]\u001b[0m ")
 		rows := strings.TrimSuffix(strings.TrimPrefix(v[4].(string), " \n\u001b[36;31m["), " rows affected or returned ]\u001b[0m ")
 		duration, _ := time.ParseDuration(durationStr)
+		line, _ := strconv.Atoi(file[1])
 		fields = logrus.Fields{
 			"file":         file[0],
-			"line":         file[1],
+			"line":         line,
 			"duration":     duration.Seconds(),
 			"full_message": v[3],
 			"rows":         rows,
