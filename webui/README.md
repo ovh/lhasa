@@ -1,27 +1,42 @@
-# Console
+# appcatalog
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.4.
+## Technical overview
 
-## Development server
+This project is currently at very early stage and under active development. It is mainly written in golang and in angular5
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Contact
 
-## Code scaffolding
+### Authors
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+* Rayene Ben Rayana <rayene.ben-rayana@corp.ovh.com>
+* Fabien Meurillon <fabien.meurillon@corp.ovh.com>
+* Yannick Roffin <yannick.roffin@corp.ovh.com>
 
-## Build
+## How to build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+make
 
-## Running unit tests
+### Build requirements
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+* Git
+* [Go installation](https://golang.org/doc/install) and [workspace](https://golang.org/doc/code.html#Workspaces) (`GOROOT` and `GOPATH` correctly set)
+* GNU Make
+* [dep](https://github.com/golang/dep) - Go dependency management tool
+* [Angular 5 CLI](https://angular.io/guide/quickstart) - Management CLI for angular 5
 
-## Running end-to-end tests
+### Steps
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+```
+cd $GOPATH/src/github.com/ovh
+git clone git@github.com/ovh/lhasa.git
+cd lhasa && make
+```
 
-## Further help
+### Run
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+#### Locally
+
+```
+cd $GOPATH/src/github.com/ovh/lhasa
+make run
+```

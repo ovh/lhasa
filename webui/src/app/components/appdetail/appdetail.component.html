@@ -1,0 +1,17 @@
+<div *ngIf="application">
+  <h1>
+    <img src="{{ application.avatarurl }}" />{{application.domain}}/{{application.name}}</h1>
+
+  <h6>Type: {{ application.type | uppercase }}</h6>
+  <h6>Language: {{ application.language }}</h6>
+  <h6>Repository:
+    <a href="{{ application.repositoryurl }}">{{ application.repositoryurl }}</a>
+  </h6>
+  <h6>Description:</h6>
+  <div class="mdl-cell mdl-cell--12-col demo-card-wide mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__supporting-text">
+      <markdown [data]="application.manifest.description"></markdown>
+    </div>
+  </div>
+  <hr/>
+</div>

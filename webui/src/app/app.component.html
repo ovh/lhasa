@@ -9,7 +9,7 @@
     <div class="mdl-layout__header-row">
       <a class="mdl-layout-title mdl-navigation__link" routerLink="/">AppCatalog</a>
       <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" routerLink="/applications">Applications</a>
+        <a class="mdl-navigation__link" routerLink="/applications" (click)="loadApplications()">Applications</a>
       </nav>
       <div class="mdl-layout-spacer"></div>
       <nav class="mdl-navigation">
@@ -18,4 +18,5 @@
     </div>
   </header>
 </div>
+
 <router-outlet></router-outlet>

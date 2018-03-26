@@ -9,7 +9,7 @@ test: dep
 	ng e2e
 	
 run: all
-	ng serve
+	npm start
 
 clean:
 	echo "no cleaning command available"
