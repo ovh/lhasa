@@ -31,8 +31,11 @@ var RestErrorGone = restErrorGone("gone")
 
 // RestFindByPage returns a filtered and paginated resource list
 func RestFindByPage(repository repositories.PageableRepository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, pageable *repositories.Pageable) (*repositories.PagedResources, error) {
-		results, err := repository.FindPageBy(*pageable, parsePathParams(c))
+	return tonic.Handler(func(c *gin.Context) (*repositories.PagedResources, error) {
+		pageable := repositories.Pageable{}
+		c.ShouldBindQuery(&pageable)
+
+		results, err := repository.FindPageBy(pageable, parsePathParams(c))
 		if err != nil {
 			return nil, err
 		}
