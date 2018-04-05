@@ -51,6 +51,7 @@ var (
 
 func main() {
 	command := kingpin.MustParse(application.Parse(os.Args[1:]))
+
 	log := logger.NewLogger(*flagVerbose, *flagDebug, *flagQuiet, *flagJSONOutput)
 
 	switch command {

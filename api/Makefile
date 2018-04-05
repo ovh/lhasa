@@ -61,8 +61,8 @@ static: vet lint
 run: server
 	./${OUT}
 
-gin:
-	VAULT_FILE=../.vault-file.json gin -p 8081 -a 3000 -i --path . --build cmd/appcatalog -- --port=3000 --auto-migrate --debug
+live:
+	VAULT_FILE=../.vault-file.json APPCATALOG_DEBUG_MODE=true gin -p 8081 -a 3000 -i --path . --build cmd/appcatalog -- --port=3000 
 
 clean:
 	@packr clean
