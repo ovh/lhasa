@@ -16,11 +16,11 @@ type Deployment struct {
 	ID            uint           `json:"-" gorm:"auto increment"`
 	PublicID      string         `json:"id" gorm:"type:varchar(255);not null;unique"`
 	ApplicationID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
-	Application   Application    `json:"-"`
+	Application   *Application   `json:"-"`
 	EnvironmentID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
-	Environment   Environment    `json:"-"`
+	Environment   *Environment   `json:"-"`
 	Properties    postgres.Jsonb `json:"properties,omitempty"`
-	UndeployedAt  *time.Time     `json:"undeployedAt"`
+	UndeployedAt  *time.Time     `json:"undeployedAt,omitempty"`
 	CreatedAt     time.Time      `json:"_createdAt"`
 	UpdatedAt     time.Time      `json:"_updatedAt"`
 	DeletedAt     *time.Time     `json:"-"`
@@ -45,10 +45,12 @@ func (dep *Deployment) GetDeletedAt() *time.Time {
 
 // ToResource implements Resourceable
 func (dep *Deployment) ToResource(baseURL string) {
-	dep.Resource.Links = []repositories.ResourceLink{
-		{Rel: "self", Href: dep.GetSelfURL(baseURL)},
-		{Rel: "environment", Href: dep.Environment.GetSelfURL(baseURL)},
-		{Rel: "application", Href: dep.Application.GetSelfURL(baseURL)},
+	dep.Resource.Links = []repositories.ResourceLink{{Rel: "self", Href: dep.GetSelfURL(baseURL)}}
+	if dep.Environment != nil {
+		dep.Resource.Links = append(dep.Resource.Links, repositories.ResourceLink{Rel: "environment", Href: dep.Environment.GetSelfURL(baseURL)})
+	}
+	if dep.Application != nil {
+		dep.Resource.Links = append(dep.Resource.Links, repositories.ResourceLink{Rel: "application", Href: dep.Application.GetSelfURL(baseURL)})
 	}
 }
 

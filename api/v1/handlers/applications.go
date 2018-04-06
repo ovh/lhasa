@@ -69,30 +69,44 @@ func ApplicationDeploy(appRepo *v1repo.ApplicationRepository, envRepo *v1repo.En
 	}, http.StatusOK)
 }
 
+// ApplicationFindLastDeployment list active deployments for a given application
+func ApplicationFindLastDeployment(appRepo *v1repo.ApplicationRepository, envRepo *v1repo.EnvironmentRepository, depRepo *v1repo.DeploymentRepository) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (*models.Deployment, error) {
+		app, err := appRepo.FindOneByDomainNameVersion(request.Domain, request.Name, request.Version)
+		if err != nil {
+			return nil, err
+		}
+		env, err := envRepo.FindOneBySlug(request.Slug)
+		if err != nil {
+			return nil, err
+		}
+		res, err := depRepo.FindOneBy(map[string]interface{}{"application_id": app.ID, "environment_id": env.ID})
+		if err != nil {
+			return nil, err
+		}
+		dep := res.(*models.Deployment)
+		dep.ToResource(handlers.HateoasBaseURL(c))
+		if err != nil {
+			return nil, err
+		}
+		return dep, nil
+	}, http.StatusOK)
+}
+
 // ApplicationListActiveDeployments list active deployments for a given application
-func ApplicationListActiveDeployments(appRepo *v1repo.ApplicationRepository, envRepo *v1repo.EnvironmentRepository, depRepo *v1repo.DeploymentRepository) gin.HandlerFunc {
+func ApplicationListActiveDeployments(appRepo *v1repo.ApplicationRepository, depRepo *v1repo.DeploymentRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
 		app, err := appRepo.FindOneByDomainNameVersion(request.Domain, request.Name, request.Version)
 		if err != nil {
 			return nil, err
 		}
 		criteria := map[string]interface{}{"application_id": app.ID}
-		if request.Slug != "" {
-			env, err := envRepo.FindOneBySlug(request.Slug)
-			if err != nil {
-				return nil, err
-			}
-			criteria["environment_id"] = env.ID
-		}
 		deps, err := depRepo.FindActivesBy(criteria)
 		if err != nil {
 			return nil, err
 		}
 		for _, dep := range deps {
 			dep.ToResource(handlers.HateoasBaseURL(c))
-		}
-		if request.Slug != "" && len(deps) > 0 {
-			return deps[0], nil
 		}
 		return deps, nil
 	}, http.StatusOK)

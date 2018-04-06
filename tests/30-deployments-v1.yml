@@ -74,12 +74,33 @@ testcases:
       - result.bodyjson.bodyjson0 ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
     - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/1/deployments/depenv"
+      headers:
+      assertions:
+      - result.bodyjson ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+    - type: http
       method: POST
       url: "{{.appsroute}}/urba/appcatalog/2/deploy/depenv"
       headers:
       body: '{"properties": {"git.commit": "41849c78a31cc2d65fa03d7ddd3b330e3e9ed2ec"}}'
       assertions:
       - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/1/deployments/depenv"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.undeployedat ShouldNotBeEmpty
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/urba/appcatalog/2/deployments/depenv"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson ShouldNotContainKey undeployedAt
     - type: http
       method: GET
       url: "{{.appsroute}}/urba/appcatalog/1/deployments"

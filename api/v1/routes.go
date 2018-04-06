@@ -20,8 +20,8 @@ func registerRoutes(group *gin.RouterGroup, appRepo *repositories.ApplicationRep
 	appRoutes.DELETE("/:domain/:name/:version", rest.RestRemoveOneBy(appRepo))
 	appRoutes.PUT("/:domain/:name/:version", v1.ApplicationCreate(appRepo))
 
-	appRoutes.GET("/:domain/:name/:version/deployments/", v1.ApplicationListActiveDeployments(appRepo, envRepo, depRepo))
-	appRoutes.GET("/:domain/:name/:version/deployments/:slug", v1.ApplicationListActiveDeployments(appRepo, envRepo, depRepo))
+	appRoutes.GET("/:domain/:name/:version/deployments/", v1.ApplicationListActiveDeployments(appRepo, depRepo))
+	appRoutes.GET("/:domain/:name/:version/deployments/:slug", v1.ApplicationFindLastDeployment(appRepo, envRepo, depRepo))
 	appRoutes.POST("/:domain/:name/:version/deploy/:slug", v1.ApplicationDeploy(appRepo, envRepo, deployer))
 
 	envRoutes := group.Group("/environments")
