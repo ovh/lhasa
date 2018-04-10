@@ -1,21 +1,17 @@
-<div class="ui-g-12">
-  <div style="padding: 8px" class="ui-g-4 ui-md-4" *ngFor="let app of applications">
-    <mat-card style="height: 400px">
-      <mat-card-header>
-        <mat-card-title>{{ app.domain | uppercase }}</mat-card-title>
-        <mat-card-subtitle>{{ app.name }}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-divider></mat-divider>
-      <mat-card-content>
-        <p *ngIf="app.description">
-          <b>Description:</b>
-          {{ app.description }}
-        </p>
-      </mat-card-content>
-      <mat-divider></mat-divider>
-      <mat-card-actions>
-        <button mat-button routerLink="/applications/{{ app.domain }}/{{ app.name }}" (click)="selectApplication(app)">More info...</button>
-      </mat-card-actions>
-    </mat-card>
+<div class="ui-g-12" *ngFor="let domain of domains | orderByDomains">
+  <div style="padding: 8px" class="ui-g-4 ui-md-4" *ngFor="let app of domain.applications | orderByApps">
+    <div class="oui-box oui-box_light">
+      <h1 class="oui-header_1 oui-header_underline">{{ app.domain | uppercase }}</h1>
+      <h1>{{ app.name }}</h1>
+      <p>
+        {{ app.description }}
+      </p>
+      <button class="oui-button oui-button_primary" routerLink="/applications/{{ app.domain }}/{{ app.name }}" (click)="selectApplication(app)">
+        More info ...
+      </button>
+      <button class="oui-button oui-button_primary" routerLink="/enrollment" (click)="selectApplication(app)">
+        Enrollment ...
+      </button>
+    </div>
   </div>
 </div>

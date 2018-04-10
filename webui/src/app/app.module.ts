@@ -9,10 +9,11 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { ApplicationsComponent } from './components/applications/applications.component';
+import { EnrollmentComponent } from './components/enrollment/enrollment.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { MarkdownModule } from 'angular2-markdown';
+import { MarkdownModule } from 'ngx-md';
 
 /**
  * material2
@@ -69,6 +70,7 @@ import { SliderModule } from 'primeng/primeng';
 import { MatSliderModule } from '@angular/material/slider';
 import { ToggleButtonModule } from 'primeng/primeng';
 import { TabMenuModule } from 'primeng/primeng';
+import { TableModule } from 'primeng/table';
 
 /**
  * guard
@@ -80,20 +82,28 @@ import { RoutingGuard } from './guards/routing.guard';
  * stores
  */
 import { ApplicationsStoreService } from './stores/applications-store.service';
-import { DataApplicationServiceService } from './services/data-application-version.service';
+import { DataApplicationService } from './services/data-application-version.service';
 import { StoreModule } from '@ngrx/store';
-import { CommonModule } from '@angular/common';
+import { CommonModule, APP_BASE_HREF } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { ConfigurationService } from './services/configuration.service';
 import { SecurityService } from './services/security.service';
+import { BitbucketService } from './services/data-bitbucket.service';
+import { OuiProgressTrackerComponent } from './kit/oui-progress-tracker/oui-progress-tracker.component';
+import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.component';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
     AppComponent,
     ApplicationsComponent,
+    EnrollmentComponent,
     DashboardComponent,
-    AppdetailComponent
+    AppdetailComponent,
+    OuiProgressTrackerComponent,
+    ApplicationSortPipe,
+    DomainSortPipe
   ],
   imports: [
     CommonModule,
@@ -163,6 +173,7 @@ import { SecurityService } from './services/security.service';
     ToggleButtonModule,
     TabMenuModule,
     CarouselModule,
+    TableModule,
     // Local modules
     AppRoutingModule,
     ArchwizardModule,
@@ -175,6 +186,12 @@ import { SecurityService } from './services/security.service';
     })
   ],
   providers: [
+    /**
+     * Base Href
+     */
+    {
+      provide: APP_BASE_HREF, useValue: environment.href
+    },
     /**
      * guards
      */
@@ -189,7 +206,8 @@ import { SecurityService } from './services/security.service';
      */
     ConfigurationService,
     SecurityService,
-    DataApplicationServiceService
+    DataApplicationService,
+    BitbucketService
   ],
   bootstrap: [AppComponent]
 })

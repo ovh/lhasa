@@ -5,6 +5,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component'
 import { ApplicationsComponent } from './components/applications/applications.component'
 import { AppdetailComponent } from './components/appdetail/appdetail.component'
 import { ProfileGuard } from './guards/profile.guard';
+import { EnrollmentComponent } from './components/enrollment/enrollment.component';
 import { RoutingGuard } from './guards/routing.guard';
 
 const routes: Routes = [
@@ -16,6 +17,11 @@ const routes: Routes = [
   {
     path: 'applications',
     component: ApplicationsComponent,
+    canActivate: [ProfileGuard, RoutingGuard]
+  },
+  {
+    path: 'enrollment',
+    component: EnrollmentComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {

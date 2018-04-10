@@ -1,10 +1,30 @@
-// The file contents for the current environment will overwrite these during build.
-// The build system defaults to the dev environment which uses `environment.ts`, but if you do
-// `ng build --env=prod` then `environment.prod.ts` will be used instead.
-// The list of which env maps to which file can be found in `.angular-cli.json`.
+/**
+ * fix BASE HREF problems
+ */
+let href = document.location.pathname.split('/')
+let base=""
+let appname="appcatalog"
+let i = 0
+for(i=1;i<href.length;i++) {
+  base += '/' + href[i]
+  if(href[i].endsWith("appcatalog")) {
+    appname = href[i]
+    break
+  }
+}
 
+/**
+ * fix API access routes
+ */
 export const environment = {
   production: false,
-  baseUrlApi: '/uservice/gateway/appcatalog',
-  baseUrlUi: '/uservice/gateway/appcatalog'
+  href: base,
+  appcatalog: {
+    baseUrlApi: '/uservice/gateway/' + appname,
+    baseUrlUi: '/uservice/gateway/' + appname
+  },
+  appcatalogCompanion: {
+    baseUrlApi: '/uservice/gateway/' + appname + '-companion',
+    baseUrlUi: '/uservice/gateway/' + appname + '-companion'
+  }
 };

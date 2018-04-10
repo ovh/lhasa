@@ -1,17 +1,29 @@
 <div *ngIf="application">
-  <h1>
-    <img src="{{ application.avatarurl }}" />{{application.domain}}/{{application.name}}</h1>
-
-  <h6>Type: {{ application.type | uppercase }}</h6>
-  <h6>Language: {{ application.language }}</h6>
-  <h6>Repository:
-    <a href="{{ application.repositoryurl }}">{{ application.repositoryurl }}</a>
-  </h6>
-  <h6>Description:</h6>
-  <div class="mdl-cell mdl-cell--12-col demo-card-wide mdl-card mdl-shadow--2dp">
-    <div class="mdl-card__supporting-text">
-      <markdown [data]="application.manifest.description"></markdown>
+  <div class="ui-g-24">
+    <div class="oui-field">
+      <label for="text-1" class="oui-field__label oui-label">Domain</label>
+      <div class="oui-field__control">
+        <input type="text" class="oui-input" placeholder="Domain" [(ngModel)]="application.domain" disabled>
+      </div>
+    </div>
+    <div class="oui-field">
+      <label for="text-1" class="oui-field__label oui-label">Name</label>
+      <div class="oui-field__control">
+        <input type="text" class="oui-input" placeholder="Name" [(ngModel)]="application.name" disabled>
+      </div>
+    </div>
+    <div class="oui-field">
+      <label for="text-10" class="oui-field__label oui-label">Repository</label>
+      <div class="oui-field__control oui-field__control_auto">
+        <a href="{{ application.manifest.repository }}">{{ application.manifest.repository }}</a>
+      </div>
+    </div>
+    <div class="oui-field">
+      <label for="text-1" class="oui-field__label oui-label">Manifest</label>
+      <div>
+        <markdown [data]="application.manifest.description"></markdown>
+      </div>
     </div>
   </div>
-  <hr/>
+
 </div>

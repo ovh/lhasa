@@ -10,11 +10,11 @@ import { DataCoreResource } from './data-core-resources.service';
 import { ApplicationBean } from '../models/commons/applications-bean';
 
 @Injectable()
-export class DataApplicationServiceService extends DataCoreResource<ApplicationBean> implements DefaultResource<ApplicationBean> {
+export class DataApplicationService extends DataCoreResource<ApplicationBean> implements DefaultResource<ApplicationBean> {
   constructor(
     private _http: Http,
     private _configuration: ConfigurationService
   ) {
-    super(_configuration, _configuration.ServerWithApiUrl + 'v1/applications', _http);
+    super(_configuration, _configuration.ServerCatalogWithApiUrl + 'v1/applications', _http);
   }
 }

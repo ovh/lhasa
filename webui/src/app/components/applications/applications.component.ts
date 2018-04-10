@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Pipe } from '@angular/core';
 import { ApplicationsStoreService, SelectApplicationAction, LoadApplicationsAction } from '../../stores/applications-store.service';
 import { Store } from '@ngrx/store';
-import { ApplicationBean } from '../../models/commons/applications-bean';
-import { DataApplicationServiceService } from '../../services/data-application-version.service';
+import { ApplicationBean, DomainBean } from '../../models/commons/applications-bean';
+import { DataApplicationService } from '../../services/data-application-version.service';
 import { ContentListResponse } from '../../models/commons/entity-bean';
 
 import * as _ from 'lodash';
@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 @Component({
   selector: 'app-applications',
   templateUrl: './applications.component.html',
-  styleUrls: ['./applications.component.css']
+  styleUrls: ['./applications.component.css'],
 })
 export class ApplicationsComponent implements OnInit {
 
@@ -18,11 +18,13 @@ export class ApplicationsComponent implements OnInit {
    * internal streams and store
    */
   protected applicationsStream: Store<ApplicationBean[]>;
-  protected applications: ApplicationBean[]
+  protected applications: ApplicationBean[];
+  protected orderedDomains = new Map<string, ApplicationBean[]>()
+  protected domains: DomainBean[] = [];
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
-    private applicationsService: DataApplicationServiceService
+    private applicationsService: DataApplicationService
   ) {
     /**
      * subscribe
@@ -39,6 +41,17 @@ export class ApplicationsComponent implements OnInit {
             app.description = "No description ..."
           }
         });
+        this.orderedDomains = new Map<string, ApplicationBean[]>()
+        _.each(this.applications, (app) => {
+          if(!this.orderedDomains.has(app.domain)) {
+            this.orderedDomains.set(app.domain, [])
+          }
+          this.orderedDomains.get(app.domain).push(app)
+        });
+        this.domains = []
+        this.orderedDomains.forEach((v,k) => {
+          this.domains.push({name: k, applications: v})
+        })
       },
       error => {
         console.error(error);
@@ -49,7 +62,6 @@ export class ApplicationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.info("x",this.applications)
     if(!this.applications || this.applications.length == 0) {
       this.loadApplications(null)
     }

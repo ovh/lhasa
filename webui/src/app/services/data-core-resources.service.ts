@@ -13,7 +13,6 @@ import { ConfigurationService } from '../services/configuration.service';
  * data model
  */
 import { EntityBean, ContentListResponse } from '../models/commons/entity-bean';
-import { HttpParams } from '@angular/common/http';
 
 /**
  * default class to handle default behaviour or resource
@@ -38,10 +37,6 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
         this.headers.append('Content-Type', 'application/json');
         this.headers.append('Accept', 'application/json');
         this.headers.append('AuthToken', this.configuration.getAuthToken());
-        this.headers.append('Cache-control', 'no-cache');
-        this.headers.append('Cache-control', 'no-store');
-        this.headers.append('Expires', '0');
-        this.headers.append('Pragma', 'no-cache');
     }
 
     /**
@@ -49,7 +44,7 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
      */
     public Tasks = (task: string, args: any): Observable<any> => {
         this.headers.set('AuthToken', this.configuration.getAuthToken());
-        return this.http.post(this.actionUrl + '?task=' + task, JSON.stringify(args), { headers: this.headers })
+        return this.http.post(this.actionUrl + '/'  + task + '?task=' + task, JSON.stringify(args), { headers: this.headers })
             .map((response: Response) => <any> response.json())
             .catch(this.handleError);
     }
@@ -87,9 +82,9 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
     /**
      * get all resources
      */
-    public GetAllFromContent = (filter: string, prm: Map<string,string>): Observable<ContentListResponse<T>> => {
+    public GetAllFromContent = (filter: string, params: Map<string,string>): Observable<ContentListResponse<T>> => {
         this.headers.set('AuthToken', this.configuration.getAuthToken());
-        return this.http.get(this.actionUrl + filter + "?", { headers: this.headers, params: prm })
+        return this.http.get(this.actionUrl + filter, { headers: this.headers, params: params })
             .map((response: Response) => <ContentListResponse<T>>response.json())
             .catch(this.handleError);
     }

@@ -19,6 +19,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
+        "assets/ovh-ui-kit/oui.css",
         "styles.css",
         "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
         "../node_modules/primeng/resources/themes/bootstrap/theme.css",

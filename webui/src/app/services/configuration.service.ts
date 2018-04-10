@@ -4,19 +4,26 @@ import { environment } from '../../environments/environment';
 @Injectable()
 export class ConfigurationService {
 
-  public ServerWithUrl: string;
-  public ServerWithApiUrl: string;
+  public ServerAppCatalogWithUrl: string;
+  public ServerCatalogWithApiUrl: string;
+  public ServerAppCatalogCompanionWithUrl: string;
+  public ServerCatalogCompanionWithApiUrl: string;
   public AuthToken: string;
 
-  private Server: string = environment.baseUrlUi + "/";
-  private ApiUrl: string = environment.baseUrlUi + "/api/";
+  private ServerAppCatalogCompanion: string = environment.appcatalogCompanion.baseUrlUi + "/";
+  private ApiUrlAppCatalogCompanion: string = environment.appcatalogCompanion.baseUrlUi + "/api/";
+
+  private ServerAppCatalog: string = environment.appcatalog.baseUrlUi + "/";
+  private ApiUrlAppCatalog: string = environment.appcatalog.baseUrlUi + "/api/";
 
   /**
    * constructor
    */
   constructor() {
-    this.ServerWithUrl = this.Server;
-    this.ServerWithApiUrl = this.ApiUrl;
+    this.ServerAppCatalogWithUrl = this.ServerAppCatalog;
+    this.ServerCatalogWithApiUrl = this.ApiUrlAppCatalog;
+    this.ServerAppCatalogCompanionWithUrl = this.ServerAppCatalogCompanion;
+    this.ServerCatalogCompanionWithApiUrl = this.ApiUrlAppCatalogCompanion;
   }
 
   /**

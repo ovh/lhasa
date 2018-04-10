@@ -40,3 +40,20 @@ cd lhasa && make
 cd $GOPATH/src/github.com/ovh/lhasa
 make run
 ```
+
+#### Locally in full stack mode
+
+```
+cd $GOPATH/src/github.com/ovh/lhasa/webui
+make live
+```
+
+```
+cd $GOPATH/src/github.com/ovh/lhasa/api
+make live
+```
+
+```
+cd $GOPATH/src/github.com/ovh/lhasa-companion/api
+make live
+```

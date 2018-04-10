@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ApplicationsStoreService, LoadApplicationsAction } from './stores/applications-store.service';
-import { DataApplicationServiceService } from './services/data-application-version.service';
+import { DataApplicationService } from './services/data-application-version.service';
 import { ApplicationBean } from './models/commons/applications-bean';
 import { ContentListResponse } from './models/commons/entity-bean';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ export class AppComponent {
   constructor(
     private router: Router,
     private applicationsStoreService: ApplicationsStoreService,
-    private applicationsService: DataApplicationServiceService
+    private applicationsService: DataApplicationService
   ) {
 
   }
@@ -27,7 +27,7 @@ export class AppComponent {
    */
   protected loadApplications(event: any) {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent("", <Map<string,string>> {size: 1000}).subscribe(
+    this.applicationsService.GetAllFromContent("", new Map<string,string>([ [ "size", "1" ]])).subscribe(
       (data: ContentListResponse<ApplicationBean>) => {
         this.applicationsStoreService.dispatch(
           new LoadApplicationsAction(

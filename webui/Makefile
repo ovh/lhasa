@@ -11,5 +11,8 @@ test: dep
 run: all
 	npm start
 
+live: 
+	npm start
+
 clean:
 	echo "no cleaning command available"

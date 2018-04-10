@@ -1,22 +1,13 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.red-pink.min.css">
-<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-
-
-<div class="mdl-layout mdl-js-layout">
-  <header class="mdl-layout__header">
-    <div class="mdl-layout__header-row">
-      <a class="mdl-layout-title mdl-navigation__link" routerLink="/">AppCatalog</a>
-      <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" routerLink="/applications" (click)="loadApplications()">Applications</a>
-      </nav>
-      <div class="mdl-layout-spacer"></div>
-      <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="#">About</a>
-      </nav>
-    </div>
-  </header>
-</div>
+<!--Integrate OVH UI Kit.-->
+<nav class="oui-navbar" role="navigation">
+  <a class="oui-navbar__brand" routerLink="/">
+    <i class="oui-icon oui-icon-ovh"></i>
+  </a>
+  <ul class="oui-navbar-list">
+    <li class="oui-navbar-list__item">
+      <a class="oui-navbar-link oui-navbar-link_active" routerLink="/applications" (click)="loadApplications()">Applications</a>
+    </li>
+  </ul>
+</nav>
 
 <router-outlet></router-outlet>

@@ -16,7 +16,7 @@ import (
 
 // redirect unknown routes to angular
 func redirect(c *gin.Context) {
-	c.File("./webui/index.html")
+	c.File("./webui/ui/assets/not-found.html")
 }
 
 //NewRouter creates a new and configured gin router
