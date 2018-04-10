@@ -11,7 +11,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/logger"
-	"github.com/ovh/lhasa/api/routers"
+	"github.com/ovh/lhasa/api/routing"
 )
 
 var (

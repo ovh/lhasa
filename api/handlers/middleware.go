@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/ovh/lhasa/api/hateoas"
 )
 
 var (
@@ -38,7 +39,7 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 		}).Info("done")
 
 		for _, err := range c.Errors.Errors() {
-			if err != RestErrorCreated.Error() {
+			if err != hateoas.ErrorCreated.Error() {
 				log.WithFields(fields).Error(err)
 			}
 		}

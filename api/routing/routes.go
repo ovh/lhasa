@@ -11,7 +11,8 @@ import (
 	"github.com/loopfz/gadgeto/tonic/utils/swag"
 	"github.com/sirupsen/logrus"
 	"github.com/ovh/lhasa/api/handlers"
-	"github.com/ovh/lhasa/api/v1"
+	"github.com/ovh/lhasa/api/hateoas"
+	v1 "github.com/ovh/lhasa/api/v1/routing"
 )
 
 // redirect unknown routes to angular
@@ -25,7 +26,7 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 	router.Use(handlers.LoggingMiddleware(log), gin.Recovery())
 	configureGin(log, debugMode)
 
-	tonic.SetErrorHook(handlers.RestErrorHook(jujerr.ErrHook))
+	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))
 	// redirect root routes to angular assets
 	router.Use(static.Serve("/", static.LocalFile("./webui", true)))
 

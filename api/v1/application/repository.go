@@ -1,49 +1,49 @@
-package repositories
+package application
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/ovh/lhasa/api/repositories"
-	"github.com/ovh/lhasa/api/v1/models"
+	"github.com/ovh/lhasa/api/hateoas"
+	"github.com/ovh/lhasa/api/v1"
 )
 
 const (
-	applicationsDefaultPageSize = 20
+	defaultPageSize = 20
 )
 
-// ApplicationRepository is a repository manager for applications
-type ApplicationRepository struct {
+// Repository is a repository manager for applications
+type Repository struct {
 	db *gorm.DB
 }
 
-// NewApplicationRepository creates an application repository
-func NewApplicationRepository(db *gorm.DB) *ApplicationRepository {
-	return &ApplicationRepository{
+// NewRepository creates an application repository
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{
 		db: db,
 	}
 }
 
 // GetNewEntityInstance returns a new empty instance of the entity managed by this repository
-func (repo *ApplicationRepository) GetNewEntityInstance() repositories.Entity {
-	return &models.Application{}
+func (repo *Repository) GetNewEntityInstance() hateoas.Entity {
+	return &v1.Application{}
 }
 
 // FindAll returns all entities of the repository type
-func (repo *ApplicationRepository) FindAll() (interface{}, error) {
+func (repo *Repository) FindAll() (interface{}, error) {
 	return repo.FindBy(map[string]interface{}{})
 }
 
 // FindAllPage returns a page of matching entities
-func (repo *ApplicationRepository) FindAllPage(pageable repositories.Pageable) (repositories.Page, error) {
+func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
 	return repo.FindPageBy(pageable, map[string]interface{}{})
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, criterias map[string]interface{}) (repositories.Page, error) {
+func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
 	if pageable.Size == 0 {
-		pageable.Size = applicationsDefaultPageSize
+		pageable.Size = defaultPageSize
 	}
-	page := repositories.Page{Pageable: pageable, BasePath: models.ApplicationBasePath}
-	var applications []*models.Application
+	page := hateoas.Page{Pageable: pageable, BasePath: v1.ApplicationBasePath}
+	var applications []*v1.Application
 
 	if err := repo.db.Where(criterias).Offset(pageable.Page * pageable.Size).Limit(pageable.Size).Find(&applications).Error; err != nil {
 		return page, err
@@ -51,13 +51,13 @@ func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, cr
 	page.Content = applications
 
 	count := 0
-	if err := repo.db.Model(&models.Application{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := repo.db.Model(&v1.Application{}).Where(criterias).Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count
 
 	if pageable.IndexedBy != "" {
-		currentIndex := map[string][]*models.Application{}
+		currentIndex := map[string][]*v1.Application{}
 		ids := map[string]bool{}
 		for _, application := range applications {
 			indexedField, err := repo.getIndexedField(pageable.IndexedBy, application)
@@ -76,7 +76,7 @@ func (repo *ApplicationRepository) FindPageBy(pageable repositories.Pageable, cr
 	return page, nil
 }
 
-func (repo *ApplicationRepository) getIndexedField(field string, application *models.Application) (string, error) {
+func (repo *Repository) getIndexedField(field string, application *v1.Application) (string, error) {
 	switch field {
 	case "version":
 		return application.Version, nil
@@ -84,11 +84,11 @@ func (repo *ApplicationRepository) getIndexedField(field string, application *mo
 	case "domain":
 		return application.Domain, nil
 	}
-	return "", repositories.NewUnsupportedIndexError(field, "version", "domain")
+	return "", hateoas.NewUnsupportedIndexError(field, "version", "domain")
 }
 
 // Save persists an application to the database
-func (repo *ApplicationRepository) Save(application repositories.Entity) error {
+func (repo *Repository) Save(application hateoas.Entity) error {
 	app, err := repo.mustBeEntity(application)
 	if err != nil {
 		return err
@@ -101,12 +101,12 @@ func (repo *ApplicationRepository) Save(application repositories.Entity) error {
 }
 
 // Truncate empties the applications table for testing purposes
-func (repo *ApplicationRepository) Truncate() error {
-	return repo.db.Delete(models.Application{}).Error
+func (repo *Repository) Truncate() error {
+	return repo.db.Delete(v1.Application{}).Error
 }
 
 // Remove deletes the application whose GetID is given as a parameter
-func (repo *ApplicationRepository) Remove(app interface{}) error {
+func (repo *Repository) Remove(app interface{}) error {
 	app, err := repo.mustBeEntity(app)
 	if err != nil {
 		return err
@@ -116,8 +116,8 @@ func (repo *ApplicationRepository) Remove(app interface{}) error {
 }
 
 // FindByID gives the details of a particular application
-func (repo *ApplicationRepository) FindByID(id interface{}) (repositories.Entity, error) {
-	app := models.Application{}
+func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
+	app := v1.Application{}
 	if err := repo.db.First(&app, id).Error; err != nil {
 		return nil, err
 	}
@@ -125,25 +125,25 @@ func (repo *ApplicationRepository) FindByID(id interface{}) (repositories.Entity
 }
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
-func (repo *ApplicationRepository) FindOneByUnscoped(criterias map[string]interface{}) (repositories.SoftDeletableEntity, error) {
-	app := models.Application{}
+func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
+	app := v1.Application{}
 	err := repo.db.Unscoped().Where(criterias).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, repositories.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
 	}
 	return &app, err
 }
 
 // FindBy fetch a collection of applications matching each criteria
-func (repo *ApplicationRepository) FindBy(criterias map[string]interface{}) (interface{}, error) {
-	var apps []*models.Application
+func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
+	var apps []*v1.Application
 	err := repo.db.Where(criterias).Find(&apps).Error
 	return apps, err
 }
 
 // FindOneByDomainNameVersion fetch the first application matching each criteria
-func (repo *ApplicationRepository) FindOneByDomainNameVersion(domain, name, version string) (*models.Application, error) {
-	app := models.Application{}
+func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string) (*v1.Application, error) {
+	app := v1.Application{}
 	criterias := map[string]interface{}{
 		"domain":  domain,
 		"name":    name,
@@ -151,31 +151,31 @@ func (repo *ApplicationRepository) FindOneByDomainNameVersion(domain, name, vers
 	}
 	err := repo.db.First(&app, criterias).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, repositories.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
 	}
 	return &app, err
 }
 
-func (repo *ApplicationRepository) FindOneBy(criterias map[string]interface{}) (repositories.Entity, error) {
-	app := models.Application{}
+func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+	app := v1.Application{}
 	err := repo.db.Where(criterias).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, repositories.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
 	}
 	return &app, err
 }
 
-func (repo *ApplicationRepository) mustBeEntity(id interface{}) (*models.Application, error) {
-	var app *models.Application
+func (repo *Repository) mustBeEntity(id interface{}) (*v1.Application, error) {
+	var app *v1.Application
 	switch id := id.(type) {
 	case uint:
-		app = &models.Application{ID: id}
-	case *models.Application:
+		app = &v1.Application{ID: id}
+	case *v1.Application:
 		app = id
-	case models.Application:
+	case v1.Application:
 		app = &id
 	default:
-		return nil, repositories.NewUnsupportedEntityError(app, id)
+		return nil, hateoas.NewUnsupportedEntityError(app, id)
 	}
 	return app, nil
 }
