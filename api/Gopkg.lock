@@ -20,6 +20,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/fabienm/go-logrus-formatters"
+  packages = ["."]
+  revision = "54b28d1fe0b946dea49c5244cf3f3b82d5ac8989"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
@@ -58,8 +64,8 @@
 [[projects]]
   name = "github.com/gobuffalo/packr"
   packages = ["."]
-  revision = "3402a167bccf1bdd5c93ca820be9f27bba46261e"
-  version = "v1.10.7"
+  revision = "1da2bc3e527d59dfffe386a55e7a0583564db4d3"
+  version = "v1.10.11"
 
 [[projects]]
   branch = "master"
@@ -77,7 +83,7 @@
   branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
-  revision = "f40e974e75af4e271d97ce0fc917af5898ae7bda"
+  revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -160,8 +166,8 @@
 [[projects]]
   name = "github.com/ovh/cds"
   packages = ["sdk/log/hook"]
-  revision = "b64105ebef73310f06a47d5bfc1436b433cba3b7"
-  version = "0.29.0"
+  revision = "d9c9beba7fa3c556ab70f0372f64eb058ee7f0dc"
+  version = "0.30.1"
 
 [[projects]]
   name = "github.com/ovh/venom"
@@ -202,14 +208,14 @@
 [[projects]]
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "9831f2c3ac1068a78f50999a30db84270f647af6"
-  version = "v1.1"
+  revision = "b4c50a2b199d93b13dc15e78929cfb23bfdf21ab"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
+  revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
 
 [[projects]]
   branch = "master"
@@ -221,13 +227,13 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
+  revision = "3b87a42e500a6dc65dae1a55d0b641295971163e"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/tools"
-  packages = ["go/ast/astutil","go/gcexportdata","go/gcimporter15","go/types/typeutil"]
-  revision = "77106db15f689a60e7d4e085d967ac557b918fb2"
+  packages = ["go/ast/astutil","go/gcexportdata","go/internal/gcimporter","go/types/typeutil"]
+  revision = "dc06d3e643411517e465276d75b66dbed2898850"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -262,6 +268,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "76e039ee413986305c3fb120bec47f26edb6313007d33e480b5a8b1f98531487"
+  inputs-digest = "28b6fad5aeb58360210d4acb81303bd7839170c53fca13f434bf241ca8a41c09"
   solver-name = "gps-cdcl"
   solver-version = 1
