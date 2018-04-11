@@ -3,6 +3,7 @@ package routers
 import (
 	"net/http"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -27,8 +28,9 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 	configureGin(log, debugMode)
 
 	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))
+
 	// redirect root routes to angular assets
-	router.Use(static.Serve("/", static.LocalFile("./webui", true)))
+	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/", static.LocalFile("./webui", true)))
 
 	// redirect unknown routes to angular
 	router.NoRoute(redirect)

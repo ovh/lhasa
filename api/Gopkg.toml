@@ -35,3 +35,7 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[override]]
   name = "github.com/satori/go.uuid"
   branch = "master"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/gin-contrib/gzip"
