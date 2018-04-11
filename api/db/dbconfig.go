@@ -14,8 +14,8 @@ type databaseInstance struct {
 	Ssl  string `json:"sslmode"`
 }
 
-// databaseCredentials credentials
-type databaseCredentials struct {
+// DatabaseCredentials credentials
+type DatabaseCredentials struct {
 	Readers  []databaseInstance `json:"readers"`
 	Writers  []databaseInstance `json:"writers"`
 	Database string             `json:"database"`
@@ -24,9 +24,9 @@ type databaseCredentials struct {
 	Type     string             `json:"type"`
 }
 
-// fromJSON unmarshall creds
-func fromJSON(creds string) (*databaseCredentials, error) {
-	dc := &databaseCredentials{}
+// FromJSON unmarshall creds
+func FromJSON(creds string) (*DatabaseCredentials, error) {
+	dc := &DatabaseCredentials{}
 	err := json.Unmarshal([]byte(creds), &dc)
 	if err != nil {
 		return nil, ErrUnmarshal
@@ -52,16 +52,16 @@ var (
 )
 
 // GetRW get a read/write database
-func (dc *databaseCredentials) GetRW() (string, error) {
+func (dc *DatabaseCredentials) GetRW() (string, error) {
 	return dc.getConnStr(dc.Writers)
 }
 
 // GetRO get a read only database
-func (dc *databaseCredentials) GetRO() (string, error) {
+func (dc *DatabaseCredentials) GetRO() (string, error) {
 	return dc.getConnStr(dc.Readers)
 }
 
-func (dc *databaseCredentials) getConnStr(instances []databaseInstance) (string, error) {
+func (dc *DatabaseCredentials) getConnStr(instances []databaseInstance) (string, error) {
 	dbType, err := dc.getType()
 	if err != nil {
 		return "", err
@@ -73,7 +73,7 @@ func (dc *databaseCredentials) getConnStr(instances []databaseInstance) (string,
 	return buildConnStr(dbType, dc, i), nil
 }
 
-func (dc *databaseCredentials) getType() (Type, error) {
+func (dc *DatabaseCredentials) getType() (Type, error) {
 	switch strings.ToLower(dc.Type) {
 	case "postgresql":
 		return PostgreSQL, nil
@@ -81,7 +81,7 @@ func (dc *databaseCredentials) getType() (Type, error) {
 	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
 }
 
-func (dc *databaseCredentials) getSslDefaultMode(value string) (string, error) {
+func (dc *DatabaseCredentials) getSslDefaultMode(value string) (string, error) {
 	if len(value) > 0 {
 		return value, nil
 	}
@@ -99,7 +99,7 @@ func getRandom(instances []databaseInstance) (*databaseInstance, error) {
 	return &instances[0], nil // TODO rnd
 }
 
-func buildConnStr(fmtStr Type, dc *databaseCredentials, i *databaseInstance) string {
+func buildConnStr(fmtStr Type, dc *DatabaseCredentials, i *databaseInstance) string {
 	// build sslmode with default value according do bdd type
 	var sslmode, _ = dc.getSslDefaultMode(i.Ssl)
 	return fmt.Sprintf(string(fmtStr), dc.User, dc.Password, i.Host, i.Port, dc.Database, sslmode)

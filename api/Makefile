@@ -62,7 +62,7 @@ run: server
 	./${OUT}
 
 live:
-	VAULT_FILE=../.vault-file.json APPCATALOG_DEBUG_MODE=true gin -p 8081 -a 3000 -i --path . --build cmd/appcatalog -- --port=3000 
+	APPCATALOG_CONFIG_FILE=../.config.json APPCATALOG_DEBUG_MODE=true gin -p 8081 -a 3000 -i --path . --build cmd/appcatalog -- --port=3000 
 
 clean:
 	@packr clean

@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/ovh/lhasa/api/config"
 	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/logger"
 	"github.com/ovh/lhasa/api/routing"
@@ -36,7 +37,8 @@ var (
 	flagDebug          = application.Flag("debug", "Enables debug mode (routing and sql logging).").Envar("APPCATALOG_DEBUG_MODE").Bool()
 	flagQuiet          = application.Flag("quiet", "Enables quiet mode.").Short('q').Envar("APPCATALOG_QUIET_MODE").Bool()
 	flagJSONOutput     = application.Flag("json", "Enables JSON output.").Envar("APPCATALOG_JSON_OUTPUT").Bool()
-	flagDBVaultAlias   = application.Flag("db-vault-alias", "Set vault alias to use").Default("appcatalog-db").Envar("APPCATALOG_DB_VAULT_ALIAS").String()
+	flagConfigFile     = application.Flag("config", "Json configuration file").Default("config.json").Envar("APPCATALOG_CONFIG_FILE").File()
+	flagDBAlias        = application.Flag("db-alias", "Set alias to use in json configuration").Default("appcatalog-db").Envar("APPCATALOG_DB_ALIAS").String()
 
 	cmdVersion = application.Command(cmdCodeVersion, "Shows version number.")
 
@@ -78,11 +80,11 @@ func main() {
 }
 
 func waitForDB(log *logrus.Logger) *gorm.DB {
-	dbHandle, err := db.NewFromVault(*flagDBVaultAlias, *flagDebug, log)
+	dbHandle, err := config.NewFromFile(*flagConfigFile, *flagDBAlias, *flagDebug, log)
 	for err != nil {
 		log.WithError(err).Errorf("cannot get DB handle, retrying in %d seconds", dbRetryDuration)
 		time.Sleep(dbRetryDuration * time.Second)
-		dbHandle, err = db.NewFromVault(*flagDBVaultAlias, *flagDebug, log)
+		dbHandle, err = config.NewFromFile(*flagConfigFile, *flagDBAlias, *flagDebug, log)
 	}
 	return dbHandle
 }

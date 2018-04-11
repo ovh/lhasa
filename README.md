@@ -38,3 +38,26 @@ go get $GOPATH/src/github.com/ovh/lhasa/api/cmd/appcatalog
 cd $GOPATH/src/github.com/ovh/lhasa
 make run
 ```
+
+### Sample config file
+
+```
+[
+    {
+        "appcatalog-db" {
+            "writers": [
+                {
+                    "host": "www.example.com",
+                    "port": 1024,
+                    "sslmode": "disable"
+                }
+            ],
+            "database": "postgres",
+            "user": "postgres",
+            "password": "sample",
+            "type": "postgresql"
+        }
+    }
+]
+```
+

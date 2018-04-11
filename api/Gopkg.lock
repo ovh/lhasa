@@ -4,7 +4,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/alecthomas/template"
-  packages = [".","parse"]
+  packages = [
+    ".",
+    "parse"
+  ]
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
 
 [[projects]]
@@ -58,7 +61,12 @@
 [[projects]]
   branch = "master"
   name = "github.com/gin-gonic/gin"
-  packages = [".","binding","json","render"]
+  packages = [
+    ".",
+    "binding",
+    "json",
+    "render"
+  ]
   revision = "6d913fc343cfac80d656db5be67a0ffb1323ba0d"
 
 [[projects]]
@@ -82,12 +90,25 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
+  packages = [
+    ".",
+    "hcl/ast",
+    "hcl/parser",
+    "hcl/scanner",
+    "hcl/strconv",
+    "hcl/token",
+    "json/parser",
+    "json/scanner",
+    "json/token"
+  ]
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
-  packages = [".","dialects/postgres"]
+  packages = [
+    ".",
+    "dialects/postgres"
+  ]
   revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
   version = "v1.9.1"
 
@@ -112,13 +133,24 @@
 [[projects]]
   branch = "master"
   name = "github.com/lib/pq"
-  packages = [".","hstore","oid"]
+  packages = [
+    ".",
+    "hstore",
+    "oid"
+  ]
   revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
   branch = "master"
   name = "github.com/loopfz/gadgeto"
-  packages = ["tonic","tonic/utils/bootstrap","tonic/utils/jujerr","tonic/utils/swag","tonic/utils/swag/doc","tonic/utils/swag/swagger"]
+  packages = [
+    "tonic",
+    "tonic/utils/bootstrap",
+    "tonic/utils/jujerr",
+    "tonic/utils/swag",
+    "tonic/utils/swag/doc",
+    "tonic/utils/swag/swagger"
+  ]
   revision = "1ed41876bc309f5ae4328fb2a0008f903473c7b5"
 
 [[projects]]
@@ -184,7 +216,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/rubenv/sql-migrate"
-  packages = [".","sqlparse"]
+  packages = [
+    ".",
+    "sqlparse"
+  ]
   revision = "081fe17d19ff4e2dd9f5a0c1158e6bcf74da6906"
 
 [[projects]]
@@ -201,7 +236,11 @@
 
 [[projects]]
   name = "github.com/smartystreets/assertions"
-  packages = [".","internal/go-render/render","internal/oglematchers"]
+  packages = [
+    ".",
+    "internal/go-render/render",
+    "internal/oglematchers"
+  ]
   revision = "7678a5452ebea5b7090a6b163f844c133f523da2"
   version = "1.8.3"
 
@@ -226,13 +265,21 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "3b87a42e500a6dc65dae1a55d0b641295971163e"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/tools"
-  packages = ["go/ast/astutil","go/gcexportdata","go/internal/gcimporter","go/types/typeutil"]
+  packages = [
+    "go/ast/astutil",
+    "go/gcexportdata",
+    "go/internal/gcimporter",
+    "go/types/typeutil"
+  ]
   revision = "dc06d3e643411517e465276d75b66dbed2898850"
 
 [[projects]]
@@ -268,6 +315,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "28b6fad5aeb58360210d4acb81303bd7839170c53fca13f434bf241ca8a41c09"
+  inputs-digest = "ccb960089e7a2a55098943267354d18ab722710cf5c174cfaf12429b95e77125"
   solver-name = "gps-cdcl"
   solver-version = 1

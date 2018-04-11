@@ -1,12 +1,15 @@
-package db
+package config
 
 // The db package's main purpose is to trigger a database connection
 // and offer it as a global variable to all the package consumers.
 // Note: This is not the best way to share this variable but
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -15,8 +18,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres" // This is required by GORM to enable postgresql support
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
-	dbconfig "github.com/ovh/lhasa/api/dbconfig"
+	"github.com/ovh/lhasa/api/db"
 )
 
 const (
@@ -24,20 +26,47 @@ const (
 	maxIdleConns = 3
 )
 
-// NewFromVault provides the database handle to its callers
-func NewFromVault(vaultAlias string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
-	// Init vault
-	connConfigStr, err := autovault.Secrets().Alias(vaultAlias)
+// read a file
+func readFile(configFile string) (string, error) {
+	b, err := ioutil.ReadFile(configFile) // just pass the file name
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot read alias %s from vault", vaultAlias)
+		return "", err
 	}
-	connConfig, err := fromJSON(connConfigStr)
+	return string(b), nil
+}
+
+// ToJSON return o json formated value (in pretty format)
+func extractKey(configFile *os.File, key string) (string, error) {
+	// Init config file
+	connConfigStr, err := readFile(configFile.Name())
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot read JSON DBConfig from vault secret %s", vaultAlias)
+		return "", errors.Wrapf(err, "cannot read configuration file %s", configFile)
+	}
+	// Extract key
+	var data = make(map[string]interface{})
+	json.Unmarshal([]byte(connConfigStr), &data)
+	// Transform it to string
+	payload, err := json.MarshalIndent(data[key], "", "\t")
+	if err != nil {
+		return "{}", errors.Wrapf(err, "Unable to marshal:", err)
+	}
+	return string(payload), nil
+}
+
+// NewFromFile provides the database handle to its callers
+func NewFromFile(configFile *os.File, dbAlias string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
+	// Init config file
+	connConfigStr, err := extractKey(configFile, dbAlias)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot read alias %s from configuration file", configFile)
+	}
+	connConfig, err := db.FromJSON(connConfigStr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot read JSON DBConfig from db alias %s", dbAlias)
 	}
 	connStr, err := connConfig.GetRW()
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot get a RW database from vault secret %s", vaultAlias)
+		return nil, errors.Wrapf(err, "cannot get a RW database from db alias %s", dbAlias)
 	}
 	return NewFromGormString(connStr, logMode, log)
 }
