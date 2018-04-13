@@ -58,6 +58,7 @@ func indexHandler() gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
+// IndexResource index HATEOS
 type IndexResource struct {
 	hateoas.Resource
 }

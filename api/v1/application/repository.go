@@ -156,6 +156,7 @@ func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string)
 	return &app, err
 }
 
+// FindOneBy find by criterias
 func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
 	app := v1.Application{}
 	err := repo.db.Where(criterias).First(&app).Error
