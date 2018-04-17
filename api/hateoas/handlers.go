@@ -1,16 +1,30 @@
 package hateoas
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
 	"github.com/loopfz/gadgeto/tonic"
 )
 
+// InternalError all internal error
+type InternalError struct {
+	Message string
+	Detail  string
+}
+
 type errorCreated string
 type errorGone string
+
+// Error implements error interface
+func (err *InternalError) Error() string {
+	return err.Message + ":" + err.Detail
+}
 
 // Error implements error interface
 func (err errorCreated) Error() string {
@@ -34,7 +48,8 @@ func HandlerFindByPage(repository PageableRepository) gin.HandlerFunc {
 		pageable := Pageable{}
 		c.ShouldBindQuery(&pageable)
 
-		results, err := repository.FindPageBy(pageable, parsePathParams(c))
+		// params and query are user to filter resultset
+		results, err := repository.FindPageBy(pageable, parsePathParamsAndQuery(c))
 		if err != nil {
 			return nil, err
 		}
@@ -151,6 +166,65 @@ func parsePathParams(c *gin.Context) map[string]interface{} {
 	criteria := map[string]interface{}{}
 	for _, p := range c.Params {
 		criteria[p.Key] = p.Value
+	}
+	return criteria
+}
+
+// unCamelCase discover physical column name in database
+func unCamelCase(value string) string {
+	if strings.Contains(value, "->>") {
+		// on jsonb column don't un camel case field
+		return value
+	}
+	accu := ""
+	for i := 0; i < len(value); i = i + 1 {
+		switch value[i] {
+		case '_':
+			break
+		default:
+			// is already lower
+			if bytes.ToLower([]byte{value[i]})[0] == value[i] {
+				accu = accu + string(value[i])
+			} else {
+				accu = accu + "_" + string(bytes.ToLower([]byte{value[i]})[0])
+			}
+		}
+	}
+	return accu
+}
+
+// parse param and query of request
+func parsePathParamsAndQuery(c *gin.Context) map[string]interface{} {
+	criteria := map[string]interface{}{}
+	for _, p := range c.Params {
+		criteria[p.Key] = p.Value
+	}
+	pageable := Pageable{}
+	c.ShouldBindQuery(&pageable)
+
+	// scan for optionnal query
+	var q = map[string]interface{}{}
+	if len(pageable.Query) > 0 {
+		json.Unmarshal([]byte(pageable.Query), &q)
+	}
+
+	// Scan it
+	for k, v := range q {
+		if len(k) > 0 {
+			// only support simple fields, no check on jsonb expression
+			if !strings.Contains(k, ".") {
+				// Only support taking first occurence
+				str, check := v.(string)
+				if !check {
+					value, _ := json.Marshal(v)
+					str = string(value)
+				}
+				criteria[unCamelCase(k)] = str
+			} else {
+				// Only support taking first occurence
+				criteria[k] = v.(string)
+			}
+		}
 	}
 	return criteria
 }

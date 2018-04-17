@@ -40,6 +40,32 @@ func HandlerDeploy(appRepo *application.Repository, envRepo *environment.Reposit
 	}, http.StatusOK)
 }
 
+type dependCreateQuery map[string]interface{}
+
+type dependCreateRequest struct {
+	PublicID       string `path:"public_id"`
+	TargetPublicID string `path:"target_public_id"`
+	Type           string `json:"type"`
+}
+
+// HandlerDepend add an observable depdendency with its
+func HandlerDepend(appRepo *application.Repository, envRepo *environment.Repository, depRepo *Repository, depend Depend) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, request *dependCreateRequest) (hateoas.Entity, error) {
+
+		// Find this dependency by its ID (public)
+		entity, _ := depRepo.FindOneBy(map[string]interface{}{"public_id": request.PublicID})
+		src := entity.(*v1.Deployment)
+		target := &v1.Deployment{PublicID: request.TargetPublicID}
+
+		// In depend update dependencies
+		if err := depend(src, target, request.Type); err != nil {
+			return nil, &(hateoas.InternalError{Message: err.Error(), Detail: request.Type})
+		}
+
+		return src, nil
+	}, http.StatusOK)
+}
+
 // HandlerFindDeployment finds deployment for a given application and environment
 func HandlerFindDeployment(appRepo *application.Repository, envRepo *environment.Repository, depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (*v1.Deployment, error) {

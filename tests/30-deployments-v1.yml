@@ -13,6 +13,18 @@ testcases:
       headers:
       assertions:
       - result.statuscode ShouldEqual 204
+    - type: http
+      method: DELETE
+      url: '{{.appsroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+    - type: http
+      method: DELETE
+      url: '{{.envsroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
 
 - name: DeploymentLifecycle
   steps:
@@ -115,3 +127,117 @@ testcases:
       assertions:
       - result.bodyjson.bodyjson0 ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
+- name: DeploymentDepend
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/domain1/app1/6"
+      body: |
+        {
+          "domain": "domain1",
+          "name": "app1",
+          "version": "6",
+          "manifest": {
+            "description": "Great application to manage and plan your information system."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/domain2/app2/7"
+      body: |
+        {
+          "domain": "domain2",
+          "name": "app2",
+          "version": "7",
+          "manifest": {
+            "description": "Another great application to manage and plan your information system."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: PUT
+      url: "{{.envsroute}}/another"
+      headers:
+      body: '{"name": "Deployment test env", "properties": {}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain1/app1/6/deployments"
+      headers:
+      assertions:
+      - result.body ShouldEqual []
+    - type: http
+      method: POST
+      url: "{{.appsroute}}/domain1/app1/6/deploy/another"
+      headers:
+      body: '{"properties": {"arsenal_id": "app1-token","application_version": "v1.0"}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain1/app1/6/deployments"
+      headers:
+      assertions:
+      - result.bodyjson.bodyjson0 ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain1/app1/6/deployments/another"
+      headers:
+      assertions:
+      - result.bodyjson ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: POST
+      url: "{{.appsroute}}/domain2/app2/7/deploy/another"
+      headers:
+      body: '{"properties": {"arsenal_id": "app2-token","application_version": "v2.0"}}'
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain2/app2/7/deployments/another"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain2/app2/7/deployments/another"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain2/app2/7/deployments"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/domain2/app2/7/deployments"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.depsroute}}/?q=%7B%22properties.arsenal_id%22%3A%20%22app1-token,app2-token%22,%20%22_createdAt%20%3E%20%3F%22%3A%20%222016-04-17T12%3A54%3A04.601578Z%22%7D"
+      headers:
+      assertions:
+      - result.bodyjson.content.content0 ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 206
+    - type: http
+      method: POST
+      url: "{{.depsroute}}/{{.DeploymentDepend.result.bodyjson.content.content0.id}}/add_link/{{.DeploymentDepend.result.bodyjson.content.content1.id}}"
+      body: '{"type": "sync:call"}'
+      headers:
+      assertions:
+      - result.bodyjson.bodyjson0 ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+
+

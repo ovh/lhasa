@@ -27,7 +27,7 @@ type Application struct {
 	Version      string          `json:"version" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"version"`
 	Manifest     *postgres.Jsonb `json:"manifest"`
 	Tags         pq.StringArray  `json:"-" gorm:"type:varchar(255)[]"`
-	Dependencies []Dependency    `json:"-" gorm:"foreignkey:OwnerID"`
+	Dependencies []Dependency    `json:"-"`
 	Deployments  []Deployment    `json:"-"`
 	CreatedAt    time.Time       `json:"_createdAt"`
 	UpdatedAt    time.Time       `json:"_updatedAt"`
@@ -85,12 +85,19 @@ type Deployment struct {
 	Application   *Application   `json:"-"`
 	EnvironmentID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
 	Environment   *Environment   `json:"-"`
+	Dependencies  postgres.Jsonb `json:"dependencies,omitempty"`
 	Properties    postgres.Jsonb `json:"properties,omitempty"`
 	UndeployedAt  *time.Time     `json:"undeployedAt,omitempty"`
 	CreatedAt     time.Time      `json:"_createdAt"`
 	UpdatedAt     time.Time      `json:"_updatedAt"`
 	DeletedAt     *time.Time     `json:"-"`
 	hateoas.Resource
+}
+
+// DeploymentDependency defines a inter-deployment link
+type DeploymentDependency struct {
+	TargetID string `json:"target"`
+	Type     string `json:"type"`
 }
 
 // GetID returns the public ID of the entity

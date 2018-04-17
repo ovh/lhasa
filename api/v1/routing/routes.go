@@ -14,7 +14,7 @@ import (
 )
 
 // registerRoutes registers v1 API routes on a gin engine
-func registerRoutes(group *gin.RouterGroup, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, d deployment.Deployer) {
+func registerRoutes(group *gin.RouterGroup, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, d deployment.Deployer, depend deployment.Depend) {
 	group.GET("/", indexHandler())
 
 	appRoutes := group.Group("/applications")
@@ -42,6 +42,7 @@ func registerRoutes(group *gin.RouterGroup, appRepo *application.Repository, env
 	depRoutes.DELETE("/", hateoas.HandlerRemoveAll(depRepo))
 	depRoutes.GET("/:public_id", hateoas.HandlerFindOneBy(depRepo))
 	depRoutes.DELETE("/:public_id", hateoas.HandlerRemoveOneBy(depRepo))
+	depRoutes.POST("/:public_id/add_link/:target_public_id", deployment.HandlerDepend(appRepo, envRepo, depRepo, depend))
 }
 
 func indexHandler() gin.HandlerFunc {
@@ -69,6 +70,7 @@ func Init(db *gorm.DB, group *gin.RouterGroup) {
 	envRepo := environment.NewRepository(db)
 	depRepo := deployment.NewRepository(db)
 	deployer := deployment.ApplicationDeployer(depRepo)
+	depend := deployment.Dependency(depRepo)
 
-	registerRoutes(group, appRepo, envRepo, depRepo, deployer)
+	registerRoutes(group, appRepo, envRepo, depRepo, deployer, depend)
 }

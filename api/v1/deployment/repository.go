@@ -51,14 +51,26 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page := hateoas.Page{Pageable: pageable, BasePath: v1.DeploymentBasePath}
 	var deployments []*v1.Deployment
 
-	if err := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).
-		Offset(pageable.Page*pageable.Size).Limit(pageable.Size).Find(&deployments, criterias).Error; err != nil {
+	// Analyse critarias for extract inline, standard and JSONB ones
+	standardCriterias, inlineCriterias, jsonbCriterias := hateoas.CheckFilter(criterias)
+
+	// Apply request
+	db := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).Offset(pageable.Page * pageable.Size).Limit(pageable.Size)
+	db = hateoas.JSONBFilter(db, jsonbCriterias)
+	db = hateoas.InlineFilter(db, inlineCriterias)
+
+	if err := db.Find(&deployments, standardCriterias).Error; err != nil {
 		return page, err
 	}
 	page.Content = deployments
 
+	// Build counters
+	counter := repo.db.Model(v1.Deployment{}).Where(standardCriterias)
+	counter = hateoas.JSONBFilter(counter, jsonbCriterias)
+	counter = hateoas.InlineFilter(counter, inlineCriterias)
+
 	count := 0
-	if err := repo.db.Model(v1.Deployment{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := counter.Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count
