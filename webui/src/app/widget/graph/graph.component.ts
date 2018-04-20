@@ -38,7 +38,7 @@ export class GraphComponent implements OnInit, AfterViewInit {
         }, 1000)
     }
 
-    public @Input() get nodes(): Node[] {
+    @Input() get nodes(): Node[] {
         return this._nodes;
     }
 

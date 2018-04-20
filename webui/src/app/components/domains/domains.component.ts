@@ -1,12 +1,13 @@
-import { Component, OnInit, Pipe } from '@angular/core';
-import { ApplicationsStoreService, SelectApplicationAction, LoadApplicationsAction } from '../../stores/applications-store.service';
-import { Store } from '@ngrx/store';
-import { ApplicationBean, DomainBean } from '../../models/commons/applications-bean';
-import { DataApplicationService } from '../../services/data-application-version.service';
-import { ContentListResponse } from '../../models/commons/entity-bean';
+import {Component, OnInit, Pipe} from '@angular/core';
+import {ApplicationsStoreService, SelectApplicationAction, LoadApplicationsAction} from '../../stores/applications-store.service';
+import {Store} from '@ngrx/store';
+import {ApplicationBean, DeploymentBean, DomainBean} from '../../models/commons/applications-bean';
+import {DataApplicationService} from '../../services/data-application-version.service';
+import {ContentListResponse} from '../../models/commons/entity-bean';
 
 import * as _ from 'lodash';
-import { Node, Edge } from '../../models/graph/graph-bean';
+import {Node, Edge} from '../../models/graph/graph-bean';
+import {DataDeploymentService} from '../../services/data-deployment.service';
 
 @Component({
   selector: 'app-domains',
@@ -29,7 +30,8 @@ export class DomainsComponent implements OnInit {
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
-    private applicationsService: DataApplicationService
+    private applicationsService: DataApplicationService,
+    private deploymentService: DataDeploymentService
   ) {
     /**
      * subscribe
@@ -38,36 +40,36 @@ export class DomainsComponent implements OnInit {
 
     this.domainsStream.subscribe(
       (domains: DomainBean[]) => {
-        this.nodes = []
-        this.edges = []
-        this.domains = domains
-        let indexApp = new Map<string, number>()
+        this.nodes = [];
+        this.edges = [];
+        this.domains = domains;
+        let indexApp = new Map<string, number>();
         _.each(domains, (domain) => {
           this.nodes.push({
             id: domain.name,
             label: domain.name
-          })
+          });
           let applications = domain.applications;
           _.each(applications, (app) => {
-            let keyApp = domain.name + "#" + app.name
-            if(indexApp.has(keyApp)) {
-              let instance = indexApp.get(keyApp)+1
-              indexApp.set(keyApp,instance)
+            let keyApp = domain.name + '#' + app.name;
+            if (indexApp.has(keyApp)) {
+              let instance = indexApp.get(keyApp) + 1;
+              indexApp.set(keyApp, instance);
             } else {
-              indexApp.set(keyApp,0)
+              indexApp.set(keyApp, 0);
             }
             this.nodes.push({
-              id: keyApp + "#" + indexApp.get(keyApp),
-              label: app.name + "#" + indexApp.get(keyApp)
-            })
+              id: keyApp + '#' + indexApp.get(keyApp),
+              label: app.name + '#' + indexApp.get(keyApp)
+            });
             this.edges.push({
               from: domain.name,
-              to: keyApp + "#" + indexApp.get(keyApp),
-              label: domain.name + " to " + app.name + "#" + indexApp.get(keyApp)
-            })
+              to: keyApp + '#' + indexApp.get(keyApp),
+              label: domain.name + ' to ' + app.name + '#' + indexApp.get(keyApp)
+            });
           });
         });
-     },
+      },
       error => {
         console.error(error);
       },
@@ -78,41 +80,51 @@ export class DomainsComponent implements OnInit {
 
   ngOnInit() {
     if (!this.domains || this.domains.length == 0) {
-      this.loadApplications(null)
+      this.loadApplications(null);
     }
   }
 
   /**
- * dispatch load applications
- * @param event 
- */
+   * dispatch load applications
+   * @param event
+   */
   protected loadApplications(event: any) {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent("", <Map<string, string>>{ size: 1000 }).subscribe(
+    this.applicationsService.GetAllFromContent('', <Map<string, string>>{size: 1000}).subscribe(
       (data: ContentListResponse<ApplicationBean>) => {
         this.applicationsStoreService.dispatch(
           new LoadApplicationsAction(
             data.content
           )
-        )
+        );
       }
     );
   }
 
+
   /**
    * dispatch load applications
-   * @param event 
+   * @param event
    */
   protected selectApplication(application: ApplicationBean) {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent('/' + application.domain + '/' + application.name, <Map<string, string>>{ size: 1 }).subscribe(
-      (data: ContentListResponse<ApplicationBean>) => {
-        this.applicationsStoreService.dispatch(
-          new SelectApplicationAction(
-            data.content[0]
-          )
-        )
-      }
-    );
+    this.applicationsService.GetAllFromContent('/' + application.domain + '/' + application.name, <Map<string, string>> {size: 1})
+      .subscribe(
+        (data: ContentListResponse<ApplicationBean>) => {
+          this.deploymentService.GetAllFromContent(
+            '/?q=%7B%22properties._app_domain%22%3A%20%22' + application.domain +
+            '%22%2C%20%22properties._app_name%22%3A%20%22' + application.name + '%22%7D',
+            <Map<string, string>> {size: 20}).subscribe(
+            (deployments: ContentListResponse<DeploymentBean>) => {
+              this.applicationsStoreService.dispatch(
+                new SelectApplicationAction(
+                  data.content[0],
+                  deployments.content
+                )
+              );
+            }
+          );
+        }
+      );
   }
 }

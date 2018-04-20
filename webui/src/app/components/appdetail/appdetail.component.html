@@ -1,29 +1,68 @@
-<div *ngIf="application">
-  <div class="ui-g-24">
-    <div class="oui-field">
-      <label for="text-1" class="oui-field__label oui-label">Domain</label>
-      <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Domain" [(ngModel)]="application.domain" disabled>
+<div *ngIf="application" class="ui-g">
+  <div class="oui-back-button">
+    <button type="button" class="oui-button oui-button_icon-alone" routerLink="/applications">
+      <i class="oui-icon oui-icon-chevron-left" aria-hidden="true"></i>
+    </button>
+  </div>
+  <h2 class="oui-back-button_title oui-header_2">{{ application.domain }}/{{ application.name }}</h2>
+  <div class="oui-box ui-g-12">
+    <div class="ui-g-7">
+      <p class="oui-chip__container" *ngIf="application.tags">
+        <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
+      </p>
+      <div *ngIf="application.manifest.description">
+        <h3 class="oui-header_3">Description</h3>
+        <p>
+        {{ application.manifest.description }}
+        </p>
+      </div>
+      <div *ngIf="application.manifest.repository">
+        <h3 class="oui-header_3">Repository</h3>
+        <p class="oui-field__control oui-field__control_auto">
+          <a class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
+          {{ application.manifest.repository }} <span class="oui-icon oui-icon-external_link"></span>
+          </a>
+        </p>
       </div>
     </div>
-    <div class="oui-field">
-      <label for="text-1" class="oui-field__label oui-label">Name</label>
-      <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Name" [(ngModel)]="application.name" disabled>
-      </div>
-    </div>
-    <div class="oui-field">
-      <label for="text-10" class="oui-field__label oui-label">Repository</label>
-      <div class="oui-field__control oui-field__control_auto">
-        <a href="{{ application.manifest.repository }}">{{ application.manifest.repository }}</a>
-      </div>
-    </div>
-    <div class="oui-field">
-      <label for="text-1" class="oui-field__label oui-label">Manifest</label>
-      <div>
-        <markdown [data]="application.manifest.description"></markdown>
-      </div>
+    <div class="oui-list ui-g-5" *ngIf="application.manifest.authors">
+      <h3 class="oui-header_3">Authors</h3>
+      <ul class="oui-list__items">
+        <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
+          <span class="oui-list__header">
+          {{ person.name }} <span *ngIf="person.role">({{ person.role }})</span><span
+            *ngIf="person.email"> &lt;{{ person.email }}&gt;</span>
+          </span>
+        </li>
+      </ul>
     </div>
   </div>
-
+  <div class="ui-g-12">
+    <h2 class="oui-header_2">Deployments</h2>
+    <table class="oui-datagrid">
+      <thead class="oui-datagrid__headers">
+      <tr>
+        <th class="oui-datagrid__header">Environment</th>
+        <th class="oui-datagrid__header">Version</th>
+        <th class="oui-datagrid__header table-col-75">Availability</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr class="oui-datagrid__row" *ngFor="let deployment of deployments | activeDeployment">
+        <td class="oui-datagrid__cell">
+          <app-env-chip slug="{{ deployment.properties._env_slug }}"></app-env-chip>
+        </td>
+        <td class="oui-datagrid__cell">{{ deployment.properties._app_version }}</td>
+        <td class="oui-datagrid__cell">
+          <div class="oui-progress oui-progress_warning oui-progress_indeterminate" role="progressbar" aria-valuemin="0"
+               aria-valuemax="100"></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ui-g-12">
+    <h2 class="oui-header_2">Readme</h2>
+    <markdown *ngIf="application.manifest.description" [data]="application.manifest.description"></markdown>
+  </div>
 </div>

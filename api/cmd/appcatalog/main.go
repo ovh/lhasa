@@ -37,7 +37,7 @@ var (
 	flagDebug          = application.Flag("debug", "Enables debug mode (routing and sql logging).").Envar("APPCATALOG_DEBUG_MODE").Bool()
 	flagQuiet          = application.Flag("quiet", "Enables quiet mode.").Short('q').Envar("APPCATALOG_QUIET_MODE").Bool()
 	flagJSONOutput     = application.Flag("json", "Enables JSON output.").Envar("APPCATALOG_JSON_OUTPUT").Bool()
-	flagConfigFile     = application.Flag("config", "Json configuration file").Default("config.json").Envar("APPCATALOG_CONFIG_FILE").File()
+	flagConfigFile     = application.Flag("config", "Json configuration file").Default(".config.json").Envar("APPCATALOG_CONFIG_FILE").File()
 	flagDBAlias        = application.Flag("db-alias", "Set alias to use in json configuration").Default("appcatalog-db").Envar("APPCATALOG_DB_ALIAS").String()
 
 	cmdVersion = application.Command(cmdCodeVersion, "Shows version number.")
