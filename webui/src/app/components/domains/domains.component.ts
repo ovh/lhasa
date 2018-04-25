@@ -6,6 +6,7 @@ import { DataApplicationService } from '../../services/data-application-version.
 import { ContentListResponse } from '../../models/commons/entity-bean';
 
 import * as _ from 'lodash';
+import { Node, Edge } from '../../models/graph/graph-bean';
 
 @Component({
   selector: 'app-domains',
@@ -20,6 +21,12 @@ export class DomainsComponent implements OnInit {
   protected domainsStream: Store<DomainBean[]>;
   protected domains: DomainBean[] = [];
 
+  /**
+   * to graph domains
+   */
+  protected nodes: Node[];
+  protected edges: Edge[];
+
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
     private applicationsService: DataApplicationService
@@ -31,21 +38,36 @@ export class DomainsComponent implements OnInit {
 
     this.domainsStream.subscribe(
       (domains: DomainBean[]) => {
+        this.nodes = []
+        this.edges = []
         this.domains = domains
+        let indexApp = new Map<string, number>()
         _.each(domains, (domain) => {
+          this.nodes.push({
+            id: domain.name,
+            label: domain.name
+          })
           let applications = domain.applications;
           _.each(applications, (app) => {
-            if (app.manifest && app.manifest.description) {
-              app.description = (app.manifest.description.length > 200) ? (app.manifest.description.substr(0, 200) + "...") : (app.manifest.description)
+            let keyApp = domain.name + "#" + app.name
+            if(indexApp.has(keyApp)) {
+              let instance = indexApp.get(keyApp)+1
+              indexApp.set(keyApp,instance)
             } else {
-              app.description = "No description ..."
-              if (!app.manifest) {
-                app.manifest = {}
-              }
+              indexApp.set(keyApp,0)
             }
+            this.nodes.push({
+              id: keyApp + "#" + indexApp.get(keyApp),
+              label: app.name + "#" + indexApp.get(keyApp)
+            })
+            this.edges.push({
+              from: domain.name,
+              to: keyApp + "#" + indexApp.get(keyApp),
+              label: domain.name + " to " + app.name + "#" + indexApp.get(keyApp)
+            })
           });
         });
-      },
+     },
       error => {
         console.error(error);
       },

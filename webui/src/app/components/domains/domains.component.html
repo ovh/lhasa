@@ -1,17 +1,2 @@
-<div class="ui-g-12" *ngFor="let domain of domains | orderByDomains">
-  <div style="padding: 8px" class="ui-g-4 ui-md-4" *ngFor="let app of domain.applications | orderByApps">
-    <div class="oui-box oui-box_light">
-      <h1 class="oui-header_1 oui-header_underline">{{ app.domain | uppercase }}</h1>
-      <h1>{{ app.name }}</h1>
-      <p>
-        {{ app.description }}
-      </p>
-      <button class="oui-button oui-button_primary" routerLink="/applications/{{ app.domain }}/{{ app.name }}" (click)="selectApplication(app)">
-        More info ...
-      </button>
-      <button class="oui-button oui-button_primary" routerLink="/enrollment" (click)="selectApplication(app)">
-        Enrollment ...
-      </button>
-    </div>
-  </div>
-</div>
+
+<app-graph *ngIf="nodes && edges" [nodes]="nodes" [edges]="edges"></app-graph>

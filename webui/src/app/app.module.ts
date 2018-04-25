@@ -94,12 +94,14 @@ import { OuiProgressTrackerComponent } from './kit/oui-progress-tracker/oui-prog
 import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.component';
 import { environment } from '../environments/environment';
 import { DomainsComponent } from './components/domains/domains.component';
+import { GraphComponent } from './widget/graph/graph.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ApplicationsComponent,
     DomainsComponent,
+    GraphComponent,
     EnrollmentComponent,
     DashboardComponent,
     AppdetailComponent,
