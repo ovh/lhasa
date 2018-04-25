@@ -35,7 +35,7 @@ export class ApplicationsComponent implements OnInit {
       (element: ApplicationBean[]) => {
         this.applications = element;
         _.each(this.applications, (app) => {
-          if(app.manifest) {
+          if(app.manifest && app.manifest.description) {
             app.description = (app.manifest.description.length>200)? (app.manifest.description.substr(0,200)+"...") : (app.manifest.description)
           } else {
             app.description = "No description ..."

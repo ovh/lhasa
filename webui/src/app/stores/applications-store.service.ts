@@ -6,7 +6,7 @@ import { createFeatureSelector, createSelector, MemoizedSelector } from '@ngrx/s
 import * as _ from 'lodash';
 
 import { ActionWithPayload } from './action-with-payload';
-import { ApplicationBean } from '../models/commons/applications-bean';
+import { ApplicationBean, DomainBean } from '../models/commons/applications-bean';
 
 /**
  * states
@@ -16,6 +16,7 @@ export interface AppState {
 }
 
 export interface ApplicationState {
+  domains: Array<DomainBean>;
   applications: Array<ApplicationBean>;
   active: ApplicationBean;
 }
@@ -41,6 +42,7 @@ export type AllStoreActions = LoadApplicationsAction | SelectApplicationAction;
 @Injectable()
 export class ApplicationsStoreService {
 
+  private getDomains: MemoizedSelector<object, Array<DomainBean>>;
   private getApplications: MemoizedSelector<object, Array<ApplicationBean>>;
   private getActive: MemoizedSelector<object, ApplicationBean>;
 
@@ -51,8 +53,16 @@ export class ApplicationsStoreService {
   constructor(
     private _store: Store<ApplicationState>
   ) {
+    this.getDomains = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.domains);
     this.getApplications = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.applications);
     this.getActive = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.active);
+  }
+
+  /**
+   * select this store service
+   */
+  public domains(): Store<Array<DomainBean>> {
+    return this._store.select(this.getDomains);
   }
 
   /**
@@ -82,7 +92,7 @@ export class ApplicationsStoreService {
    * @param state 
    * @param action 
    */
-  public static reducer(state: ApplicationState = { applications: new Array<ApplicationBean>(), active: new ApplicationBean() }, action: AllStoreActions): ApplicationState {
+  public static reducer(state: ApplicationState = { domains: new Array<DomainBean>(), applications: new Array<ApplicationBean>(), active: new ApplicationBean() }, action: AllStoreActions): ApplicationState {
 
     switch (action.type) {
       /**
@@ -91,7 +101,21 @@ export class ApplicationsStoreService {
       case 'LoadApplicationsAction':
         {
           let applications = Object.assign([], action.payload);
+
+          let orderedDomains = new Map<string, ApplicationBean[]>()
+          _.each(applications, (app) => {
+            if (!orderedDomains.has(app.domain)) {
+              orderedDomains.set(app.domain, [])
+            }
+            orderedDomains.get(app.domain).push(app)
+          });
+          let domains = []
+          orderedDomains.forEach((v, k) => {
+            domains.push({ name: k, applications: v })
+          })
+
           return {
+            domains: domains,
             applications: applications,
             active: applications[0]
           };
@@ -101,6 +125,7 @@ export class ApplicationsStoreService {
         {
           let active = Object.assign({}, action.payload);
           return {
+            domains: state.domains,
             applications: state.applications,
             active: active
           };

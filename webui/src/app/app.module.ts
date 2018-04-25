@@ -93,11 +93,13 @@ import { BitbucketService } from './services/data-bitbucket.service';
 import { OuiProgressTrackerComponent } from './kit/oui-progress-tracker/oui-progress-tracker.component';
 import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.component';
 import { environment } from '../environments/environment';
+import { DomainsComponent } from './components/domains/domains.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ApplicationsComponent,
+    DomainsComponent,
     EnrollmentComponent,
     DashboardComponent,
     AppdetailComponent,

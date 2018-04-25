@@ -7,11 +7,17 @@ import { AppdetailComponent } from './components/appdetail/appdetail.component'
 import { ProfileGuard } from './guards/profile.guard';
 import { EnrollmentComponent } from './components/enrollment/enrollment.component';
 import { RoutingGuard } from './guards/routing.guard';
+import { DomainsComponent } from './components/domains/domains.component';
 
 const routes: Routes = [
   {
     path: '',
     component: DashboardComponent,
+    canActivate: [ProfileGuard, RoutingGuard]
+  },
+  {
+    path: 'domains',
+    component: DomainsComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {
