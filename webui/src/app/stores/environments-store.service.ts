@@ -1,13 +1,8 @@
 import {Injectable} from '@angular/core';
-import {ActionReducer, Action, State} from '@ngrx/store';
-import {Store} from '@ngrx/store';
-import {createFeatureSelector, createSelector, MemoizedSelector} from '@ngrx/store';
-
-import * as _ from 'lodash';
+import {createFeatureSelector, createSelector, MemoizedSelector, Store} from '@ngrx/store';
 
 import {ActionWithPayload} from './action-with-payload';
-import {ApplicationBean, DeploymentBean, EnvironmentBean} from '../models/commons/applications-bean';
-import {ApplicationState} from './applications-store.service';
+import {EnvironmentBean} from '../models/commons/applications-bean';
 
 /**
  * states

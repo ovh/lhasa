@@ -1,20 +1,12 @@
 import {Injectable} from '@angular/core';
-import {ActionReducer, Action, State} from '@ngrx/store';
-import {Store} from '@ngrx/store';
-import {createFeatureSelector, createSelector, MemoizedSelector} from '@ngrx/store';
-
-import * as _ from 'lodash';
+import {createFeatureSelector, createSelector, MemoizedSelector, Store} from '@ngrx/store';
 
 import {ActionWithPayload} from './action-with-payload';
-import {ApplicationBean, DomainBean, DeploymentBean} from '../models/commons/applications-bean';
+import {ApplicationBean, DeploymentBean, DomainBean} from '../models/commons/applications-bean';
 
 /**
  * states
  */
-export interface AppState {
-  feature: ApplicationState;
-}
-
 export interface ApplicationState {
   domains: Array<DomainBean>;
   applications: Array<ApplicationBean>;
@@ -26,14 +18,22 @@ export interface ApplicationState {
  * actions
  */
 export class LoadApplicationsAction implements ActionWithPayload<Array<ApplicationBean>> {
-  readonly type = 'LoadApplicationsAction';
+  readonly type = LoadApplicationsAction.getType();
+
+  public static getType(): string {
+    return 'LoadApplicationsAction';
+  }
 
   constructor(public payload: Array<ApplicationBean>) {
   }
 }
 
 export class SelectApplicationAction implements ActionWithPayload<ApplicationBean> {
-  readonly type = 'SelectApplicationAction';
+  readonly type = SelectApplicationAction.getType();
+
+  public static getType(): string {
+    return 'SelectApplicationAction';
+  }
 
   constructor(public payload: ApplicationBean, public deployments: Array<DeploymentBean>) {
   }
@@ -47,10 +47,10 @@ export type AllStoreActions = LoadApplicationsAction | SelectApplicationAction;
 @Injectable()
 export class ApplicationsStoreService {
 
-  private getDomains: MemoizedSelector<object, Array<DomainBean>>;
-  private getApplications: MemoizedSelector<object, Array<ApplicationBean>>;
-  private getActive: MemoizedSelector<object, ApplicationBean>;
-  private getDeployments: MemoizedSelector<object, Array<DeploymentBean>>;
+  readonly getDomains: MemoizedSelector<object, Array<DomainBean>>;
+  readonly getApplications: MemoizedSelector<object, Array<ApplicationBean>>;
+  readonly getActive: MemoizedSelector<object, ApplicationBean>;
+  readonly getDeployments: MemoizedSelector<object, Array<DeploymentBean>>;
 
   /**
    *
@@ -107,7 +107,7 @@ export class ApplicationsStoreService {
    * @param action
    */
   public static reducer(state: ApplicationState = {
-      domains: new Array<DomainBean>(),
+    domains: new Array<DomainBean>(),
     applications: new Array<ApplicationBean>(),
     active: new ApplicationBean(),
     deployments: new Array<DeploymentBean>(),
@@ -117,21 +117,20 @@ export class ApplicationsStoreService {
       /**
        * message incomming
        */
-      case 'LoadApplicationsAction':
-      {
-        let applications = Object.assign([], action.payload);
+      case LoadApplicationsAction.getType(): {
+        const applications = Object.assign([], action.payload);
 
-        let orderedDomains = new Map<string, ApplicationBean[]>()
-        _.each(applications, (app) => {
+        const orderedDomains = new Map<string, ApplicationBean[]>();
+        applications.forEach((app) => {
           if (!orderedDomains.has(app.domain)) {
-            orderedDomains.set(app.domain, [])
+            orderedDomains.set(app.domain, []);
           }
-          orderedDomains.get(app.domain).push(app)
+          orderedDomains.get(app.domain).push(app);
         });
-        let domains = []
+        const domains = [];
         orderedDomains.forEach((v, k) => {
-          domains.push({ name: k, applications: v })
-        })
+          domains.push({name: k, applications: v});
+        });
 
         return {
           domains: domains,
@@ -141,9 +140,10 @@ export class ApplicationsStoreService {
         };
       }
 
-      case 'SelectApplicationAction': {
-        let active = Object.assign({}, action.payload);
-        let deployments = Object.assign([], action.deployments);
+      case SelectApplicationAction.getType(): {
+        action = action as SelectApplicationAction;
+        const active = Object.assign({}, action.payload);
+        const deployments = Object.assign([], action.deployments);
         return {
           domains: state.domains,
           applications: state.applications,

@@ -1,9 +1,7 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { Network, DataSet, IdType } from 'vis';
-import * as _ from 'lodash';
-import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
-import { Edge, Node } from '../../models/graph/graph-bean';
+import {Component, Input, OnInit} from '@angular/core';
+import {DataSet, IdType, Network} from 'vis';
+import {AfterViewInit} from '@angular/core/src/metadata/lifecycle_hooks';
+import {Edge, Node} from '../../models/graph/graph-bean';
 
 @Component({
     selector: 'app-graph',
@@ -34,8 +32,8 @@ export class GraphComponent implements OnInit, AfterViewInit {
      */
     ngAfterViewInit() {
         setTimeout(() => {
-            this.update()
-        }, 1000)
+            this.update();
+        }, 1000);
     }
 
     @Input() get nodes(): Node[] {
@@ -59,12 +57,12 @@ export class GraphComponent implements OnInit, AfterViewInit {
      */
     public update() {
         // create a network
-        var container = document.getElementById('mynetwork');
-        var data = {
+        const container = document.getElementById('mynetwork');
+        const data = {
             nodes: this._nodes,
             edges: this._edges
         };
-        var options = {
+        const options = {
             groups: {
                 failure: {
                     color: {

@@ -5,7 +5,6 @@ import {ApplicationBean, DeploymentBean, DomainBean} from '../../models/commons/
 import {DataApplicationService} from '../../services/data-application-version.service';
 import {ContentListResponse} from '../../models/commons/entity-bean';
 
-import * as _ from 'lodash';
 import {DataDeploymentService} from '../../services/data-deployment.service';
 
 @Component({
@@ -36,7 +35,7 @@ export class ApplicationsComponent implements OnInit {
     this.applicationsStream.subscribe(
       (element: ApplicationBean[]) => {
         this.applications = element;
-        _.each(this.applications, (app) => {
+        this.applications.forEach((app) => {
           app.description = 'No provided description. Please fill the `description` field of the manifest.';
           if (app.manifest && app.manifest.description) {
             app.description = (app.manifest.description.length > 200) ?
@@ -44,7 +43,7 @@ export class ApplicationsComponent implements OnInit {
           }
         });
         this.orderedDomains = new Map<string, ApplicationBean[]>();
-        _.each(this.applications, (app) => {
+        this.applications.forEach((app) => {
           if (!this.orderedDomains.has(app.domain)) {
             this.orderedDomains.set(app.domain, []);
           }

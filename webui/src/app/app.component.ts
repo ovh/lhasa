@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
    */
   public loadApplications() {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent('', new Map<string, string>([['size', '1']])).subscribe(
+    this.applicationsService.GetAllFromContent('', <Map<string, string>> {size: 1000}).subscribe(
       (data: ContentListResponse<ApplicationBean>) => {
         this.applicationsStoreService.dispatch(
           new LoadApplicationsAction(

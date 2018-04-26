@@ -1,12 +1,11 @@
-import {Component, OnInit, Pipe} from '@angular/core';
-import {ApplicationsStoreService, SelectApplicationAction, LoadApplicationsAction} from '../../stores/applications-store.service';
+import {Component, OnInit} from '@angular/core';
+import {ApplicationsStoreService, LoadApplicationsAction, SelectApplicationAction} from '../../stores/applications-store.service';
 import {Store} from '@ngrx/store';
 import {ApplicationBean, DeploymentBean, DomainBean} from '../../models/commons/applications-bean';
 import {DataApplicationService} from '../../services/data-application-version.service';
 import {ContentListResponse} from '../../models/commons/entity-bean';
 
-import * as _ from 'lodash';
-import {Node, Edge} from '../../models/graph/graph-bean';
+import {Edge, Node} from '../../models/graph/graph-bean';
 import {DataDeploymentService} from '../../services/data-deployment.service';
 
 @Component({
@@ -43,17 +42,17 @@ export class DomainsComponent implements OnInit {
         this.nodes = [];
         this.edges = [];
         this.domains = domains;
-        let indexApp = new Map<string, number>();
-        _.each(domains, (domain) => {
+        const indexApp = new Map<string, number>();
+        domains.forEach((domain) => {
           this.nodes.push({
             id: domain.name,
             label: domain.name
           });
-          let applications = domain.applications;
-          _.each(applications, (app) => {
-            let keyApp = domain.name + '#' + app.name;
+          const applications = domain.applications;
+          applications.forEach((app) => {
+            const keyApp = domain.name + '#' + app.name;
             if (indexApp.has(keyApp)) {
-              let instance = indexApp.get(keyApp) + 1;
+              const instance = indexApp.get(keyApp) + 1;
               indexApp.set(keyApp, instance);
             } else {
               indexApp.set(keyApp, 0);
@@ -79,7 +78,7 @@ export class DomainsComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.domains || this.domains.length == 0) {
+    if (!this.domains || this.domains.length === 0) {
       this.loadApplications(null);
     }
   }
@@ -90,7 +89,7 @@ export class DomainsComponent implements OnInit {
    */
   protected loadApplications(event: any) {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent('', <Map<string, string>>{size: 1000}).subscribe(
+    this.applicationsService.GetAllFromContent('', <Map<string, string>> {size: 1000}).subscribe(
       (data: ContentListResponse<ApplicationBean>) => {
         this.applicationsStoreService.dispatch(
           new LoadApplicationsAction(
