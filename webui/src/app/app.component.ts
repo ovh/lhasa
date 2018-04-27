@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
    * dispatch load applications
    * @param event
    */
-  protected loadApplications(event: any) {
+  public loadApplications() {
     // load all applications from a content return
     this.applicationsService.GetAllFromContent('', new Map<string, string>([['size', '1']])).subscribe(
       (data: ContentListResponse<ApplicationBean>) => {

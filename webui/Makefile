@@ -1,4 +1,7 @@
 all: dep
+	ng build --output-path=../dist/webui --prod --aot
+
+dev: dep
 	ng build --output-path=../dist/webui
 
 dep:

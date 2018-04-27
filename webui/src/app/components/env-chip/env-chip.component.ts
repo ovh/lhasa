@@ -18,7 +18,7 @@ export class EnvChipComponent implements OnInit, OnDestroy {
   protected environmentStream: Store<Map<string, EnvironmentBean>>;
   protected environmentSubscription: ISubscription;
 
-  protected environments: Map<string, EnvironmentBean>;
+  public environments: Map<string, EnvironmentBean>;
 
   constructor(
     private environmentsStoreService: EnvironmentsStoreService) {

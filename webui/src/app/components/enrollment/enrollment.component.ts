@@ -21,7 +21,7 @@ import {environment} from '../../../environments/environment';
 })
 export class EnrollmentComponent implements OnInit {
 
-  private selected: string = '0';
+  public selected: string = '0';
 
   /**
    * internal streams and store
@@ -142,7 +142,7 @@ export class EnrollmentComponent implements OnInit {
     return environment.appcatalog.baseUrlUi + '/ui' + path;
   }
 
-  protected onSelect(event: any) {
+  public onSelect(event: any) {
     this.selected = event.data;
   }
 

@@ -25,8 +25,8 @@ export class DomainsComponent implements OnInit {
   /**
    * to graph domains
    */
-  protected nodes: Node[];
-  protected edges: Edge[];
+  public nodes: Node[];
+  public edges: Edge[];
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,

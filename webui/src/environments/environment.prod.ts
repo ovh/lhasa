@@ -1,16 +1,22 @@
 /**
  * fix BASE HREF problems
  */
-let href = document.location.pathname.split('/')
-let base=""
-let appname="appcatalog"
-let i = 0
-for(i=1;i<href.length;i++) {
-  base += '/' + href[i]
-  if(href[i].endsWith("appcatalog")) {
-    appname = href[i]
-    break
+const href = document.location.pathname.split('/');
+let base = '';
+let appname = 'appcatalog';
+let prefix = '';
+let i = 0;
+for (i = 1; i < href.length; i++) {
+  base += '/' + href[i];
+  if (href[i].endsWith('appcatalog')) {
+    appname = href[i];
+    break;
   }
+}
+
+// Check DEV env
+if (document.location.pathname.indexOf('/dev/') >= 0) {
+  prefix = '/dev';
 }
 
 /**
@@ -20,11 +26,11 @@ export const environment = {
   production: true,
   href: base,
   appcatalog: {
-    baseUrlApi: '/uservice/gateway/' + appname,
-    baseUrlUi: '/uservice/gateway/' + appname
+    baseUrlApi: prefix + '/uservice/gateway/' + appname,
+    baseUrlUi: prefix + '/uservice/gateway/' + appname
   },
   appcatalogCompanion: {
-    baseUrlApi: '/uservice/gateway/' + appname + '-companion',
-    baseUrlUi: '/uservice/gateway/' + appname + '-companion'
+    baseUrlApi: prefix + '/uservice/gateway/' + appname + '-companion',
+    baseUrlUi: prefix + '/uservice/gateway/' + appname + '-companion'
   }
 };

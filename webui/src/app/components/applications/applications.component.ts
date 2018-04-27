@@ -21,7 +21,7 @@ export class ApplicationsComponent implements OnInit {
   protected applicationsStream: Store<ApplicationBean[]>;
   protected applications: ApplicationBean[];
   protected orderedDomains = new Map<string, ApplicationBean[]>();
-  protected domains: DomainBean[] = [];
+  public domains: DomainBean[] = [];
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
@@ -73,7 +73,7 @@ export class ApplicationsComponent implements OnInit {
    * dispatch load applications
    * @param event
    */
-  protected loadApplications(event: any) {
+  public loadApplications(event: any) {
     // load all applications from a content return
     this.applicationsService.GetAllFromContent('', <Map<string, string>> {size: 1000}).subscribe(
       (data: ContentListResponse<ApplicationBean>) => {

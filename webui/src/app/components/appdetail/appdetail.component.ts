@@ -24,7 +24,7 @@ export class AppdetailComponent implements OnInit, OnDestroy {
   protected applicationSubscription: ISubscription;
   protected deploymentStream: Store<DeploymentBean[]>;
   protected deploymentSubscription: ISubscription;
-  protected application: ApplicationBean;
+  public application: ApplicationBean;
   protected deployments: DeploymentBean[];
 
   constructor(
