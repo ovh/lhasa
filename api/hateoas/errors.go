@@ -20,6 +20,15 @@ type EntityDoesNotExistError struct {
 	Criteria   map[string]interface{}
 }
 
+// InternalError all internal error
+type InternalError struct {
+	Message string
+	Detail  string
+}
+
+type errorCreated string
+type errorGone string
+
 // Error implements error interface for UnsupportedEntityError
 func (err UnsupportedEntityError) Error() string {
 	return fmt.Sprintf("unsupported entity (expected: %s, actual: %s)", err.Expected, err.Actual)
@@ -34,6 +43,27 @@ func (err EntityDoesNotExistError) Error() string {
 func (err UnsupportedIndexError) Error() string {
 	return fmt.Sprintf("index by %s is not supported (one of %v)", err.Field, err.Supported)
 }
+
+// Error implements error interface
+func (err *InternalError) Error() string {
+	return err.Message + ":" + err.Detail
+}
+
+// Error implements error interface
+func (err errorCreated) Error() string {
+	return string(err)
+}
+
+// Error implements error interface
+func (err errorGone) Error() string {
+	return string(err)
+}
+
+// ErrorCreated is raised when no error occurs but a resource has been created (tonic single-status code workaround)
+var ErrorCreated = errorCreated("created")
+
+// ErrorGone is raised when a former resource has been requested but no longer exist
+var ErrorGone = errorGone("gone")
 
 //NewUnsupportedEntityError is a helper to create an UnsupportedEntityError
 func NewUnsupportedEntityError(expected, actual interface{}) error {

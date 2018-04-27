@@ -1,7 +1,6 @@
 package hateoas
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,35 +11,23 @@ import (
 	"github.com/loopfz/gadgeto/tonic"
 )
 
-// InternalError all internal error
-type InternalError struct {
-	Message string
-	Detail  string
+const hateoasBasePathKey = "HateoasBasePath"
+
+// HandlerIndex generates a simple hateoas index
+func HandlerIndex(links ...ResourceLink) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context) (Resource, error) {
+		var l []ResourceLink
+		for _, link := range links {
+			l = append(l, ResourceLink{
+				Href: BaseURL(c) + link.Href,
+				Rel:  link.Rel,
+			})
+		}
+		return Resource{
+			Links: l,
+		}, nil
+	}, http.StatusOK)
 }
-
-type errorCreated string
-type errorGone string
-
-// Error implements error interface
-func (err *InternalError) Error() string {
-	return err.Message + ":" + err.Detail
-}
-
-// Error implements error interface
-func (err errorCreated) Error() string {
-	return string(err)
-}
-
-// Error implements error interface
-func (err errorGone) Error() string {
-	return string(err)
-}
-
-// ErrorCreated is raised when no error occurs but a resource has been created (tonic single-status code workaround)
-var ErrorCreated = errorCreated("created")
-
-// ErrorGone is raised when a former resource has been requested but no longer exist
-var ErrorGone = errorGone("gone")
 
 // HandlerFindByPage returns a filtered and paginated resource list
 func HandlerFindByPage(repository PageableRepository) gin.HandlerFunc {
@@ -70,6 +57,9 @@ func HandlerFindBy(repository Repository) gin.HandlerFunc {
 func HandlerFindOneBy(repository Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (interface{}, error) {
 		result, err := findByPath(c, repository)
+		if resource, ok := result.(Resourceable); ok {
+			resource.ToResource(BaseURL(c))
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -146,6 +136,19 @@ func ErrorHook(tonicErrorHook tonic.ErrorHook) tonic.ErrorHook {
 	}
 }
 
+// AddToBasePath add a subpath to the BasePath stored in the gin context, in order to build hateoas links
+func AddToBasePath(basePath string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		path, ok := c.Get(hateoasBasePathKey)
+		if !ok {
+			c.Set(hateoasBasePathKey, basePath)
+			c.Next()
+			return
+		}
+		c.Set(hateoasBasePathKey, path.(string)+basePath)
+	}
+}
+
 func findByPath(c *gin.Context, repository Repository) (Entity, error) {
 	params := parsePathParams(c)
 	if repo, ok := repository.(SoftDeletableRepository); ok {
@@ -168,29 +171,6 @@ func parsePathParams(c *gin.Context) map[string]interface{} {
 		criteria[p.Key] = p.Value
 	}
 	return criteria
-}
-
-// unCamelCase discover physical column name in database
-func unCamelCase(value string) string {
-	if strings.Contains(value, "->>") {
-		// on jsonb column don't un camel case field
-		return value
-	}
-	accu := ""
-	for i := 0; i < len(value); i = i + 1 {
-		switch value[i] {
-		case '_':
-			break
-		default:
-			// is already lower
-			if bytes.ToLower([]byte{value[i]})[0] == value[i] {
-				accu = accu + string(value[i])
-			} else {
-				accu = accu + "_" + string(bytes.ToLower([]byte{value[i]})[0])
-			}
-		}
-	}
-	return accu
 }
 
 // parse param and query of request
@@ -227,13 +207,4 @@ func parsePathParamsAndQuery(c *gin.Context) map[string]interface{} {
 		}
 	}
 	return criteria
-}
-
-// BaseURL returns the base path that has been used to access current resource
-func BaseURL(c *gin.Context) string {
-	basePath, ok := c.Get("BasePath")
-	if ok {
-		return basePath.(string)
-	}
-	return c.Request.URL.EscapedPath()
 }

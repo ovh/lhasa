@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -75,7 +76,11 @@ func main() {
 			runMigrationsUp(db.DB(), log)
 		}
 		router := routers.NewRouter(db, version, *flagHateoasBasePath, *flagDebug, log)
-		panic(router.Run(fmt.Sprintf(":%d", *flagStartPort)))
+		srv := &http.Server{
+			Addr:    fmt.Sprintf(":%d", *flagStartPort),
+			Handler: router,
+		}
+		panic(srv.ListenAndServe())
 	}
 }
 

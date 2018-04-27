@@ -2,28 +2,28 @@ package routers
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
-	"github.com/loopfz/gadgeto/tonic/utils/swag"
 	"github.com/sirupsen/logrus"
+	"github.com/wI2L/fizz"
+	"github.com/wI2L/fizz/openapi"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
 	v1 "github.com/ovh/lhasa/api/v1/routing"
 )
 
-// redirect unknown routes to angular
-func redirect(c *gin.Context) {
-	c.File("./webui/ui/assets/not-found.html")
-}
-
 //NewRouter creates a new and configured gin router
-func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log *logrus.Logger) *gin.Engine {
-	router := gin.New()
+func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
+	router := fizz.New()
+	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
+
 	router.Use(handlers.LoggingMiddleware(log), gin.Recovery())
 	configureGin(log, debugMode)
 
@@ -33,21 +33,46 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/", static.LocalFile("./webui", true)))
 
 	// redirect unknown routes to angular
-	router.NoRoute(redirect)
+	router.Engine().NoRoute(func(c *gin.Context) {
+		c.File("./webui/index.html")
+	})
 
-	api := router.Group("/api", handlers.AddToBasePath(hateoasBaseBath))
-	v1.Init(db, api.Group("/v1", handlers.AddToBasePath("/v1")))
+	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath))
+	api.GET("/", []fizz.OperationOption{
+		fizz.Summary("Hateoas index of available resources"),
+		fizz.ID("IndexAPI"),
+	}, hateoas.HandlerIndex(
+		hateoas.ResourceLink{Rel: "v1", Href: "/v1"},
+		hateoas.ResourceLink{Rel: "unsecured", Href: "/unsecured"},
+	))
+
+	v1.Init(db, api.Group("/v1", "", "", hateoas.AddToBasePath("/v1")))
 
 	// unsecured group does not check incoming signatures
-	unsecured := api.Group("/unsecured")
+	unsecured := api.Group("/unsecured", "unsecured", "Authentication-free routes", hateoas.AddToBasePath("/unsecured"))
+	unsecured.GET("/", []fizz.OperationOption{
+		fizz.Summary("Hateoas index of available resources"),
+		fizz.ID("IndexUnsecured"),
+	}, hateoas.HandlerIndex(
+		hateoas.ResourceLink{Rel: "monitoring", Href: "/mon"},
+		hateoas.ResourceLink{Rel: "version", Href: "/version"},
+	))
 	// health check route
-	unsecured.GET("/mon", tonic.Handler(handlers.PingHandler(db.DB()), http.StatusOK))
+	unsecured.GET("/mon", []fizz.OperationOption{fizz.ID("Monitoring"), fizz.Summary("Check application and subcomponents health")}, tonic.Handler(handlers.PingHandler(db.DB()), http.StatusOK))
 	// API version
-	unsecured.GET("/version", tonic.Handler(handlers.VersionHandler(version), http.StatusOK))
-	// auto-generated swagger documentation
-	unsecured.GET("/swagger.json", swag.Swagger(router, ""))
+	unsecured.GET("/version", []fizz.OperationOption{fizz.ID("Version"), fizz.Summary("Show the current version of the server")}, tonic.Handler(handlers.VersionHandler(version), http.StatusOK))
 
-	router.BasePath()
+	// auto-generated swagger documentation
+	infos := &openapi.Info{
+		Title: "AppCatalog Open API Specification",
+		License: &openapi.License{
+			Name: "BSD 3-Clause License",
+			URL:  "https://opensource.org/licenses/BSD-3-Clause",
+		},
+	}
+	unsecured.GET("/openapi.json", nil, router.OpenAPI(infos, "json"))
+	unsecured.GET("/openapi.yaml", nil, router.OpenAPI(infos, "yaml"))
+
 	return router
 }
 

@@ -1,6 +1,8 @@
 package deployment
 
 import (
+	"reflect"
+
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
 	"github.com/ovh/lhasa/api/hateoas"
@@ -24,6 +26,11 @@ const (
 // Repository is a repository manager for applications
 type Repository struct {
 	db *gorm.DB
+}
+
+// GetType returns the entity type managed by this repository
+func (repo *Repository) GetType() reflect.Type {
+	return reflect.TypeOf(v1.Deployment{})
 }
 
 // NewRepository creates an application repository
@@ -127,12 +134,12 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 
 // FindOneByUnscoped gives the details of a particular deployment, even if soft deleted
 func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
-	dep := v1.Deployment{}
+	dep := &v1.Deployment{}
 	err := repo.db.Model(v1.Deployment{}).Unscoped().First(dep, criterias).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &dep, hateoas.NewEntityDoesNotExistError(dep, criterias)
+		return dep, hateoas.NewEntityDoesNotExistError(dep, criterias)
 	}
-	return &dep, err
+	return dep, err
 }
 
 // FindBy fetch a collection of deployments matching each criteria

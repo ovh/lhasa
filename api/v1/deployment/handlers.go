@@ -13,10 +13,10 @@ import (
 
 type deploymentCreateRequest struct {
 	*v1.Deployment
-	Domain  string `path:"domain"`
-	Name    string `path:"name"`
-	Version string `path:"version"`
-	Slug    string `path:"slug"`
+	Domain  string `path:"domain" description:"Application Domain"`
+	Name    string `path:"name" description:"Application Name"`
+	Version string `path:"version" description:"Application Version"`
+	Slug    string `path:"slug" description:"Environment identifier"`
 }
 
 // HandlerDeploy deploy this application version to the given environment and removes old deployments
@@ -35,25 +35,28 @@ func HandlerDeploy(appRepo *application.Repository, envRepo *environment.Reposit
 		if err := deployer(*app, *env, dep); err != nil {
 			return err
 		}
-
-		return hateoas.ErrorCreated
-	}, http.StatusOK)
+		// If a resource has been created on the origin server, the response SHOULD be 201 (Created) and contain an
+		// entity which describes the status of the request and refers to the new resource, and a Location header.
+		// https://tools.ietf.org/html/rfc2616#page-54
+		c.Header("location", dep.GetSelfURL(hateoas.BaseURL(c)))
+		return nil
+	}, http.StatusCreated)
 }
 
-type dependCreateQuery map[string]interface{}
-
 type dependCreateRequest struct {
-	PublicID       string `path:"public_id"`
-	TargetPublicID string `path:"target_public_id"`
+	PublicID       string `path:"public_id" description:"ID of the deployment that owns the dependency"`
+	TargetPublicID string `path:"target_public_id" description:"ID of the deployment targeted by the dependency"`
 	Type           string `json:"type"`
 }
 
 // HandlerDepend add an observable depdendency with its
-func HandlerDepend(appRepo *application.Repository, envRepo *environment.Repository, depRepo *Repository, depend Depend) gin.HandlerFunc {
+func HandlerDepend(depRepo *Repository, depend Depend) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *dependCreateRequest) (hateoas.Entity, error) {
-
 		// Find this dependency by its ID (public)
-		entity, _ := depRepo.FindOneBy(map[string]interface{}{"public_id": request.PublicID})
+		entity, err := depRepo.FindOneBy(map[string]interface{}{"public_id": request.PublicID})
+		if err != nil {
+			return nil, err
+		}
 		src := entity.(*v1.Deployment)
 		target := &v1.Deployment{PublicID: request.TargetPublicID}
 

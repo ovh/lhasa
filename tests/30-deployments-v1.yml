@@ -237,7 +237,7 @@ testcases:
       body: '{"type": "sync:call"}'
       headers:
       assertions:
-      - result.bodyjson.bodyjson0 ShouldNotBeEmpty
+      - result.bodyjson.id ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
 
 

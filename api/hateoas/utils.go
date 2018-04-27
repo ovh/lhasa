@@ -1,9 +1,11 @@
 package hateoas
 
 import (
+	"bytes"
 	"encoding/json"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
 
@@ -69,4 +71,36 @@ func CheckFilter(criterias map[string]interface{}) (map[string]interface{}, map[
 		}
 	}
 	return standardCriterias, inlineCriterias, jsonbCriterias
+}
+
+// unCamelCase discover physical column name in database
+func unCamelCase(value string) string {
+	if strings.Contains(value, "->>") {
+		// on jsonb column don't un camel case field
+		return value
+	}
+	accu := ""
+	for i := 0; i < len(value); i = i + 1 {
+		switch value[i] {
+		case '_':
+			break
+		default:
+			// is already lower
+			if bytes.ToLower([]byte{value[i]})[0] == value[i] {
+				accu = accu + string(value[i])
+			} else {
+				accu = accu + "_" + string(bytes.ToLower([]byte{value[i]})[0])
+			}
+		}
+	}
+	return accu
+}
+
+// BaseURL returns the base path that has been used to access current resource
+func BaseURL(c *gin.Context) string {
+	basePath, ok := c.Get(hateoasBasePathKey)
+	if ok {
+		return basePath.(string)
+	}
+	return c.Request.URL.EscapedPath()
 }

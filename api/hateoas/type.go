@@ -28,6 +28,7 @@ type Repository interface {
 	Save(Entity) error
 	Remove(interface{}) error
 	GetNewEntityInstance() Entity
+	GetType() reflect.Type
 }
 
 // PageableRepository defines a repository that handles pagination
@@ -55,7 +56,7 @@ type Pageable struct {
 	Size      int    `json:"size" form:"size"`
 	Sort      string `json:"sort" form:"sort"`
 	Query     string `json:"q" form:"q"`
-	IndexedBy string `json:"indexedBy" form:"indexedBy"`
+	IndexedBy string `json:"indexedBy" form:"indexedBy" default:""`
 }
 
 // Page defines a page
@@ -69,17 +70,17 @@ type Page struct {
 
 // PagedResources defines a REST representation of paged contents
 type PagedResources struct {
-	Content      interface{}    `json:"content"`
-	PageMetadata pageMetadata   `json:"pageMetadata"`
-	Links        []ResourceLink `json:"_links"`
+	Content      interface{}    `json:"content" binding:"-"`
+	PageMetadata pageMetadata   `json:"pageMetadata" binding:"-"`
+	Links        []ResourceLink `json:"_links" binding:"-"`
 }
 
 type pageMetadata struct {
 	TotalElements int      `json:"totalElements"`
 	TotalPages    int      `json:"totalPages"`
-	Size          int      `json:"size"`
-	Number        int      `json:"number"`
-	IndexedBy     string   `json:"indexedBy,omitempty"`
+	Size          int      `json:"size" default:"20"`
+	Number        int      `json:"number" default:"0"`
+	IndexedBy     string   `json:"indexedBy,omitempty" default:"null"`
 	IDs           []string `json:"ids,omitempty"`
 }
 
@@ -91,7 +92,7 @@ type ResourceLink struct {
 
 // Resource defines a REST resources links
 type Resource struct {
-	Links []ResourceLink `json:"_links,omitempty" gorm:"-"`
+	Links []ResourceLink `json:"_links,omitempty" gorm:"-" binding:"-"`
 }
 
 // Resourceable defines a linkable hateoas resource

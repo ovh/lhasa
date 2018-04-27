@@ -43,3 +43,7 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[constraint]]
   name = "github.com/fabienm/go-logrus-formatters"
   version = "~1.0.0"
+
+[[constraint]]
+  name = "github.com/wI2L/fizz"
+  version = "~0.10.2"

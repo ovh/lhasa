@@ -1,6 +1,8 @@
 package application
 
 import (
+	"reflect"
+
 	"github.com/jinzhu/gorm"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
@@ -20,6 +22,11 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		db: db,
 	}
+}
+
+// GetType returns the entity type managed by this repository
+func (repo *Repository) GetType() reflect.Type {
+	return reflect.TypeOf(v1.Application{})
 }
 
 // GetNewEntityInstance returns a new empty instance of the entity managed by this repository

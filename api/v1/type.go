@@ -21,17 +21,17 @@ const EnvironmentBasePath = "/environments"
 
 // Application defines the model properties of an application
 type Application struct {
-	ID           uint            `json:"-" gorm:"auto increment"`
-	Domain       string          `json:"domain" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"domain"`
-	Name         string          `json:"name" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"name"`
-	Version      string          `json:"version" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"version"`
+	ID           uint            `json:"-" gorm:"auto increment" binding:"-"`
+	Domain       string          `json:"domain" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"domain" description:"Application Domain"`
+	Name         string          `json:"name" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"name" description:"Application Name"`
+	Version      string          `json:"version" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"version" description:"Application Version"`
 	Manifest     *postgres.Jsonb `json:"manifest"`
-	Tags         pq.StringArray  `json:"-" gorm:"type:varchar(255)[]"`
+	Tags         pq.StringArray  `json:"tags,omitempty" gorm:"type:varchar(255)[]"`
 	Dependencies []Dependency    `json:"-"`
 	Deployments  []Deployment    `json:"-"`
-	CreatedAt    time.Time       `json:"_createdAt"`
-	UpdatedAt    time.Time       `json:"_updatedAt"`
-	DeletedAt    *time.Time      `json:"-"`
+	CreatedAt    time.Time       `json:"_createdAt" binding:"-"`
+	UpdatedAt    time.Time       `json:"_updatedAt" binding:"-"`
+	DeletedAt    *time.Time      `json:"-" binding:"-"`
 	hateoas.Resource
 }
 
@@ -79,18 +79,18 @@ func (app *Application) GetSelfURL(baseURL string) string {
 
 // Deployment is an application version instance on a given environment
 type Deployment struct {
-	ID            uint           `json:"-" gorm:"auto increment"`
-	PublicID      string         `json:"id" gorm:"type:varchar(255);not null;unique"`
+	ID            uint           `json:"-" gorm:"auto increment" binding:"-"`
+	PublicID      string         `json:"id" path:"public_id" gorm:"type:varchar(255);not null;unique" validate:"omitempty,uuid4" binding:"omitempty,uuid4" description:"Deployment public identifier"`
 	ApplicationID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
 	Application   *Application   `json:"-"`
 	EnvironmentID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
 	Environment   *Environment   `json:"-"`
-	Dependencies  postgres.Jsonb `json:"dependencies,omitempty"`
+	Dependencies  postgres.Jsonb `json:"dependencies,omitempty" binding:"-"`
 	Properties    postgres.Jsonb `json:"properties,omitempty"`
-	UndeployedAt  *time.Time     `json:"undeployedAt,omitempty"`
-	CreatedAt     time.Time      `json:"_createdAt"`
-	UpdatedAt     time.Time      `json:"_updatedAt"`
-	DeletedAt     *time.Time     `json:"-"`
+	UndeployedAt  *time.Time     `json:"undeployedAt,omitempty" binding:"-"`
+	CreatedAt     time.Time      `json:"_createdAt" binding:"-"`
+	UpdatedAt     time.Time      `json:"_updatedAt" binding:"-"`
+	DeletedAt     *time.Time     `json:"-" binding:"-"`
 	hateoas.Resource
 }
 
@@ -118,7 +118,10 @@ func (dep *Deployment) GetDeletedAt() *time.Time {
 
 // ToResource implements Resourceable
 func (dep *Deployment) ToResource(baseURL string) {
-	dep.Resource.Links = []hateoas.ResourceLink{{Rel: "self", Href: dep.GetSelfURL(baseURL)}}
+	dep.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "self", Href: dep.GetSelfURL(baseURL)},
+		{Rel: "add_link", Href: dep.GetSelfURL(baseURL) + "/add_link/:target_deployment_id"},
+	}
 	if dep.Environment != nil {
 		dep.Resource.Links = append(dep.Resource.Links, hateoas.ResourceLink{Rel: "environment", Href: dep.Environment.GetSelfURL(baseURL)})
 	}
@@ -134,13 +137,13 @@ func (dep *Deployment) GetSelfURL(baseURL string) string {
 
 // Environment is a target deployment environment
 type Environment struct {
-	ID         uint           `json:"-" gorm:"auto increment"`
-	Slug       string         `json:"slug" gorm:"type:varchar(255);unique;not null;default:''" path:"slug"`
+	ID         uint           `json:"-" gorm:"auto increment" binding:"-"`
+	Slug       string         `json:"slug" gorm:"type:varchar(255);unique;not null;default:''" path:"slug" description:"Environment identifier"`
 	Name       string         `json:"name" gorm:"type:varchar(255)"`
 	Properties postgres.Jsonb `json:"properties,omitempty"`
-	CreatedAt  time.Time      `json:"_createdAt"`
-	UpdatedAt  time.Time      `json:"_updatedAt"`
-	DeletedAt  *time.Time     `json:"-"`
+	CreatedAt  time.Time      `json:"_createdAt" binding:"-"`
+	UpdatedAt  time.Time      `json:"_updatedAt" binding:"-"`
+	DeletedAt  *time.Time     `json:"-" binding:"-"`
 	hateoas.Resource
 }
 
