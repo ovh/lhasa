@@ -13,16 +13,17 @@ export class ApplicationBean extends EntityBean {
   manifest: ManifestBean;
   tags: string[];
   deployments: DeploymentBean[];
+  version: string;
 }
 
 // Manifest
 export class ManifestBean {
-  name: string;
-  profile: string;
-  description: string;
-  repository: string;
-  authors: PersonBean[];
-  support: TeamBean;
+  name?: string;
+  profile?: string;
+  description?: string;
+  repository?: string;
+  authors?: PersonBean[];
+  support?: TeamBean;
 }
 
 // Deployment

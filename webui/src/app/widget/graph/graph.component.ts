@@ -103,19 +103,21 @@ export class GraphComponent implements OnInit, AfterViewInit {
             },
             physics: {
                 adaptiveTimestep: true,
-                barnesHut: {
-                    gravitationalConstant: -8000,
-                    springConstant: 0.04,
-                    springLength: 95
+                solver: 'barnesHut',
+                stabilization: {
+                    enabled: true,
+                    iterations: 1000,
+                    updateInterval: 100,
+                    onlyDynamicEdges: false,
+                    fit: true
                 },
-                stabilization: false
             },
             layout: {
                 randomSeed: 191006,
                 improvedLayout: false
             }
         };
-        var network = new Network(container, data, options);
+        const network = new Network(container, data, options);
     }
 
 }

@@ -2,22 +2,48 @@
 
 <div *ngIf="selected === '0'">
   <div class="ui-g-12" *ngIf="application.manifest">
-    <markdown path="assets/roadmap.md"></markdown>
+<markdown>
+## Enroll your app ({{application.manifest.profile}}/{{application.manifest.name}}) 
+
+Hi, 
+  
+As part of the STS 15 (proud to be a developer), OVH is in the process of listing and mapping all the applications of the Information System. 
+If you are a developer / maintainer of [{{application.domain}}/{{application.name}}](/applications/{{application.domain}}/{{application.name}}), we need your help to enroll it properly in the catalog. This two-step wizard will help you producing a manifest file that you'll have to push to your git repository's master branch to finish the enrollment. 
+  
+### Why do I need to enroll my app ? 
+  
+In the short term, enrolling your app will only improve its visibility.  
+List application releases (semver git tags) 
+Centralize information (last contributors, release notes, RUN team contact info). 
+List applications deployments (PROD-EU, PROD-CA, DEV-EU, ...) 
+People will know that your app exists and will reach out to you to use it instead of re-developing the same feature set. 
+  
+In the longer term, appcatalog's roadmap should answer to more use cases : 
+- List inter-application dependencies 
+- Draw inter-application dependencies graphs 
+- List business processes and know which applications they need to finish properly 
+- Improve the system's observability 
+- Perform easy impact analysis (What is the business risk of deploying a new version of my app ?  What are the services impacted by a current bug?). 
+- ... 
+  
+If you want to know more about the vision behind the tool, please follow this [link](https://docs.dsi.ovh/display/URBA/Register+your+applications) or contact us on cisco:conf.urba@conf.cms.
+</markdown>
   </div>
 </div>
 
 <div *ngIf="selected === '1'">
+  <h2>App's identification</h2>
   <div class="ui-g-12">
     <div class="oui-field">
       <label for="text-1" class="oui-field__label oui-label">Domain</label>
       <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Domain" [(ngModel)]="application.domain" disabled>
+        <input type="text" class="oui-input" placeholder="Domain" [(ngModel)]="application.manifest.profile" disabled>
       </div>
     </div>
     <div class="oui-field">
       <label for="text-1" class="oui-field__label oui-label">Name</label>
       <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Name" [(ngModel)]="application.name" disabled>
+        <input type="text" class="oui-input" placeholder="Name" [(ngModel)]="application.manifest.name" disabled>
       </div>
     </div>
     <div class="oui-field">
@@ -26,20 +52,13 @@
         <input type="text" class="oui-input" placeholder="Repository" [(ngModel)]="application.manifest.repository" disabled>
       </div>
     </div>
-    <div class="oui-field">
-      <label for="text-1" class="oui-field__label oui-label">Project</label>
-      <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Project" [(ngModel)]="application.project" required>
-      </div>
-    </div>
-    <div class="oui-field">
-      <label for="text-1" class="oui-field__label oui-label">Repo</label>
-      <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Repo" [(ngModel)]="application.repo" required>
-      </div>
-    </div>
   </div>
-  <div class="ui-g-12">
+  <h2>App's manifest (200/300 charaters to describe your application)</h2>
+  <div class="ui-g-12" *ngIf="application.manifest">
+    <textarea class="oui-textarea oui-textarea_active" style="height: 356px; padding: 0rem 0rem;" [(ngModel)]="application.manifest.description"></textarea>
+  </div>
+  <div class="ui-g-12" *ngIf="application.manifest.support">
+    <h2>App's support info</h2>
     <div class="oui-field">
       <label for="text-1" class="oui-field__label oui-label">Team Name</label>
       <div class="oui-field__control">
@@ -60,11 +79,13 @@
     </div>
   </div>
   <div class="ui-g-12" *ngIf="application.manifest">
+    <h2>App's authors info</h2>
     <p-table [value]="application.manifest.authors" class="oui-datagrid">
       <ng-template pTemplate="header">
         <tr class="oui-datagrid__headers">
           <th class="oui-datagrid__header oui-datagrid__header_sortable">Name</th>
           <th class="oui-datagrid__header oui-datagrid__header_sortable">Email</th>
+          <th class="oui-datagrid__header oui-datagrid__header_sortable">Drop/Add</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-author>
@@ -89,22 +110,53 @@
               </ng-template>
             </p-cellEditor>
           </td>
+          <td class="oui-datagrid__cell" pEditableColumn>
+              <button class="oui-button oui-button_primary" (click)="drop(author)">
+Drop
+              </button>
+              <button class="oui-button oui-button_primary" (click)="add()">
+Add
+            </button>
+        </td>
         </tr>
       </ng-template>
     </p-table>
   </div>
-  <div class="ui-g-12" *ngIf="application.manifest">
-    <textarea class="oui-textarea oui-textarea_active" style="height: 356px; padding: 0rem 0rem;" [(ngModel)]="application.manifest.description"></textarea>
-  </div>
 </div>
 
 <div *ngIf="selected === '2'">
-  <div>
-    <button class="oui-button oui-button_primary" (click)="createPullRequest()">
-      Create the pull the request
-    </button>
-  </div>
-  <div class="ui-g-12" *ngIf="application.manifest">
-    <markdown [data]="application.manifest.description"></markdown>
-  </div>
+
+<markdown>
+```json
+{{enrollment}}
+```
+</markdown>
+
+<div>
+  <button class="oui-button oui-button_primary" (click)="copy()">
+Copy to clipboard
+  </button>
+  <button class="oui-button oui-button_primary" (click)="download()">
+Download manifest file
+  </button>
+</div>
+      
+<markdown>
+## Instructions
+
+Please execute the folowing steps to store this manifest in your own repository
+
+```ksh
+git clone {{application.manifest.repository}} myrepo
+cd myrepo
+
+git checkout -b feature/create-manifest
+# filename must be called manifest.json in order to help us to find it
+git add ./manifest.json
+git commit -m "add manifest for appcatalog"
+git push --set-upstream origin feature/create-manifest
+```
+And validate your pull request on your master branch
+</markdown>
+
 </div>

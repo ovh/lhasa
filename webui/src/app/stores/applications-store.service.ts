@@ -60,45 +60,11 @@ export class ApplicationsStoreService {
     private _store: Store<ApplicationState>
   ) {
     this.getDomains = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.domains);
-    this.getApplications = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.applications);
+    this.getApplications = createSelector(createFeatureSelector<ApplicationState>('applications'),
+      (state: ApplicationState) => state.applications);
     this.getActive = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.active);
-    this.getDeployments = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.deployments);
-  }
-
-  /**
-   * select this store service
-   */
-  public domains(): Store<Array<DomainBean>> {
-    return this._store.select(this.getDomains);
-  }
-
-  /**
-   * select this store service
-   */
-  public applications(): Store<Array<ApplicationBean>> {
-    return this._store.select(this.getApplications);
-  }
-
-  /**
-   * select this store service
-   */
-  public active(): Store<ApplicationBean> {
-    return this._store.select(this.getActive);
-  }
-
-  /**
-   * select this store service
-   */
-  public deployments(): Store<Array<DeploymentBean>> {
-    return this._store.select(this.getDeployments);
-  }
-
-  /**
-   * dispatch
-   * @param action dispatch action
-   */
-  public dispatch(action: AllStoreActions) {
-    this._store.dispatch(action);
+    this.getDeployments = createSelector(createFeatureSelector<ApplicationState>('applications'),
+      (state: ApplicationState) => state.deployments);
   }
 
   /**
@@ -143,6 +109,7 @@ export class ApplicationsStoreService {
       case SelectApplicationAction.getType(): {
         action = action as SelectApplicationAction;
         const active = Object.assign({}, action.payload);
+
         const deployments = Object.assign([], action.deployments);
         return {
           domains: state.domains,
@@ -155,5 +122,41 @@ export class ApplicationsStoreService {
       default:
         return state;
     }
+  }
+
+  /**
+   * select this store service
+   */
+  public domains(): Store<Array<DomainBean>> {
+    return this._store.select(this.getDomains);
+  }
+
+  /**
+   * select this store service
+   */
+  public applications(): Store<Array<ApplicationBean>> {
+    return this._store.select(this.getApplications);
+  }
+
+  /**
+   * select this store service
+   */
+  public active(): Store<ApplicationBean> {
+    return this._store.select(this.getActive);
+  }
+
+  /**
+   * select this store service
+   */
+  public deployments(): Store<Array<DeploymentBean>> {
+    return this._store.select(this.getDeployments);
+  }
+
+  /**
+   * dispatch
+   * @param action dispatch action
+   */
+  public dispatch(action: AllStoreActions) {
+    this._store.dispatch(action);
   }
 }

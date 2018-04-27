@@ -24,6 +24,7 @@ if (document.location.pathname.indexOf('/dev/') >= 0) {
  */
 export const environment = {
   production: true,
+  tracing: false,
   href: base,
   appcatalog: {
     baseUrlApi: prefix + '/uservice/gateway/' + appname,

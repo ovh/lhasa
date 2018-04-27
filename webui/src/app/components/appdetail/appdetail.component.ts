@@ -1,12 +1,12 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import {ActivatedRoute} from '@angular/router';
-import {ApplicationBean, DeploymentBean, EnvironmentBean} from '../../models/commons/applications-bean';
-import {Store} from '@ngrx/store';
-import {ApplicationsStoreService} from '../../stores/applications-store.service';
-import {EnvironmentsStoreService} from '../../stores/environments-store.service';
-import {element} from 'protractor';
-import {ISubscription} from 'rxjs/Subscription';
+import { ActivatedRoute } from '@angular/router';
+import { ApplicationBean, DeploymentBean, EnvironmentBean } from '../../models/commons/applications-bean';
+import { Store } from '@ngrx/store';
+import { ApplicationsStoreService } from '../../stores/applications-store.service';
+import { EnvironmentsStoreService } from '../../stores/environments-store.service';
+import { element } from 'protractor';
+import { ISubscription } from 'rxjs/Subscription';
 
 
 @Component({
@@ -39,8 +39,8 @@ export class AppdetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.applicationSubscription = this.applicationStream.subscribe(
-      (element: ApplicationBean) => {
-        this.application = element;
+      (app: ApplicationBean) => {
+        this.application = app;
       },
       error => {
         console.error(error);
@@ -50,8 +50,8 @@ export class AppdetailComponent implements OnInit, OnDestroy {
     );
 
     this.deploymentSubscription = this.deploymentStream.subscribe(
-      (element: DeploymentBean[]) => {
-        this.deployments = element;
+      (app: DeploymentBean[]) => {
+        this.deployments = app;
       },
       error => {
         console.error(error);

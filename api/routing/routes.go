@@ -2,7 +2,10 @@ package routers
 
 import (
 	"net/http"
+	"os"
+	"path"
 	"reflect"
+	"strings"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
@@ -19,6 +22,47 @@ import (
 	v1 "github.com/ovh/lhasa/api/v1/routing"
 )
 
+// checkHTML5Path check for HTML5 path in request
+func checkHTML5Path(c *gin.Context) bool {
+	if strings.HasPrefix(c.Request.URL.Path, "/api") {
+		return false
+	}
+	return true
+}
+
+// find existing resource on base webui (for security issue)
+func findResource(dir string, name string) (string, string, bool) {
+	var existing = strings.Replace(dir+"/"+name, "//", "", -1)
+	if _, err := os.Stat(existing); err == nil {
+		return "", existing, false
+	}
+	if dir == "/" {
+		return "", name, true
+	}
+	return path.Dir(dir), name, true
+}
+
+// redirect unknown routes to angular
+func redirect(c *gin.Context) {
+	var basepath = "./webui"
+	if checkHTML5Path(c) {
+		dir, name, notfound := findResource(basepath+path.Dir(c.Request.URL.Path), path.Base(c.Request.URL.Path))
+		for notfound && dir != "." {
+			dir, name, notfound = findResource(dir, name)
+			if !notfound {
+				c.File(dir + name)
+				return
+			}
+		}
+	}
+	if len(c.Request.URL.Path) > 1 {
+		// Path is not slash
+		c.Redirect(301, "/?redirect="+c.Request.URL.Path)
+		return
+	}
+	c.File(basepath + "/index.html")
+}
+
 //NewRouter creates a new and configured gin router
 func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
 	router := fizz.New()
@@ -31,11 +75,6 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 
 	// redirect root routes to angular assets
 	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/", static.LocalFile("./webui", true)))
-
-	// redirect unknown routes to angular
-	router.Engine().NoRoute(func(c *gin.Context) {
-		c.File("./webui/index.html")
-	})
 
 	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath))
 	api.GET("/", []fizz.OperationOption{
@@ -73,6 +112,8 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 	unsecured.GET("/openapi.json", nil, router.OpenAPI(infos, "json"))
 	unsecured.GET("/openapi.yaml", nil, router.OpenAPI(infos, "yaml"))
 
+	// redirect unknown routes to angular
+	router.Engine().NoRoute(redirect)
 	return router
 }
 

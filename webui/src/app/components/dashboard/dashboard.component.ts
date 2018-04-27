@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,13 +17,15 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.forEach((params: Params) => {
-      if (params.target) {
-        console.info("Routing to:", params.target)
-        this.router.navigate([params.target], {
-          queryParams: {
-            domain: params.domain,
-            application: params.application
+      if (params.redirect) {
+        const copy: Params = {};
+        _.each(params, prm => {
+          if (prm !== 'redirect') {
+            copy[prm.key] = params[prm];
           }
+        });
+        this.router.navigate([params.redirect], {
+          queryParams: copy
         });
       }
     });

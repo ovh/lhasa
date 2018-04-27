@@ -10,13 +10,13 @@
       <p class="oui-chip__container" *ngIf="application.tags">
         <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
       </p>
-      <div *ngIf="application.manifest.description">
+      <div *ngIf="application.manifest && application.manifest.description">
         <h3 class="oui-header_3">Description</h3>
         <p>
         {{ application.manifest.description }}
         </p>
       </div>
-      <div *ngIf="application.manifest.repository">
+      <div *ngIf="application.manifest && application.manifest.repository">
         <h3 class="oui-header_3">Repository</h3>
         <p class="oui-field__control oui-field__control_auto">
           <a class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
@@ -25,7 +25,7 @@
         </p>
       </div>
     </div>
-    <div class="oui-list ui-g-5" *ngIf="application.manifest.authors">
+    <div class="oui-list ui-g-5" *ngIf="application.manifest && application.manifest.authors">
       <h3 class="oui-header_3">Authors</h3>
       <ul class="oui-list__items">
         <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
@@ -63,6 +63,6 @@
   </div>
   <div class="ui-g-12">
     <h2 class="oui-header_2">Readme</h2>
-    <markdown *ngIf="application.manifest.description" [data]="application.manifest.description"></markdown>
+    <markdown *ngIf="application.manifest && application.manifest.description" [data]="application.manifest.description"></markdown>
   </div>
 </div>

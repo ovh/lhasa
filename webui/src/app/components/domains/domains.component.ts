@@ -19,7 +19,7 @@ export class DomainsComponent implements OnInit {
    * internal streams and store
    */
   protected domainsStream: Store<DomainBean[]>;
-  protected domains: DomainBean[] = [];
+  public domains: DomainBean[] = [];
 
   /**
    * to graph domains

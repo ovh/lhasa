@@ -1,15 +1,15 @@
 /**
  * fix BASE HREF problems
  */
-let href = document.location.pathname.split('/')
-let base=""
-let appname="appcatalog"
-let i = 0
-for(i=1;i<href.length;i++) {
-  base += '/' + href[i]
-  if(href[i].endsWith("appcatalog")) {
-    appname = href[i]
-    break
+const href = document.location.pathname.split('/');
+let base = '';
+let appname = 'appcatalog';
+let i = 0;
+for (i = 1; i < href.length; i++) {
+  base += '/' + href[i];
+  if (href[i].endsWith('appcatalog')) {
+    appname = href[i];
+    break;
   }
 }
 
@@ -18,6 +18,7 @@ for(i=1;i<href.length;i++) {
  */
 export const environment = {
   production: false,
+  tracing: true,
   href: base,
   appcatalog: {
     baseUrlApi: '/uservice/gateway/' + appname,

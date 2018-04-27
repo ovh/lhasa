@@ -100,6 +100,8 @@ import {EnvironmentsStoreService} from './stores/environments-store.service';
 import {DomainsComponent} from './components/domains/domains.component';
 import {GraphComponent} from './widget/graph/graph.component';
 import {EnvChipComponent} from './components/env-chip/env-chip.component';
+import { ApplicationResolver } from './resolver/resolve-app-detail';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -223,6 +225,14 @@ import {EnvChipComponent} from './components/env-chip/env-chip.component';
     DataDeploymentService,
     DataEnvironmentService,
     BitbucketService,
+    /**
+     * resolvers
+     */
+    ApplicationResolver,
+    {
+      provide: 'ApplicationResolver',
+      useValue: (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => 'application'
+    }
   ],
   bootstrap: [AppComponent]
 })

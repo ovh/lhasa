@@ -18,7 +18,7 @@ export class ApplicationsComponent implements OnInit {
    * internal streams and store
    */
   protected applicationsStream: Store<ApplicationBean[]>;
-  protected applications: ApplicationBean[];
+  public applications: ApplicationBean[];
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
 
@@ -83,31 +83,5 @@ export class ApplicationsComponent implements OnInit {
         );
       }
     );
-  }
-
-  /**
-   * dispatch load applications
-   * @param event
-   */
-  protected selectApplication(application: ApplicationBean) {
-    // load all applications from a content return
-    this.applicationsService.GetAllFromContent('/' + application.domain + '/' + application.name, <Map<string, string>> {size: 1})
-      .subscribe(
-        (data: ContentListResponse<ApplicationBean>) => {
-          this.deploymentService.GetAllFromContent(
-            '/?q=%7B%22properties._app_domain%22%3A%20%22' + application.domain +
-            '%22%2C%20%22properties._app_name%22%3A%20%22' + application.name + '%22%7D',
-            <Map<string, string>> {size: 20}).subscribe(
-            (deployments: ContentListResponse<DeploymentBean>) => {
-              this.applicationsStoreService.dispatch(
-                new SelectApplicationAction(
-                  data.content[0],
-                  deployments.content
-                )
-              );
-            }
-          );
-        }
-      );
   }
 }

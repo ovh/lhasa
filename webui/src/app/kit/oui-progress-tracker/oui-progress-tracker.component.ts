@@ -12,7 +12,7 @@ import { ApplicationsStoreService } from '../../stores/applications-store.servic
 })
 export class OuiProgressTrackerComponent implements OnInit {
 
-  visible: boolean = true;
+  visible = true;
   @Output() select: EventEmitter<any> = new EventEmitter();
 
   constructor(
@@ -23,7 +23,7 @@ export class OuiProgressTrackerComponent implements OnInit {
   }
 
   onSelect(event: any, tabs: string) {
-    event.data = tabs
+    event.data = tabs;
     this.select.emit(event);
   }
 

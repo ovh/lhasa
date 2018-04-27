@@ -1,27 +1,30 @@
-import {Component, OnInit} from '@angular/core';
-import {ApplicationsStoreService, SelectApplicationAction} from '../../stores/applications-store.service';
-import {Store} from '@ngrx/store';
-import {ApplicationBean, DeploymentBean} from '../../models/commons/applications-bean';
-import {DataApplicationService} from '../../services/data-application-version.service';
-import {ContentListResponse} from '../../models/commons/entity-bean';
+import { DeploymentBean, PersonBean } from './../../models/commons/applications-bean';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ApplicationsStoreService, SelectApplicationAction } from '../../stores/applications-store.service';
+import { Store } from '@ngrx/store';
+import { ApplicationBean } from '../../models/commons/applications-bean';
+import { DataApplicationService } from '../../services/data-application-version.service';
+import { ContentListResponse } from '../../models/commons/entity-bean';
 
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 import * as _ from 'lodash';
-import {ActivatedRoute} from '@angular/router';
-import {URLSearchParams} from '@angular/http';
-import {BitbucketService} from '../../services/data-bitbucket.service';
-import {MatSnackBar} from '@angular/material';
-import {environment} from '../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
+import { URLSearchParams } from '@angular/http';
+import { BitbucketService } from '../../services/data-bitbucket.service';
+import { MatSnackBar } from '@angular/material';
+import { environment } from '../../../environments/environment';
+import { ISubscription } from 'rxjs/Subscription';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-enrollment',
   templateUrl: './enrollment.component.html',
   styleUrls: ['./enrollment.component.css']
 })
-export class EnrollmentComponent implements OnInit {
+export class EnrollmentComponent implements OnInit, OnDestroy {
 
-  public selected: string = '0';
+  public selected = '';
 
   /**
    * internal streams and store
@@ -29,6 +32,11 @@ export class EnrollmentComponent implements OnInit {
   protected applicationStream: Store<ApplicationBean>;
   protected application: ApplicationBean;
   protected enrollment: string;
+
+  /**
+ * internal streams and store
+ */
+  protected subscription: ISubscription;
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
@@ -42,19 +50,29 @@ export class EnrollmentComponent implements OnInit {
      * subscribe
      */
     this.applicationStream = this.applicationsStoreService.active();
+  }
 
-    this.applicationStream.subscribe(
+  isLinear = false;
+
+  ngOnInit() {
+    this.subscription = this.applicationStream.subscribe(
       (element: ApplicationBean) => {
         this.application = element;
-
         if (this.application.manifest && this.application.manifest.repository) {
-          let url = this.application.manifest.repository.split(/\//);
-          this.application.project = url[3];
-          this.application.repo = url[4].split(/\./)[0];
-        } else {
-          this.application.project = 'UNKNOWN';
-          this.application.repo = 'UNKNOWN';
+          // Analyse is base on stach url
+          const url = this.application.manifest.repository.split(/\//);
+          this.application.project = url[4];
+          this.application.repo = url[6].split(/\./)[0];
         }
+        // Add support info
+        if (this.application.manifest) {
+          this.application.manifest.support = {
+            name: '',
+            email: '',
+            cisco: ''
+          };
+        }
+        this.selected = '0';
       },
       error => {
         console.error(error);
@@ -62,39 +80,8 @@ export class EnrollmentComponent implements OnInit {
       () => {
       }
     );
-
-    this.firstFormGroup = this._formBuilder.group({
-      firstCtrl: ['', Validators.required]
-    });
-    this.secondFormGroup = this._formBuilder.group({
-      secondCtrl: ['', Validators.required]
-    });
-
-    this.enrollment = `
-   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-   tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-   quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-   Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-   dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-   sunt in culpa qui officia deserunt mollit anim id est laborum.
-`;
-  }
-
-  isLinear = false;
-  firstFormGroup: FormGroup;
-  secondFormGroup: FormGroup;
-
-  ngOnInit() {
-    this.activatedRoute.queryParams.subscribe(params => {
-      let domain = params['domain'];
-      let application = params['application'];
-      if (domain && application) {
-        this.selectApplication(
-          domain,
-          application
-        );
-      }
-    });
+    // Default selection
+    this.onSelect({data: '2'});
   }
 
   /**
@@ -121,33 +108,90 @@ export class EnrollmentComponent implements OnInit {
   }
 
   /**
-   * dispatch load applications
-   * @param event
+   * change selection
    */
-  protected selectApplication(domain: string, application: string) {
-    // load all applications from a content return
-    this.applicationsService.GetAllFromContent('/' + domain + '/' + application, new Map<string, string>([['size', '1']])).subscribe(
-      (data: ContentListResponse<ApplicationBean>) => {
-        this.applicationsStoreService.dispatch(
-          new SelectApplicationAction(
-            data.content[0],
-            new Array<DeploymentBean>(),
-          )
-        );
+  public onSelect(event: any) {
+    this.selected = event.data;
+    // upgrade manifest on each change
+    const manifest = _.cloneDeep(this.application.manifest);
+    if (manifest) {
+      // remove empty data
+      if (manifest.support.name === '') {
+        delete manifest.support.name;
       }
+      if (manifest.support.email === '') {
+        delete manifest.support.email;
+      }
+      if (manifest.support.cisco === '') {
+        delete manifest.support.cisco;
+      }
+      if (!manifest.support.name && !manifest.support.email && !manifest.support.cisco) {
+        delete manifest.support;
+      }
+      this.enrollment = JSON.stringify(manifest, null, 2);
+    } else {
+      this.application.manifest = {
+      };
+    }
+  }
+
+  /**
+   * copy localfile
+   */
+  protected copy() {
+    const a: any = document.createElement('textarea');
+    document.body.appendChild(a);
+    a.value = this.enrollment;
+    a.select();
+    document.execCommand( 'copy' );
+    a.style = 'display: none';
+  }
+
+  /**
+   * drop
+   */
+  protected drop(author: PersonBean) {
+    _.remove(this.application.manifest.authors, (item: PersonBean) => {
+      return item.email === author.email;
+    });
+  }
+
+  /**
+   * add
+   */
+  protected add(author: PersonBean) {
+    this.application.manifest.authors.push({
+      email: 'nobody@exemple.com',
+      name: 'name',
+      role: 'MAINTAINER',
+      cisco: undefined
+    }
     );
   }
 
-  protected resource(path: string) {
-    return environment.appcatalog.baseUrlUi + '/ui' + path;
+  /**
+   * download localfile
+   */
+  protected download() {
+    const fileName = 'manifest.json';
+    const a: any = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    const file = new Blob([this.enrollment], { type: 'application/text' });
+    const fileURL = window.URL.createObjectURL(file);
+    a.href = fileURL;
+    a.download = fileName;
+    a.click();
   }
 
-  public onSelect(event: any) {
-    this.selected = event.data;
+  /**
+   * ngOnDestroy
+   */
+  ngOnDestroy(): void {
+    // Unsubcribe any current subscription
+    // See: http://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
-
-  ngOnDestroy() {
-    // this.sub.unsubscribe();
-  }
-
 }

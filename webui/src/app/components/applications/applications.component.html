@@ -7,15 +7,13 @@
       </p>
       <p-footer class="ui-g">
         <p class="ui-g-8">
-          <button class="oui-button" routerLink="/applications/{{ app.domain }}/{{ app.name }}"
-                  (click)="selectApplication(app)">
+          <button class="oui-button" routerLink="/applications/{{ app.domain }}/{{ app.name }}">
             More info ...
           </button>
         </p>
         <p class="ui-g-4">
-          <button class="oui-button oui-button_primary" routerLink="/enrollment"
-                  (click)="selectApplication(app)">
-            Enrollment ...
+          <button class="oui-button oui-button_primary" routerLink="/register/{{ app.domain }}/{{ app.name }}">
+            Registration ...
           </button>
         </p>
       </p-footer>

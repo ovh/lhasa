@@ -82,7 +82,7 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
     /**
      * get all resources
      */
-    public GetAllFromContent = (filter: string, params: Map<string,string>): Observable<ContentListResponse<T>> => {
+    public GetAllFromContent = (filter: string, params: Map<string, string>): Observable<ContentListResponse<T>> => {
         this.headers.set('AuthToken', this.configuration.getAuthToken());
         return this.http.get(this.actionUrl + filter, { headers: this.headers, params: params })
             .map((response: Response) => <ContentListResponse<T>>response.json())

@@ -10,11 +10,11 @@ export class ConfigurationService {
   public ServerCatalogCompanionWithApiUrl: string;
   public AuthToken: string;
 
-  private ServerAppCatalogCompanion: string = environment.appcatalogCompanion.baseUrlUi + "/";
-  private ApiUrlAppCatalogCompanion: string = environment.appcatalogCompanion.baseUrlUi + "/api/";
+  private ServerAppCatalogCompanion: string = environment.appcatalogCompanion.baseUrlUi + '/';
+  private ApiUrlAppCatalogCompanion: string = environment.appcatalogCompanion.baseUrlUi + '/api/';
 
-  private ServerAppCatalog: string = environment.appcatalog.baseUrlUi + "/";
-  private ApiUrlAppCatalog: string = environment.appcatalog.baseUrlUi + "/api/";
+  private ServerAppCatalog: string = environment.appcatalog.baseUrlUi + '/';
+  private ApiUrlAppCatalog: string = environment.appcatalog.baseUrlUi + '/api/';
 
   /**
    * constructor
@@ -28,7 +28,7 @@ export class ConfigurationService {
 
   /**
    * fix session token
-   * @param AuthToken 
+   * @param AuthToken
    */
   public setAuthToken(AuthToken: string): void {
     this.AuthToken = AuthToken;
@@ -36,7 +36,7 @@ export class ConfigurationService {
 
   /**
    * get token
-   * @param AuthToken 
+   * @param AuthToken
    */
   public getAuthToken(): string {
     return this.AuthToken;
