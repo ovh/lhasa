@@ -7,7 +7,7 @@
   <h2 class="oui-back-button_title oui-header_2">{{ application.domain }}/{{ application.name }}</h2>
   <div class="oui-box ui-g-12">
     <div class="ui-g-7">
-      <p class="oui-chip__container" *ngIf="application.tags">
+      <p *ngIf="application.tags">
         <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
       </p>
       <div *ngIf="application.manifest && application.manifest.description">
