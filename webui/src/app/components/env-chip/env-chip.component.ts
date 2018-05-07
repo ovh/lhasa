@@ -1,15 +1,17 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {EnvironmentsStoreService} from '../../stores/environments-store.service';
 import {EnvironmentBean} from '../../models/commons/applications-bean';
 import {Store} from '@ngrx/store';
 import {ISubscription} from 'rxjs/Subscription';
+import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 
 @Component({
   selector: 'app-env-chip',
   templateUrl: './env-chip.component.html',
   styleUrls: ['./env-chip.component.css', './flags.css'],
 })
-export class EnvChipComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe()
+export class EnvChipComponent implements OnInit {
 
   @Input() slug: string;
 
@@ -36,9 +38,5 @@ export class EnvChipComponent implements OnInit, OnDestroy {
       () => {
       }
     );
-  }
-
-  ngOnDestroy(): void {
-    this.environmentSubscription.unsubscribe();
   }
 }

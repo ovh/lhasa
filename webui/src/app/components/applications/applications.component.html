@@ -1,6 +1,6 @@
 <div class="ui-g-12" *ngFor="let domain of domains | orderByDomains">
   <h1 class="oui-header_1 oui-header_underline header">{{ domain.name | uppercase }}</h1>
-  <div style="padding: 8px" class="ui-g-4 ui-md-4" *ngFor="let app of domain.applications | orderByApps">
+  <div class="ui-g-4 ui-md-4 pad-tile" *ngFor="let app of domain.applications | orderByApps">
     <p-card title="{{ app.name }}" subtitle="{{ app.domain }}">
       <p class="application-description">
       {{ app.description }}

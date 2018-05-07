@@ -1,3 +1,8 @@
 .application-description {
   height: 100px;
 }
+
+.pad-tile {
+  padding: 8px
+}
+

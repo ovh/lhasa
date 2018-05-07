@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
 import { ApplicationBean, DeploymentBean, EnvironmentBean } from '../../models/commons/applications-bean';
@@ -7,6 +7,7 @@ import { ApplicationsStoreService } from '../../stores/applications-store.servic
 import { EnvironmentsStoreService } from '../../stores/environments-store.service';
 import { element } from 'protractor';
 import { ISubscription } from 'rxjs/Subscription';
+import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 
 
 @Component({
@@ -15,7 +16,8 @@ import { ISubscription } from 'rxjs/Subscription';
   styleUrls: ['./appdetail.component.css'],
 
 })
-export class AppdetailComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe()
+export class AppdetailComponent implements OnInit {
 
   /**
    * internal streams and store
@@ -59,10 +61,5 @@ export class AppdetailComponent implements OnInit, OnDestroy {
       () => {
       }
     );
-  }
-
-  ngOnDestroy(): void {
-    this.applicationSubscription.unsubscribe();
-    this.deploymentSubscription.unsubscribe();
   }
 }

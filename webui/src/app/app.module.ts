@@ -1,3 +1,5 @@
+import {TranslateModule, TranslateLoader, TranslateService} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -103,6 +105,11 @@ import {EnvChipComponent} from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
+// Cf. https://github.com/ngx-translate/core
+export function createTranslateLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -197,6 +204,16 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
     StoreModule.forRoot({
       applications: ApplicationsStoreService.reducer,
       environments: EnvironmentsStoreService.reducer,
+    }),
+    /**
+     * i18n
+     */
+    TranslateModule.forRoot({
+      loader: {
+          provide: TranslateLoader,
+          useFactory: createTranslateLoader,
+          deps: [HttpClient]
+      }
     })
   ],
   providers: [
@@ -225,6 +242,7 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
     DataDeploymentService,
     DataEnvironmentService,
     BitbucketService,
+    TranslateService,
     /**
      * resolvers
      */

@@ -1,5 +1,5 @@
 import { DeploymentBean, PersonBean } from './../../models/commons/applications-bean';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ApplicationsStoreService, SelectApplicationAction } from '../../stores/applications-store.service';
 import { Store } from '@ngrx/store';
 import { ApplicationBean } from '../../models/commons/applications-bean';
@@ -8,7 +8,7 @@ import { ContentListResponse } from '../../models/commons/entity-bean';
 
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-import * as _ from 'lodash';
+import { cloneDeep, remove } from 'lodash';
 import { ActivatedRoute } from '@angular/router';
 import { URLSearchParams } from '@angular/http';
 import { BitbucketService } from '../../services/data-bitbucket.service';
@@ -16,13 +16,15 @@ import { MatSnackBar } from '@angular/material';
 import { environment } from '../../../environments/environment';
 import { ISubscription } from 'rxjs/Subscription';
 import { DatePipe } from '@angular/common';
+import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 
 @Component({
   selector: 'app-enrollment',
   templateUrl: './enrollment.component.html',
   styleUrls: ['./enrollment.component.css']
 })
-export class EnrollmentComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe()
+export class EnrollmentComponent implements OnInit {
 
   public selected = '';
 
@@ -34,8 +36,8 @@ export class EnrollmentComponent implements OnInit, OnDestroy {
   protected enrollment: string;
 
   /**
- * internal streams and store
- */
+   * internal streams and store
+   */
   protected subscription: ISubscription;
 
   constructor(
@@ -113,7 +115,7 @@ export class EnrollmentComponent implements OnInit, OnDestroy {
   public onSelect(event: any) {
     this.selected = event.data;
     // upgrade manifest on each change
-    const manifest = _.cloneDeep(this.application.manifest);
+    const manifest = cloneDeep(this.application.manifest);
     if (manifest) {
       // remove empty data
       if (manifest.support.name === '') {
@@ -151,7 +153,7 @@ export class EnrollmentComponent implements OnInit, OnDestroy {
    * drop
    */
   protected drop(author: PersonBean) {
-    _.remove(this.application.manifest.authors, (item: PersonBean) => {
+    remove(this.application.manifest.authors, (item: PersonBean) => {
       return item.email === author.email;
     });
   }
@@ -182,16 +184,5 @@ export class EnrollmentComponent implements OnInit, OnDestroy {
     a.href = fileURL;
     a.download = fileName;
     a.click();
-  }
-
-  /**
-   * ngOnDestroy
-   */
-  ngOnDestroy(): void {
-    // Unsubcribe any current subscription
-    // See: http://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
   }
 }

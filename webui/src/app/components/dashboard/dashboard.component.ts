@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import * as _ from 'lodash';
+import { each } from 'lodash';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
     this.route.queryParams.forEach((params: Params) => {
       if (params.redirect) {
         const copy: Params = {};
-        _.each(params, prm => {
+        each(params, prm => {
           if (prm !== 'redirect') {
             copy[prm.key] = params[prm];
           }
