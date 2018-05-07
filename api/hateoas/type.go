@@ -112,10 +112,10 @@ func (page Page) ToResources(baseURL string) PagedResources {
 	}
 	totalPages := int(math.Ceil(float64(page.TotalElements) / float64(page.Pageable.Size)))
 	if page.Pageable.Page < totalPages-1 {
-		links = append(links, ResourceLink{Href: fmt.Sprintf("%s%s?page=%d&size=%d%s", baseURL, page.BasePath, page.Pageable.Page+1, page.Pageable.Size, sortParam), Rel: "next"})
+		links = append(links, getPageLink(baseURL, page.BasePath, page.Pageable.Page+1, page.Pageable.Size, sortParam))
 	}
 	if page.Pageable.Page > 0 {
-		links = append(links, ResourceLink{Href: fmt.Sprintf("%s%s?page=%d&size=%d%s", baseURL, page.BasePath, page.Pageable.Page-1, page.Pageable.Size, sortParam), Rel: "prev"})
+		links = append(links, getPageLink(baseURL, page.BasePath, page.Pageable.Page-1, page.Pageable.Size, sortParam))
 	}
 	metadata := pageMetadata{
 		Size:          page.Pageable.Size,
@@ -137,15 +137,25 @@ func (page Page) ToResources(baseURL string) PagedResources {
 	}
 }
 
+func getPageLink(baseURL, basePath string, page, size int, sortParam string) ResourceLink {
+	return ResourceLink{Href: fmt.Sprintf("%s%s?page=%d&size=%d%s", baseURL, basePath, page, size, sortParam), Rel: "next"}
+}
+
 func reflectValueToResource(value reflect.Value, baseURL string) {
-	if value.Kind() != reflect.Slice && value.Kind() != reflect.Map {
-		resource, ok := value.Interface().(Resourceable)
-		if ok {
-			resource.ToResource(baseURL)
+	if value.Kind() == reflect.Map {
+		for _, key := range value.MapKeys() {
+			reflectValueToResource(value.MapIndex(key), baseURL)
 		}
 		return
 	}
-	for i := 0; i < value.Len(); i++ {
-		reflectValueToResource(value.Index(i), baseURL)
+	if value.Kind() == reflect.Slice || value.Kind() == reflect.Array {
+		for i := 0; i < value.Len(); i++ {
+			reflectValueToResource(value.Index(i), baseURL)
+		}
+		return
+	}
+	resource, ok := value.Interface().(Resourceable)
+	if ok {
+		resource.ToResource(baseURL)
 	}
 }
