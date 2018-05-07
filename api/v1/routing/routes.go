@@ -7,11 +7,12 @@ import (
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/application"
 	"github.com/ovh/lhasa/api/v1/deployment"
+	"github.com/ovh/lhasa/api/v1/domain"
 	"github.com/ovh/lhasa/api/v1/environment"
 )
 
 // registerRoutes registers v1 API routes on a gin engine
-func registerRoutes(group *fizz.RouterGroup, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend) {
+func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend) {
 	group.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
 		fizz.ID("IndexV1"),
@@ -20,6 +21,14 @@ func registerRoutes(group *fizz.RouterGroup, appRepo *application.Repository, en
 		hateoas.ResourceLink{Href: v1.EnvironmentBasePath, Rel: "environments"},
 		hateoas.ResourceLink{Href: v1.DeploymentBasePath, Rel: "deployments"},
 	))
+
+	domRoutes := group.Group("/domains", "domains", "Domains resource management")
+	domRoutes.GET("/", getOperationOptions("FindByPage", domRepo,
+		fizz.Summary("Find a page of Domains"),
+	), hateoas.HandlerFindByPage(domRepo))
+	domRoutes.GET("/:domain", getOperationOptions("FindOneBy", domRepo,
+		fizz.Summary("Find one Domain"),
+	), hateoas.HandlerFindOneBy(domRepo))
 
 	appRoutes := group.Group("/applications", "applications", "Application versions resource management")
 	appRoutes.GET("/", getOperationOptions("FindByPage", appRepo,
@@ -110,13 +119,14 @@ func registerRoutes(group *fizz.RouterGroup, appRepo *application.Repository, en
 
 // Init initialize the API v1 module
 func Init(db *gorm.DB, group *fizz.RouterGroup) {
+	domRepo := domain.NewRepository(db)
 	appRepo := application.NewRepository(db)
 	envRepo := environment.NewRepository(db)
 	depRepo := deployment.NewRepository(db)
 	deployer := deployment.ApplicationDeployer(depRepo)
 	depend := deployment.Dependency(depRepo)
 
-	registerRoutes(group, appRepo, envRepo, depRepo, deployer, depend)
+	registerRoutes(group, domRepo, appRepo, envRepo, depRepo, deployer, depend)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository

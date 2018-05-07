@@ -19,6 +19,39 @@ const DeploymentBasePath = "/deployments"
 // EnvironmentBasePath is the URL base path for this resource
 const EnvironmentBasePath = "/environments"
 
+// DomainBasePath is the URL base path for this resource
+const DomainBasePath = "/domains"
+
+// Domain define a business domain
+type Domain struct {
+	Name string `json:"name"`
+	hateoas.Resource
+}
+
+// GetID returns the public ID of the entity
+func (dom *Domain) GetID() string {
+	return dom.Name
+}
+
+// SetID sets up the new ID of the entity
+func (dom *Domain) SetID(id string) error {
+	dom.Name = id
+	return nil
+}
+
+// ToResource implements Resourceable
+func (dom *Domain) ToResource(baseURL string) {
+	dom.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "self", Href: dom.GetSelfURL(baseURL)},
+		{Rel: "applications", Href: fmt.Sprintf("%s%s/%s", baseURL, ApplicationBasePath, dom.Name)},
+	}
+}
+
+// GetSelfURL implements Resourceable
+func (dom *Domain) GetSelfURL(baseURL string) string {
+	return fmt.Sprintf("%s%s/%s", baseURL, DomainBasePath, dom.Name)
+}
+
 // Application defines the model properties of an application
 type Application struct {
 	ID           uint            `json:"-" gorm:"auto increment" binding:"-"`
