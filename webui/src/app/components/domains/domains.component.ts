@@ -11,7 +11,7 @@ import {DataDeploymentService} from '../../services/data-deployment.service';
 @Component({
   selector: 'app-domains',
   templateUrl: './domains.component.html',
-  styleUrls: ['./domains.component.css'],
+  styleUrls: [],
 })
 export class DomainsComponent implements OnInit {
 
@@ -78,28 +78,7 @@ export class DomainsComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.domains || this.domains.length === 0) {
-      this.loadApplications(null);
-    }
   }
-
-  /**
-   * dispatch load applications
-   * @param event
-   */
-  protected loadApplications(event: any) {
-    // load all applications from a content return
-    this.applicationsService.GetAllFromContent('', <Map<string, string>> {size: 1000}).subscribe(
-      (data: ContentListResponse<ApplicationBean>) => {
-        this.applicationsStoreService.dispatch(
-          new LoadApplicationsAction(
-            data.content
-          )
-        );
-      }
-    );
-  }
-
 
   /**
    * dispatch load applications

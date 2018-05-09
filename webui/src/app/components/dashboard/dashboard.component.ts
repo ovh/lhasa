@@ -19,9 +19,9 @@ export class DashboardComponent implements OnInit {
     this.route.queryParams.forEach((params: Params) => {
       if (params.redirect) {
         const copy: Params = {};
-        each(params, prm => {
-          if (prm !== 'redirect') {
-            copy[prm.key] = params[prm];
+        each(params, (value, key) => {
+          if (key !== 'redirect') {
+            copy[key] = value;
           }
         });
         this.router.navigate([params.redirect], {

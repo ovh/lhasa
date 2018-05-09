@@ -1,15 +1,24 @@
 import {Injectable} from '@angular/core';
-import {createFeatureSelector, createSelector, MemoizedSelector, Store} from '@ngrx/store';
+import {createFeatureSelector, createSelector, Store, Selector} from '@ngrx/store';
 
-import {ActionWithPayload} from './action-with-payload';
-import {ApplicationBean, DeploymentBean, DomainBean} from '../models/commons/applications-bean';
+import { ActionWithPayload, ActionWithPayloadAndPromise } from './action-with-payload';
+import {ApplicationBean, DeploymentBean, DomainBean, DomainPagesBean, ApplicationPagesBean} from '../models/commons/applications-bean';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 
 /**
  * states
  */
 export interface ApplicationState {
+  /**
+   * domains of each application loaded in store
+   */
+  domainPages: DomainPagesBean;
+  /**
+   * domains of each application loaded in store
+   */
   domains: Array<DomainBean>;
-  applications: Array<ApplicationBean>;
+  applications: ApplicationPagesBean;
   active: ApplicationBean;
   deployments: Array<DeploymentBean>;
 }
@@ -17,29 +26,40 @@ export interface ApplicationState {
 /**
  * actions
  */
-export class LoadApplicationsAction implements ActionWithPayload<Array<ApplicationBean>> {
+export class LoadApplicationsAction implements ActionWithPayloadAndPromise<ApplicationPagesBean> {
   readonly type = LoadApplicationsAction.getType();
 
   public static getType(): string {
     return 'LoadApplicationsAction';
   }
 
-  constructor(public payload: Array<ApplicationBean>) {
+  constructor(public payload: ApplicationPagesBean, public subject?: Subject<any>) {
   }
 }
 
-export class SelectApplicationAction implements ActionWithPayload<ApplicationBean> {
+export class SelectApplicationAction implements ActionWithPayloadAndPromise<ApplicationBean> {
   readonly type = SelectApplicationAction.getType();
 
   public static getType(): string {
     return 'SelectApplicationAction';
   }
 
-  constructor(public payload: ApplicationBean, public deployments: Array<DeploymentBean>) {
+  constructor(public payload: ApplicationBean, public deployments: Array<DeploymentBean>, public subject?: Subject<any>) {
   }
 }
 
-export type AllStoreActions = LoadApplicationsAction | SelectApplicationAction;
+export class LoadDomainsAction implements ActionWithPayloadAndPromise<DomainPagesBean> {
+  readonly type = LoadDomainsAction.getType();
+
+  public static getType(): string {
+    return 'LoadDomainsAction';
+  }
+
+  constructor(public payload: DomainPagesBean, public subject: Subject<any>) {
+  }
+}
+
+export type AllStoreActions = LoadApplicationsAction | LoadDomainsAction | SelectApplicationAction;
 
 /**
  * main store for this application
@@ -47,10 +67,11 @@ export type AllStoreActions = LoadApplicationsAction | SelectApplicationAction;
 @Injectable()
 export class ApplicationsStoreService {
 
-  readonly getDomains: MemoizedSelector<object, Array<DomainBean>>;
-  readonly getApplications: MemoizedSelector<object, Array<ApplicationBean>>;
-  readonly getActive: MemoizedSelector<object, ApplicationBean>;
-  readonly getDeployments: MemoizedSelector<object, Array<DeploymentBean>>;
+  readonly getDomainPages: Selector<object, DomainPagesBean>;
+  readonly getDomains: Selector<object, Array<DomainBean>>;
+  readonly getApplications: Selector<object, ApplicationPagesBean>;
+  readonly getActive: Selector<object, ApplicationBean>;
+  readonly getDeployments: Selector<object, Array<DeploymentBean>>;
 
   /**
    *
@@ -65,6 +86,15 @@ export class ApplicationsStoreService {
     this.getActive = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.active);
     this.getDeployments = createSelector(createFeatureSelector<ApplicationState>('applications'),
       (state: ApplicationState) => state.deployments);
+    this.getDomainPages = ApplicationsStoreService.create((state: ApplicationState) => state.domainPages);
+  }
+
+  /**
+   * create a selector
+   * @param handler internal static
+   */
+  private static create(handler: (S1: ApplicationState) => any)  {
+    return createSelector(createFeatureSelector<ApplicationState>('applications'), handler);
   }
 
   /**
@@ -73,21 +103,22 @@ export class ApplicationsStoreService {
    * @param action
    */
   public static reducer(state: ApplicationState = {
+    domainPages: new DomainPagesBean(),
     domains: new Array<DomainBean>(),
-    applications: new Array<ApplicationBean>(),
+    applications: new ApplicationPagesBean(),
     active: new ApplicationBean(),
     deployments: new Array<DeploymentBean>(),
   }, action: AllStoreActions): ApplicationState {
 
     switch (action.type) {
       /**
-       * message incomming
+       * update all applications in store
        */
       case LoadApplicationsAction.getType(): {
-        const applications = Object.assign([], action.payload);
+        const pages = <ApplicationPagesBean> Object.assign([], action.payload);
 
         const orderedDomains = new Map<string, ApplicationBean[]>();
-        applications.forEach((app) => {
+        pages.applications.forEach((app) => {
           if (!orderedDomains.has(app.domain)) {
             orderedDomains.set(app.domain, []);
           }
@@ -98,20 +129,45 @@ export class ApplicationsStoreService {
           domains.push({name: k, applications: v});
         });
 
+        action.subject.complete();
         return {
+          domainPages: state.domainPages,
           domains: domains,
-          applications: applications,
-          active: applications[0],
+          applications: pages,
+          active: pages.applications[0],
           deployments: new Array<DeploymentBean>(),
         };
       }
 
+      /**
+       * update all domains in store
+       */
+      case LoadDomainsAction.getType(): {
+        const domainPages = Object.assign(new DomainPagesBean(), action.payload);
+
+        /**
+         * notify domains change
+         */
+        action.subject.complete();
+        return {
+          domainPages: domainPages,
+          domains: state.domains,
+          applications: state.applications,
+          active: state.active,
+          deployments: state.deployments,
+        };
+      }
+
+      /**
+       * select a single applications
+       */
       case SelectApplicationAction.getType(): {
         action = action as SelectApplicationAction;
         const active = Object.assign({}, action.payload);
 
         const deployments = Object.assign([], action.deployments);
         return {
+          domainPages: state.domainPages,
           domains: state.domains,
           applications: state.applications,
           active: active,
@@ -127,6 +183,13 @@ export class ApplicationsStoreService {
   /**
    * select this store service
    */
+  public domainPages(): Store<DomainPagesBean> {
+    return this._store.select(this.getDomainPages);
+  }
+
+  /**
+   * select this store service
+   */
   public domains(): Store<Array<DomainBean>> {
     return this._store.select(this.getDomains);
   }
@@ -134,7 +197,7 @@ export class ApplicationsStoreService {
   /**
    * select this store service
    */
-  public applications(): Store<Array<ApplicationBean>> {
+  public applications(): Store<ApplicationPagesBean> {
     return this._store.select(this.getApplications);
   }
 

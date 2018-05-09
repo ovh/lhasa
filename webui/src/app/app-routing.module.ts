@@ -10,6 +10,9 @@ import { EnrollmentComponent } from './components/enrollment/enrollment.componen
 import { RoutingGuard } from './guards/routing.guard';
 import { DomainsComponent } from './components/domains/domains.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
+import { DomainsBrowseComponent } from './components/domains-browse/domains-browse.component';
+import { DomainsResolver } from './resolver/resolve-domains';
+import { ApplicationsResolver } from './resolver/resolve-applications';
 
 const routes: Routes = [
   {
@@ -18,12 +21,18 @@ const routes: Routes = [
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {
-    path: 'domains',
+    path: 'domains/graph',
+    resolve: {
+      applications: ApplicationsResolver
+    },
     component: DomainsComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {
     path: 'applications',
+    resolve: {
+      applications: ApplicationsResolver
+    },
     component: ApplicationsComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
@@ -41,6 +50,14 @@ const routes: Routes = [
       application: ApplicationResolver
     },
     component: AppdetailComponent,
+    canActivate: [ProfileGuard, RoutingGuard]
+  },
+  {
+    path: 'domains',
+    resolve: {
+      domains: DomainsResolver
+    },
+    component: DomainsBrowseComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   }
 ];

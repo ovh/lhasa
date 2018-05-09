@@ -1,0 +1,20 @@
+<div>
+<nav class="oui-navbar" role="navigation">
+  <a class="oui-navbar__brand" routerLink="{{home}}">
+    <i class="oui-icon oui-icon-ovh"></i>
+  </a>
+  <ul class="oui-navbar-list">
+    <li class="oui-navbar-list__item" *ngFor="let menuitem of items">
+      <a *ngIf="!menuitem.items || menuitem.items.length === 0" class="oui-navbar-link oui-navbar-link_primary" routerLink="{{menuitem.routerLink}}">{{ menuitem.label | translate }}</a>
+      <button *ngIf="menuitem.items && menuitem.items.length != 0" id="{{'button-' + menuitem.id}}" (mouseover)="expand(menuitem)" class="oui-navbar-link oui-navbar-link_primary" type="button" aria-haspopup="true" aria-expanded="false">{{ menuitem.label | translate }}</button>
+      <div class="oui-navbar-menu" (mouseleave)="release()">
+        <ul class="oui-navbar-list" (mouseleave)="release()">
+          <li class="oui-navbar-list__item" *ngFor="let submenuitem of menuitem.items">
+            <a *ngIf="!submenuitem.items || submenuitem.items.length === 0" href class="oui-navbar-link" routerLink="{{submenuitem.routerLink}}">{{ submenuitem.label | translate }}</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</nav>
+</div>

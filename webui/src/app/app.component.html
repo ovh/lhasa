@@ -1,16 +1,4 @@
 <!--Integrate OVH UI Kit.-->
-<nav class="oui-navbar" role="navigation">
-  <a class="oui-navbar__brand" routerLink="/">
-    <i class="oui-icon oui-icon-ovh"></i>
-  </a>
-  <ul class="oui-navbar-list">
-    <li class="oui-navbar-list__item">
-      <a class="oui-navbar-link oui-navbar-link_active" routerLink="/domains" (click)="loadApplications()">{{ 'DOMAINS' | translate }}</a>
-    </li>
-    <li class="oui-navbar-list__item">
-      <a class="oui-navbar-link oui-navbar-link_active" routerLink="/applications" (click)="loadApplications()">{{ 'APPLICATIONS' | translate }}</a>
-    </li>
-  </ul>
-</nav>
+<app-oui-nav-bar [home]="'/'" [items]="items" ></app-oui-nav-bar>
 
 <router-outlet></router-outlet>

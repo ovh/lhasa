@@ -1,0 +1,7 @@
+.oui-navbar-link {
+    min-height: 1.0rem;
+}
+
+.oui-navbar-menu .oui-navbar-link {
+    width: auto;
+}

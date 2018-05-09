@@ -1,3 +1,6 @@
+<br>
+<app-oui-pagination #pagination [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
+<app-oui-message #message *ngIf="domain.length > 0" (select)="onMessageEvent($event)" message="{{ 'FILERED_BY_DOMAIN' | translate:param }}"></app-oui-message>
 <div class="ui-g-12" *ngFor="let domain of domains | orderByDomains">
   <h1 class="oui-header_1 oui-header_underline header">{{ domain.name | uppercase }}</h1>
   <div class="ui-g-4 ui-md-4 pad-tile" *ngFor="let app of domain.applications | orderByApps">

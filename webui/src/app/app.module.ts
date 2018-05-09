@@ -1,3 +1,4 @@
+import { OuiNavBarComponent } from './kit/oui-nav-bar/oui-nav-bar.component';
 import {TranslateModule, TranslateLoader, TranslateService} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {BrowserModule} from '@angular/platform-browser';
@@ -104,6 +105,12 @@ import {GraphComponent} from './widget/graph/graph.component';
 import {EnvChipComponent} from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { DomainsBrowseComponent } from './components/domains-browse/domains-browse.component';
+import { DomainsResolver } from './resolver/resolve-domains';
+import { DataDomainService } from './services/data-domain.service';
+import { OuiPaginationComponent } from './kit/oui-pagination/oui-pagination.component';
+import { ApplicationsResolver } from './resolver/resolve-applications';
+import { OuiMessageComponent } from './kit/oui-message/oui-message.component';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
@@ -115,11 +122,18 @@ export function createTranslateLoader(http: HttpClient) {
     AppComponent,
     ApplicationsComponent,
     DomainsComponent,
+    DomainsBrowseComponent,
     GraphComponent,
     EnrollmentComponent,
     DashboardComponent,
     AppdetailComponent,
+    /**
+     * UI Kit component
+     */
     OuiProgressTrackerComponent,
+    OuiNavBarComponent,
+    OuiPaginationComponent,
+    OuiMessageComponent,
     ApplicationSortPipe,
     DomainSortPipe,
     AppdetailsActiveDeploymentsPipe,
@@ -243,14 +257,13 @@ export function createTranslateLoader(http: HttpClient) {
     DataEnvironmentService,
     BitbucketService,
     TranslateService,
+    DataDomainService,
     /**
      * resolvers
      */
     ApplicationResolver,
-    {
-      provide: 'ApplicationResolver',
-      useValue: (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => 'application'
-    }
+    ApplicationsResolver,
+    DomainsResolver
   ],
   bootstrap: [AppComponent]
 })

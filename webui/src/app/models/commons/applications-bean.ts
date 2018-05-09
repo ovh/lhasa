@@ -1,5 +1,5 @@
-import {EntityBean} from './entity-bean';
-import {Timestamp} from 'rxjs/operators/timestamp';
+import { EntityBean, PageMetaData, HrefLinks } from './entity-bean';
+import { Timestamp } from 'rxjs/operators/timestamp';
 
 // Application
 export class ApplicationBean extends EntityBean {
@@ -55,10 +55,33 @@ export class TeamBean {
   cisco: string;
 }
 
+// Domain for page browse
+export class ApplicationPagesBean {
+  applications: ApplicationBean[] = [];
+  metadata: PageMetaData = {
+    totalElements: 0,
+    totalPages: 0,
+    size: 0,
+    number: 0
+  };
+}
+
 // Domain
-export class DomainBean {
+export class DomainBean extends EntityBean {
   name: string;
-  applications: ApplicationBean[];
+  applications?: ApplicationBean[];
+  _links?: HrefLinks[];
+}
+
+// Domain for page browse
+export class DomainPagesBean {
+  domains: DomainBean[] = [];
+  metadata: PageMetaData = {
+    totalElements: 0,
+    totalPages: 0,
+    size: 0,
+    number: 0
+  };
 }
 
 // Bitbucket

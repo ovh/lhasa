@@ -3,10 +3,21 @@ export class EntityBean {
     timestamp: Date;
 }
 
-export class ContentListResponse<T extends EntityBean> {
-    _links: {};
-    start: number;
+export class HrefLinks {
+    rel: string;
+    href: string;
+}
+
+// Page meta data
+export class PageMetaData {
+    totalElements?: number;
+    totalPages?: number;
     size: number;
-    limit: number;
+    number: number;
+}
+
+export class ContentListResponse<T extends EntityBean> {
     content: T[];
+    pageMetadata: PageMetaData;
+    _links: {};
 }

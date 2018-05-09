@@ -1,11 +1,18 @@
-import {Component, OnInit, Pipe} from '@angular/core';
-import {ApplicationsStoreService, SelectApplicationAction, LoadApplicationsAction} from '../../stores/applications-store.service';
-import {Store} from '@ngrx/store';
-import {ApplicationBean, DeploymentBean, DomainBean} from '../../models/commons/applications-bean';
-import {DataApplicationService} from '../../services/data-application-version.service';
-import {ContentListResponse} from '../../models/commons/entity-bean';
+import { Component, OnInit, Pipe, ViewChild } from '@angular/core';
+import { ApplicationsStoreService, SelectApplicationAction, LoadApplicationsAction } from '../../stores/applications-store.service';
+import { Store } from '@ngrx/store';
+import { ApplicationBean, DeploymentBean, DomainBean, ApplicationPagesBean } from '../../models/commons/applications-bean';
+import { DataApplicationService } from '../../services/data-application-version.service';
+import { ContentListResponse, PageMetaData } from '../../models/commons/entity-bean';
 
-import {DataDeploymentService} from '../../services/data-deployment.service';
+import { DataDeploymentService } from '../../services/data-deployment.service';
+import { UiKitPaginate } from '../../models/kit/paginate';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ApplicationsResolver } from '../../resolver/resolve-applications';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { OuiMessageComponent } from '../../kit/oui-message/oui-message.component';
+import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
 
 @Component({
   selector: 'app-applications',
@@ -17,24 +24,66 @@ export class ApplicationsComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected applicationsStream: Store<ApplicationBean[]>;
+  protected applicationsStream: Store<ApplicationPagesBean>;
   public applications: ApplicationBean[];
+  public metadata: UiKitPaginate = {
+    totalElements: 0,
+    totalPages: 0,
+    size: 0,
+    number: 0
+  };
+
+  @ViewChild('pagination') pagination: OuiPaginationComponent;
+  @ViewChild('message') msg: OuiMessageComponent;
+
+  public domain = '';
+  public param = { target: '' };
+
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
+  public page = 0;
 
   constructor(
+    private router: Router,
     private applicationsStoreService: ApplicationsStoreService,
-    private applicationsService: DataApplicationService,
-    private deploymentService: DataDeploymentService,
+    private applicationsResolver: ApplicationsResolver,
+    private route: ActivatedRoute
   ) {
     /**
      * subscribe
      */
     this.applicationsStream = this.applicationsStoreService.applications();
 
+    // Subscribe to retrieve page asked
+    this.route
+      .queryParams
+      .subscribe(params => {
+        let changeDomain = false;
+        // Defaults to 0 if no query param provided.
+        this.page = +params['page'] || 0;
+        // verify if filter by domain
+        if (!params['domain'] && this.domain !== '') {
+          changeDomain = true;
+        }
+        if (params['domain']) {
+          this.domain = '/' + params['domain'];
+          this.param.target = params['domain'];
+        } else {
+          this.domain = '';
+          this.param.target = null;
+        }
+        // reload data
+        if (changeDomain) {
+          this.refreshApplications();
+        }
+      });
+  }
+
+  ngOnInit() {
+    // store
     this.applicationsStream.subscribe(
-      (element: ApplicationBean[]) => {
-        this.applications = element;
+      (element: ApplicationPagesBean) => {
+        this.applications = element.applications;
         this.applications.forEach((app) => {
           app.description = 'No provided description. Please fill the `description` field of the manifest.';
           if (app.manifest && app.manifest.description) {
@@ -51,8 +100,19 @@ export class ApplicationsComponent implements OnInit {
         });
         this.domains = [];
         this.orderedDomains.forEach((v, k) => {
-          this.domains.push({name: k, applications: v});
+          this.domains.push({ id: null, timestamp: null, name: k, applications: v });
         });
+        // Fix meta data
+        this.metadata = {
+          totalElements: element.metadata.totalElements,
+          totalPages: element.metadata.totalPages,
+          size: element.metadata.size,
+          number: element.metadata.number
+        };
+        // if page different from 0
+        if (this.page !== 0) {
+          this.pagination.RefreshMetadata(this.metadata, 'select', this.page);
+        }
       },
       error => {
         console.error(error);
@@ -62,26 +122,53 @@ export class ApplicationsComponent implements OnInit {
     );
   }
 
-  ngOnInit() {
-    if (!this.applications || this.applications.length === 0) {
-      this.loadApplications(null);
+  /**
+   * change selection
+   */
+  public onSelect(event: any) {
+    const metadata: PageMetaData = {
+      totalElements: event.data.metadata.totalElements,
+      totalPages: event.data.metadata.totalPages,
+      size: event.data.metadata.size,
+      number: event.data.page
+    };
+    // Change page
+    this.navigate(metadata, event.data.page);
+  }
+
+  /**
+   * change navigation
+   */
+  public navigate(metadata: PageMetaData, page: number) {
+    // navigate if needed
+    if (page !== this.page) {
+      // Refresh query params
+      this.router.navigate([], { queryParams: { page: page } });
+      this.applicationsResolver.selectApplications(metadata,
+        this.domain, new BehaviorSubject<any>('select another page on domains'));
+      this.page = page;
     }
   }
 
   /**
-   * dispatch load applications
-   * @param event
+   * change selection
    */
-  public loadApplications(event: any) {
-    // load all applications from a content return
-    this.applicationsService.GetAllFromContent('', <Map<string, string>> {size: 1000}).subscribe(
-      (data: ContentListResponse<ApplicationBean>) => {
-        this.applicationsStoreService.dispatch(
-          new LoadApplicationsAction(
-            data.content
-          )
-        );
-      }
-    );
+  public onMessageEvent(event: any) {
+    if (event.data.type === 'close') {
+      this.msg.hide();
+      this.refreshApplications();
+    }
+  }
+
+  /**
+   * refresh applications
+   */
+  public refreshApplications() {
+    // Reset nav
+    this.router.navigate([], { queryParams: { page: 0 } });
+    return this.applicationsResolver.selectApplications({
+      number: 0,
+      size: 100
+    }, '', new BehaviorSubject<any>('refresh all applications'));
   }
 }

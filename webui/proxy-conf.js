@@ -6,7 +6,7 @@
  */
 const redirect = function (req, res, proxyOptions) {
     console.log("Catch all.", req.originalUrl);
-    res.set('location', 'http://localhost:4200/?redirect='+req.originalUrl);
+    res.set('location', 'http://localhost:4200/?redirect='+req.originalUrl.replace('?','&'));
     res.status(301)
 };
 

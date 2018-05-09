@@ -1,0 +1,5 @@
+<div *ngIf="visible" class="oui-message oui-message_info" role="alert">
+  <i class="oui-icon oui-icon-info_circle oui-icon_bicolor" aria-hidden="true"></i>
+  <p class="oui-message__body">{{ message }}</p>
+  <button class="oui-icon oui-icon-close oui-message__close-button" type="button" title="Close the alert" (click)="onSelect($event, 'close')"></button>
+</div>

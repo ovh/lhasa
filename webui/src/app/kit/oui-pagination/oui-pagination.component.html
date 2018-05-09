@@ -1,0 +1,14 @@
+<div class="oui-pagination">
+  <div class="oui-pagination__selector">
+    <button type="button" class="oui-button oui-button_secondary oui-button_icon-only oui-button_small-width" aria-label="Previous page" (click)="onSelect($event, 'previous', null)">
+      <i class="oui-icon oui-icon-chevron-left" aria-hidden="true"></i>
+    </button>
+    <div class="oui-button-group">
+      <button *ngFor="let item of pages" 
+      class="oui-button oui-button_primary oui-button_small-width {{item.selected}}" (click)="onSelect($event, 'select', item.index)" disabled="{{item.disabled}}">{{item.index + 1}}</button>
+    </div>
+    <button type="button" class="oui-button oui-button_secondary oui-button_icon-only oui-button_small-width" aria-label="Next page" (click)="onSelect($event, 'next', null)" >
+      <i class="oui-icon oui-icon-chevron-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</div>

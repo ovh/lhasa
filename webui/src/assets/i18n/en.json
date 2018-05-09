@@ -1,4 +1,6 @@
 {
     "DOMAINS": "Domains",
-    "APPLICATIONS": "Applications"
+    "APPLICATIONS": "Applications",
+    "SEARCH": "Search for {{target}}",
+    "FILERED_BY_DOMAIN": "Filtered by domain {{target}}"
 }
