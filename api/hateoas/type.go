@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+const (
+	DirectionAsc  = "asc"
+	DirectionDesc = "desc"
+)
+
 // Entity defines and identifiable REST entity
 type Entity interface {
 	GetID() string

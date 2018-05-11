@@ -46,13 +46,15 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
-	if pageable.Size == 0 {
-		pageable.Size = defaultPageSize
-	}
-	page := hateoas.Page{Pageable: pageable, BasePath: v1.ApplicationBasePath}
+	page := hateoas.NewPage(pageable, defaultPageSize, v1.ApplicationBasePath)
 	var applications []*v1.ApplicationVersion
 
-	if err := repo.db.Where(criterias).Offset(pageable.Page * pageable.Size).Limit(pageable.Size).Find(&applications).Error; err != nil {
+	if err := repo.db.
+		Where(criterias).
+		Order(page.Pageable.GetSortClause()).
+		Limit(page.Pageable.Size).
+		Offset(page.Pageable.GetOffset()).
+		Find(&applications).Error; err != nil {
 		return page, err
 	}
 	page.Content = applications

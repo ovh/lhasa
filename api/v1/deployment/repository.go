@@ -52,17 +52,17 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
-	if pageable.Size == 0 {
-		pageable.Size = defaultPageSize
-	}
-	page := hateoas.Page{Pageable: pageable, BasePath: v1.DeploymentBasePath}
+	page := hateoas.NewPage(pageable, defaultPageSize, v1.DeploymentBasePath)
 	var deployments []*v1.Deployment
 
 	// Analyse critarias for extract inline, standard and JSONB ones
 	standardCriterias, inlineCriterias, jsonbCriterias := hateoas.CheckFilter(criterias)
 
 	// Apply request
-	db := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).Offset(pageable.Page * pageable.Size).Limit(pageable.Size)
+	db := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).
+		Order(page.Pageable.GetSortClause()).
+		Limit(page.Pageable.Size).
+		Offset(page.Pageable.GetOffset())
 	db = hateoas.JSONBFilter(db, jsonbCriterias)
 	db = hateoas.InlineFilter(db, inlineCriterias)
 

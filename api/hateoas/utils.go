@@ -3,6 +3,7 @@ package hateoas
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -103,4 +104,39 @@ func BaseURL(c *gin.Context) string {
 		return basePath.(string)
 	}
 	return c.Request.URL.EscapedPath()
+}
+
+// GetSortClause returns the SQL-escaped sort clause
+func (p Pageable) GetSortClause() interface{} {
+	// if not sort column was specified, optimistically use first column to preserve page consistency
+	if p.Sort == "" {
+		return gorm.Expr("1")
+	}
+	fields := strings.Split(p.Sort, ",")
+	for i, field := range fields {
+		// for each field to sort, read sort direction after a semicolon, asc will be used as default
+		direction := DirectionAsc
+		if fieldClause := strings.Split(field, ";"); len(fieldClause) == 2 {
+			field = fieldClause[0]
+			if strings.ToLower(fieldClause[1]) == DirectionDesc {
+				direction = DirectionDesc
+			}
+		}
+		// %q sanitizes the field double-quotes to prevent sql injections
+		fields[i] = fmt.Sprintf("%q %s", field, direction)
+	}
+	return strings.Join(fields, ", ")
+}
+
+// GetOffset returns the page offset
+func (p Pageable) GetOffset() int {
+	return p.Page * p.Size
+}
+
+// NewPage initialize an empty resource page
+func NewPage(pageable Pageable, defaultPageSize int, basePath string) Page {
+	if pageable.Size == 0 {
+		pageable.Size = defaultPageSize
+	}
+	return Page{Pageable: pageable, BasePath: basePath}
 }

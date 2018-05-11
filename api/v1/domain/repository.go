@@ -47,13 +47,15 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
-	if pageable.Size == 0 {
-		pageable.Size = defaultPageSize
-	}
-	page := hateoas.Page{Pageable: pageable, BasePath: v1.DomainBasePath}
-
+	page := hateoas.NewPage(pageable, defaultPageSize, v1.DomainBasePath)
 	var domainNames []string
-	if err := repo.db.Model(&v1.ApplicationVersion{}).Where(criterias).Offset(pageable.Page*pageable.Size).Limit(pageable.Size).Pluck("DISTINCT domain", &domainNames).Error; err != nil {
+
+	if err := repo.db.Model(&v1.ApplicationVersion{}).
+		Where(criterias).
+		Order(page.Pageable.GetSortClause()).
+		Limit(page.Pageable.Size).
+		Offset(page.Pageable.GetOffset()).
+		Pluck("DISTINCT \"applications\".\"domain\" as \"name\"", &domainNames).Error; err != nil {
 		return page, err
 	}
 
@@ -64,7 +66,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page.Content = domains
 
 	count := 0
-	rows, err := repo.db.Raw("select COUNT(DISTINCT domain) totalElements from applications where deleted_at is null").Rows()
+	rows, err := repo.db.Raw("select count(distinct \"applications\".\"domain\") \"totalElements\" from \"applications\" where \"applications\".\"deleted_at\" is null").Rows()
 	if err != nil {
 		return page, err
 	}
