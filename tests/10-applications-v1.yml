@@ -13,21 +13,21 @@ testcases:
       - result.statuscode ShouldEqual 204
     - type: http
       method: PUT
-      url: "{{.appsroute}}/agora/api/1"
+      url: "{{.appsroute}}/agora/api/versions/1"
       body: '{"domain": "agora", "name":"api", "version":"1", "manifest":{"description":"Sample app"}}'
       headers:
       assertions:
       - result.statuscode ShouldEqual 201
     - type: http
       method: PUT
-      url: "{{.appsroute}}/agora/api/1"
+      url: "{{.appsroute}}/agora/api/versions/1"
       body: '{"domain": "agora", "name":"api", "version":"1", "manifest":{"description":"Sample app"}}'
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/agora/api/1"
+      url: "{{.appsroute}}/agora/api/versions/1"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
@@ -47,7 +47,7 @@ testcases:
       - result.bodyjson.content.content0.domain ShouldEqual agora
     - type: http
       method: DELETE
-      url: "{{.appsroute}}/agora/api/1"
+      url: "{{.appsroute}}/agora/api/versions/1"
       headers:
       assertions:
       - result.statuscode ShouldEqual 204
@@ -60,7 +60,7 @@ testcases:
       - result.bodyjson.content.__len__ ShouldEqual 0
     - type: http
       method: DELETE
-      url: "{{.appsroute}}/batch_mailer/batch_mailer/2"
+      url: "{{.appsroute}}/batch_mailer/batch_mailer/versions/2"
       headers:
       assertions:
       - result.statuscode ShouldEqual 404
@@ -69,7 +69,7 @@ testcases:
   steps:
     - type: http
       method: PUT
-      url: "{{.appsroute}}/agora/api/1"
+      url: "{{.appsroute}}/agora/api/versions/1"
       body: |
         {
           "domain": "agora",
@@ -84,7 +84,7 @@ testcases:
       - result.statuscode ShouldEqual 201
     - type: http
       method: PUT
-      url: "{{.appsroute}}/cds/cds/1"
+      url: "{{.appsroute}}/cds/cds/versions/1"
       body: |
         {
           "domain": "cds",
@@ -99,7 +99,7 @@ testcases:
       - result.statuscode ShouldEqual 201
     - type: http
       method: PUT
-      url: "{{.appsroute}}/batch_mailer/batch_mailer/1"
+      url: "{{.appsroute}}/batch_mailer/batch_mailer/versions/1"
       body: |
         {
           "domain": "batch_mailer",

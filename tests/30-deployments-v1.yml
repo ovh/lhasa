@@ -30,7 +30,7 @@ testcases:
   steps:
     - type: http
       method: PUT
-      url: "{{.appsroute}}/urba/appcatalog/1"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1"
       body: |
         {
           "domain": "urba",
@@ -45,7 +45,7 @@ testcases:
       - result.statuscode ShouldEqual 201
     - type: http
       method: PUT
-      url: "{{.appsroute}}/urba/appcatalog/2"
+      url: "{{.appsroute}}/urba/appcatalog/versions/2"
       body: |
         {
           "domain": "urba",
@@ -67,62 +67,62 @@ testcases:
       - result.statuscode ShouldEqual 201
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/1/deployments"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1/deployments"
       headers:
       assertions:
       - result.body ShouldEqual []
     - type: http
       method: POST
-      url: "{{.appsroute}}/urba/appcatalog/1/deploy/depenv"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1/deploy/depenv"
       headers:
       body: '{"properties": {"git.commit": "41849c78a31cc2d65fa03d7ddd3b330e3e9ed2ec"}}'
       assertions:
       - result.statuscode ShouldEqual 201
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/1/deployments"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1/deployments"
       headers:
       assertions:
       - result.bodyjson.bodyjson0 ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/1/deployments/depenv"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1/deployments/depenv"
       headers:
       assertions:
       - result.bodyjson ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
     - type: http
       method: POST
-      url: "{{.appsroute}}/urba/appcatalog/2/deploy/depenv"
+      url: "{{.appsroute}}/urba/appcatalog/versions/2/deploy/depenv"
       headers:
       body: '{"properties": {"git.commit": "41849c78a31cc2d65fa03d7ddd3b330e3e9ed2ec"}}'
       assertions:
       - result.statuscode ShouldEqual 201
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/1/deployments/depenv"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1/deployments/depenv"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
       - result.bodyjson.undeployedat ShouldNotBeEmpty
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/2/deployments/depenv"
+      url: "{{.appsroute}}/urba/appcatalog/versions/2/deployments/depenv"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
       - result.bodyjson ShouldNotContainKey undeployedAt
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/1/deployments"
+      url: "{{.appsroute}}/urba/appcatalog/versions/1/deployments"
       headers:
       assertions:
       - result.body ShouldEqual []
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/urba/appcatalog/2/deployments"
+      url: "{{.appsroute}}/urba/appcatalog/versions/2/deployments"
       headers:
       assertions:
       - result.bodyjson.bodyjson0 ShouldNotBeEmpty
@@ -131,7 +131,7 @@ testcases:
   steps:
     - type: http
       method: PUT
-      url: "{{.appsroute}}/domain1/app1/6"
+      url: "{{.appsroute}}/domain1/app1/versions/6"
       body: |
         {
           "domain": "domain1",
@@ -146,7 +146,7 @@ testcases:
       - result.statuscode ShouldEqual 201
     - type: http
       method: PUT
-      url: "{{.appsroute}}/domain2/app2/7"
+      url: "{{.appsroute}}/domain2/app2/versions/7"
       body: |
         {
           "domain": "domain2",
@@ -168,59 +168,59 @@ testcases:
       - result.statuscode ShouldEqual 201
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain1/app1/6/deployments"
+      url: "{{.appsroute}}/domain1/app1/versions/6/deployments"
       headers:
       assertions:
       - result.body ShouldEqual []
     - type: http
       method: POST
-      url: "{{.appsroute}}/domain1/app1/6/deploy/another"
+      url: "{{.appsroute}}/domain1/app1/versions/6/deploy/another"
       headers:
       body: '{"properties": {"arsenal_id": "app1-token","application_version": "v1.0"}}'
       assertions:
       - result.statuscode ShouldEqual 201
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain1/app1/6/deployments"
+      url: "{{.appsroute}}/domain1/app1/versions/6/deployments"
       headers:
       assertions:
       - result.bodyjson.bodyjson0 ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain1/app1/6/deployments/another"
+      url: "{{.appsroute}}/domain1/app1/versions/6/deployments/another"
       headers:
       assertions:
       - result.bodyjson ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
     - type: http
       method: POST
-      url: "{{.appsroute}}/domain2/app2/7/deploy/another"
+      url: "{{.appsroute}}/domain2/app2/versions/7/deploy/another"
       headers:
       body: '{"properties": {"arsenal_id": "app2-token","application_version": "v2.0"}}'
       assertions:
       - result.statuscode ShouldEqual 201
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain2/app2/7/deployments/another"
+      url: "{{.appsroute}}/domain2/app2/versions/7/deployments/another"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain2/app2/7/deployments/another"
+      url: "{{.appsroute}}/domain2/app2/versions/7/deployments/another"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain2/app2/7/deployments"
+      url: "{{.appsroute}}/domain2/app2/versions/7/deployments"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.appsroute}}/domain2/app2/7/deployments"
+      url: "{{.appsroute}}/domain2/app2/versions/7/deployments"
       headers:
       assertions:
       - result.statuscode ShouldEqual 200

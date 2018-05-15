@@ -42,19 +42,19 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 		fizz.Summary("Find a page of Applications"),
 		fizz.InputModel(v1.Domain{}),
 	), hateoas.HandlerFindByPage(appRepo))
-	appRoutes.GET("/:domain/:name", getOperationOptions("FindByPageDomainName", appRepo,
+	appRoutes.GET("/:domain/:name/versions", getOperationOptions("FindByPageDomainName", appRepo,
 		fizz.Summary("Find a page of Applications"),
 		fizz.InputModel(v1.Application{}),
 	), hateoas.HandlerFindByPage(appRepo))
-	appRoutes.GET("/:domain/:name/:version", getOperationOptions("FindOneBy", appRepo,
+	appRoutes.GET("/:domain/:name/versions/:version", getOperationOptions("FindOneBy", appRepo,
 		fizz.Summary("Find one Application"),
 		fizz.InputModel(v1.ApplicationVersion{}),
 	), hateoas.HandlerFindOneBy(appRepo))
-	appRoutes.DELETE("/:domain/:name/:version", getOperationOptions("RemoveOneBy", appRepo,
+	appRoutes.DELETE("/:domain/:name/versions/:version", getOperationOptions("RemoveOneBy", appRepo,
 		fizz.Summary("Remove an Application"),
 		fizz.InputModel(v1.ApplicationVersion{}),
 	), hateoas.HandlerRemoveOneBy(appRepo))
-	appRoutes.PUT("/:domain/:name/:version", getOperationOptions("Create", appRepo,
+	appRoutes.PUT("/:domain/:name/versions/:version", getOperationOptions("Create", appRepo,
 		fizz.Summary("Create an Application Version"),
 		fizz.Description("Use this route to create a new application version. The `manifest` field can contains "+
 			"any properties useful to track applications in your information system. It is recommended to track it as "+
@@ -63,15 +63,15 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 		fizz.Response("201", "Created", nil, nil),
 	), application.HandlerCreate(appRepo))
 
-	appRoutes.GET("/:domain/:name/:version/deployments/", getOperationOptions("ListActiveDeployments", appRepo,
+	appRoutes.GET("/:domain/:name/versions/:version/deployments/", getOperationOptions("ListActiveDeployments", appRepo,
 		fizz.Summary("List active deployments for this application version"),
 		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
 			"Only a single deployment can be active at a time on a given environment."),
 	), deployment.HandlerListActiveDeployments(appRepo, depRepo))
-	appRoutes.GET("/:domain/:name/:version/deployments/:slug", getOperationOptions("FindDeployment", appRepo,
+	appRoutes.GET("/:domain/:name/versions/:version/deployments/:slug", getOperationOptions("FindDeployment", appRepo,
 		fizz.Summary("Find active deployment for this application version, on this environment"),
 	), deployment.HandlerFindDeployment(appRepo, envRepo, depRepo))
-	appRoutes.POST("/:domain/:name/:version/deploy/:slug", getOperationOptions("Deploy", appRepo,
+	appRoutes.POST("/:domain/:name/versions/:version/deploy/:slug", getOperationOptions("Deploy", appRepo,
 		fizz.Summary("Mark this application version as deployed on the given environment"),
 		fizz.Description("Note that previous versions of this application on this environments will be marked as undeployed."),
 		fizz.Header("location", "URI of the created deployment", nil),

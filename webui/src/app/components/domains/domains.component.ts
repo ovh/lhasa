@@ -107,7 +107,7 @@ export class DomainsComponent implements OnInit {
    */
   protected selectApplication(application: ApplicationBean) {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent('/' + application.domain + '/' + application.name, <Map<string, string>> {size: 1})
+    this.applicationsService.GetAllFromContent(`/${application.domain}/${application.name}/versions`, <Map<string, string>> {size: 1})
       .subscribe(
         (data: ContentListResponse<ApplicationBean>) => {
           this.deploymentService.GetAllFromContent(

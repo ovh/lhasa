@@ -28,7 +28,7 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
      */
     protected selectApplication(domaine: string, name: string) {
         // load all applications from a content return
-        this.applicationsService.GetAllFromContent('/' + domaine + '/' + name, <Map<string, string>>{ size: 1 })
+        this.applicationsService.GetAllFromContent(`/${domaine}/${name}/versions`, <Map<string, string>>{ size: 1 })
             .subscribe(
                 (data: ContentListResponse<ApplicationBean>) => {
                     this.deploymentService.GetAllFromContent(
