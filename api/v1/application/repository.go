@@ -26,12 +26,12 @@ func NewRepository(db *gorm.DB) *Repository {
 
 // GetType returns the entity type managed by this repository
 func (repo *Repository) GetType() reflect.Type {
-	return reflect.TypeOf(v1.Application{})
+	return reflect.TypeOf(v1.ApplicationVersion{})
 }
 
 // GetNewEntityInstance returns a new empty instance of the entity managed by this repository
 func (repo *Repository) GetNewEntityInstance() hateoas.Entity {
-	return &v1.Application{}
+	return &v1.ApplicationVersion{}
 }
 
 // FindAll returns all entities of the repository type
@@ -50,7 +50,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 		pageable.Size = defaultPageSize
 	}
 	page := hateoas.Page{Pageable: pageable, BasePath: v1.ApplicationBasePath}
-	var applications []*v1.Application
+	var applications []*v1.ApplicationVersion
 
 	if err := repo.db.Where(criterias).Offset(pageable.Page * pageable.Size).Limit(pageable.Size).Find(&applications).Error; err != nil {
 		return page, err
@@ -58,13 +58,13 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page.Content = applications
 
 	count := 0
-	if err := repo.db.Model(&v1.Application{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := repo.db.Model(&v1.ApplicationVersion{}).Where(criterias).Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count
 
 	if pageable.IndexedBy != "" {
-		currentIndex := map[string][]*v1.Application{}
+		currentIndex := map[string][]*v1.ApplicationVersion{}
 		ids := map[string]bool{}
 		for _, application := range applications {
 			indexedField, err := repo.getIndexedField(pageable.IndexedBy, application)
@@ -83,7 +83,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	return page, nil
 }
 
-func (repo *Repository) getIndexedField(field string, application *v1.Application) (string, error) {
+func (repo *Repository) getIndexedField(field string, application *v1.ApplicationVersion) (string, error) {
 	switch field {
 	case "version":
 		return application.Version, nil
@@ -109,7 +109,7 @@ func (repo *Repository) Save(application hateoas.Entity) error {
 
 // Truncate empties the applications table for testing purposes
 func (repo *Repository) Truncate() error {
-	return repo.db.Delete(v1.Application{}).Error
+	return repo.db.Delete(v1.ApplicationVersion{}).Error
 }
 
 // Remove deletes the application whose GetID is given as a parameter
@@ -124,7 +124,7 @@ func (repo *Repository) Remove(app interface{}) error {
 
 // FindByID gives the details of a particular application
 func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
-	app := v1.Application{}
+	app := v1.ApplicationVersion{}
 	if err := repo.db.First(&app, id).Error; err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
 func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
-	app := v1.Application{}
+	app := v1.ApplicationVersion{}
 	err := repo.db.Unscoped().Where(criterias).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
@@ -143,14 +143,14 @@ func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hat
 
 // FindBy fetch a collection of applications matching each criteria
 func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
-	var apps []*v1.Application
+	var apps []*v1.ApplicationVersion
 	err := repo.db.Where(criterias).Find(&apps).Error
 	return apps, err
 }
 
 // FindOneByDomainNameVersion fetch the first application matching each criteria
-func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string) (*v1.Application, error) {
-	app := v1.Application{}
+func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string) (*v1.ApplicationVersion, error) {
+	app := v1.ApplicationVersion{}
 	criterias := map[string]interface{}{
 		"domain":  domain,
 		"name":    name,
@@ -165,7 +165,7 @@ func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string)
 
 // FindOneBy find by criterias
 func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
-	app := v1.Application{}
+	app := v1.ApplicationVersion{}
 	err := repo.db.Where(criterias).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
@@ -173,14 +173,14 @@ func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Ent
 	return &app, err
 }
 
-func (repo *Repository) mustBeEntity(id interface{}) (*v1.Application, error) {
-	var app *v1.Application
+func (repo *Repository) mustBeEntity(id interface{}) (*v1.ApplicationVersion, error) {
+	var app *v1.ApplicationVersion
 	switch id := id.(type) {
 	case uint:
-		app = &v1.Application{ID: id}
-	case *v1.Application:
+		app = &v1.ApplicationVersion{ID: id}
+	case *v1.ApplicationVersion:
 		app = id
-	case v1.Application:
+	case v1.ApplicationVersion:
 		app = &id
 	default:
 		return nil, hateoas.NewUnsupportedEntityError(app, id)

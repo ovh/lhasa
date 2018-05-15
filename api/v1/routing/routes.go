@@ -28,6 +28,7 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 	), hateoas.HandlerFindByPage(domRepo))
 	domRoutes.GET("/:domain", getOperationOptions("FindOneBy", domRepo,
 		fizz.Summary("Find one Domain"),
+		fizz.InputModel(v1.Domain{}),
 	), hateoas.HandlerFindOneBy(domRepo))
 
 	appRoutes := group.Group("/applications", "applications", "Application versions resource management")
@@ -39,7 +40,7 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 	), hateoas.HandlerRemoveAll(appRepo))
 	appRoutes.GET("/:domain", getOperationOptions("FindByPageDomain", appRepo,
 		fizz.Summary("Find a page of Applications"),
-		fizz.InputModel(v1.Application{}),
+		fizz.InputModel(v1.Domain{}),
 	), hateoas.HandlerFindByPage(appRepo))
 	appRoutes.GET("/:domain/:name", getOperationOptions("FindByPageDomainName", appRepo,
 		fizz.Summary("Find a page of Applications"),
@@ -47,11 +48,11 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 	), hateoas.HandlerFindByPage(appRepo))
 	appRoutes.GET("/:domain/:name/:version", getOperationOptions("FindOneBy", appRepo,
 		fizz.Summary("Find one Application"),
-		fizz.InputModel(v1.Application{}),
+		fizz.InputModel(v1.ApplicationVersion{}),
 	), hateoas.HandlerFindOneBy(appRepo))
 	appRoutes.DELETE("/:domain/:name/:version", getOperationOptions("RemoveOneBy", appRepo,
 		fizz.Summary("Remove an Application"),
-		fizz.InputModel(v1.Application{}),
+		fizz.InputModel(v1.ApplicationVersion{}),
 	), hateoas.HandlerRemoveOneBy(appRepo))
 	appRoutes.PUT("/:domain/:name/:version", getOperationOptions("Create", appRepo,
 		fizz.Summary("Create an Application Version"),

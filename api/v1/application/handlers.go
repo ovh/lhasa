@@ -11,9 +11,9 @@ import (
 
 // HandlerCreate replace or create a resource
 func HandlerCreate(repository *Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, application *v1.Application) error {
+	return tonic.Handler(func(c *gin.Context, application *v1.ApplicationVersion) error {
 		oldres, err := repository.FindOneByUnscoped(map[string]interface{}{"domain": application.Domain, "name": application.Name, "version": application.Version})
-		oldapp := oldres.(*v1.Application)
+		oldapp := oldres.(*v1.ApplicationVersion)
 		if hateoas.IsEntityDoesNotExistError(err) {
 			if err := repository.Save(application); err != nil {
 				return err

@@ -53,7 +53,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page := hateoas.Page{Pageable: pageable, BasePath: v1.DomainBasePath}
 
 	var domainNames []string
-	if err := repo.db.Model(&v1.Application{}).Where(criterias).Offset(pageable.Page*pageable.Size).Limit(pageable.Size).Pluck("DISTINCT domain", &domainNames).Error; err != nil {
+	if err := repo.db.Model(&v1.ApplicationVersion{}).Where(criterias).Offset(pageable.Page*pageable.Size).Limit(pageable.Size).Pluck("DISTINCT domain", &domainNames).Error; err != nil {
 		return page, err
 	}
 
@@ -103,7 +103,7 @@ func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, e
 
 // FindOneBy find by criterias
 func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
-	var app v1.Application
+	var app v1.ApplicationVersion
 	err := repo.db.First(&app, criterias).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)

@@ -103,11 +103,12 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 
 	// auto-generated swagger documentation
 	infos := &openapi.Info{
-		Title: "AppCatalog Open API Specification",
+		Title: "OpenAPI specification",
 		License: &openapi.License{
 			Name: "BSD 3-Clause License",
 			URL:  "https://opensource.org/licenses/BSD-3-Clause",
 		},
+		Version: "v1", // this refers to the latest stable api version available on this server
 	}
 	unsecured.GET("/openapi.json", nil, router.OpenAPI(infos, "json"))
 	unsecured.GET("/openapi.yaml", nil, router.OpenAPI(infos, "yaml"))
