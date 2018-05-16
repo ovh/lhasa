@@ -26,6 +26,11 @@ const (
 	maxIdleConns = 3
 )
 
+var (
+	// Config store all configuraiton items
+	config = make(map[string]interface{})
+)
+
 // read a file
 func readFile(configFile string) (string, error) {
 	b, err := ioutil.ReadFile(configFile) // just pass the file name
@@ -35,18 +40,28 @@ func readFile(configFile string) (string, error) {
 	return string(b), nil
 }
 
-// ToJSON return o json formated value (in pretty format)
-func extractKey(configFile *os.File, key string) (string, error) {
+// extractFile extract configuration file
+func extractFile(configFile *os.File) (map[string]interface{}, error) {
 	// Init config file
 	connConfigStr, err := readFile(configFile.Name())
 	if err != nil {
-		return "", errors.Wrapf(err, "cannot read configuration file %s", configFile)
+		return nil, errors.Wrapf(err, "cannot read configuration file %s", configFile)
 	}
 	// Extract key
-	var data = make(map[string]interface{})
-	json.Unmarshal([]byte(connConfigStr), &data)
+	json.Unmarshal([]byte(connConfigStr), &config)
+	return config, nil
+}
+
+// ExtractValue return value from key
+func ExtractValue(key string) interface{} {
 	// Transform it to string
-	payload, err := json.MarshalIndent(data[key], "", "\t")
+	return config[key]
+}
+
+// ExtractKey return o json formated value (in pretty format)
+func extractKey(key string) (string, error) {
+	// Transform it to string
+	payload, err := json.MarshalIndent(config[key], "", "\t")
 	if err != nil {
 		return "{}", errors.Wrapf(err, "Unable to marshal:", err)
 	}
@@ -56,7 +71,9 @@ func extractKey(configFile *os.File, key string) (string, error) {
 // NewFromFile provides the database handle to its callers
 func NewFromFile(configFile *os.File, dbAlias string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
 	// Init config file
-	connConfigStr, err := extractKey(configFile, dbAlias)
+	extractFile(configFile)
+	// Init config file
+	connConfigStr, err := extractKey(dbAlias)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot read alias %s from configuration file", configFile)
 	}

@@ -12,7 +12,7 @@ import (
 )
 
 // registerRoutes registers v1 API routes on a gin engine
-func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend) {
+func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend, metaAssistant application.MetaAssistant) {
 	group.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
 		fizz.ID("IndexV1"),
@@ -62,6 +62,10 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 		fizz.StatusDescription("Updated"),
 		fizz.Response("201", "Created", nil, nil),
 	), application.HandlerCreate(appRepo))
+	appRoutes.POST("/:domain/:name/assistant", getOperationOptions("Assistant", appRepo,
+		fizz.Summary("Assistant for manifest creation"),
+		fizz.InputModel(v1.Application{}),
+	), application.HandlerAssistant(appRepo, metaAssistant))
 
 	appRoutes.GET("/:domain/:name/versions/:version/deployments/", getOperationOptions("ListActiveDeployments", appRepo,
 		fizz.Summary("List active deployments for this application version"),
@@ -126,8 +130,9 @@ func Init(db *gorm.DB, group *fizz.RouterGroup) {
 	depRepo := deployment.NewRepository(db)
 	deployer := deployment.ApplicationDeployer(depRepo)
 	depend := deployment.Dependency(depRepo)
+	gitAssistant := application.GitMetaAssistant(appRepo)
 
-	registerRoutes(group, domRepo, appRepo, envRepo, depRepo, deployer, depend)
+	registerRoutes(group, domRepo, appRepo, envRepo, depRepo, deployer, depend, gitAssistant)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository

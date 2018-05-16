@@ -11,5 +11,12 @@
         "user": "postgres",
         "password": "#sample#",
         "type": "postgresql"
+    },
+    "manifest": {
+        "name": ".sherpa.json"
+    },
+    "bitbucket": {
+        "url": "https://#bitbucket_addr#/rest/api/1.0/",
+        "token": "TOKEN"
     }
 }

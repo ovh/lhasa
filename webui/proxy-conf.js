@@ -10,6 +10,11 @@ const redirect = function (req, res, proxyOptions) {
     res.status(301)
 };
 
+const injectCreds = function (req, res, proxyOptions) {
+    console.log("Inject.");
+    req.headers["X-Remote-User"] = "fabien.meurillon";
+};
+
 const PROXY_CONFIG = {
     "/api": {
         "target": "http://localhost:8081",
@@ -20,7 +25,8 @@ const PROXY_CONFIG = {
         "secure": false,
         "changeOrigin": true,
         "logLevel": "info",
-        "pathRewrite": {"^/uservice/gateway/appcatalog/api" : "/api"}
+        "pathRewrite": {"^/uservice/gateway/appcatalog/api" : "/api"},
+        "bypass": injectCreds
      },
      "/all": {
         "secure": false,

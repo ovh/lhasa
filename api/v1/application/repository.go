@@ -165,6 +165,20 @@ func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string)
 	return &app, err
 }
 
+// FindOneByDomainName fetch the first application matching each criteria
+func (repo *Repository) FindOneByDomainName(domain, name string) (*v1.ApplicationVersion, error) {
+	app := v1.ApplicationVersion{}
+	criterias := map[string]interface{}{
+		"domain": domain,
+		"name":   name,
+	}
+	err := repo.db.First(&app, criterias).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+	}
+	return &app, err
+}
+
 // FindOneBy find by criterias
 func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
 	app := v1.ApplicationVersion{}

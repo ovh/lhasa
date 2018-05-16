@@ -109,20 +109,23 @@ export class EnrollmentComponent implements OnInit {
    * dispatch load applications
    * @param event
    */
-  protected createPullRequest(domain: string, application: string) {
+  protected createPullRequest() {
     this.application.manifest.profile = this.application.domain;
     this.application.manifest.name = this.application.name;
     // load all applications from a content return
-    this.bitbucketService.Tasks('create-pull-request', {
-      domain: this.application.domain,
-      application: this.application.name,
-      project: this.application.project,
-      repo: this.application.repo,
+    this.applicationsService.Tasks(`${this.application.domain}/${this.application.name}/assistant`, {
+      repository: 'bitbucket',
       manifest: this.application.manifest
     }).subscribe(
       (data: any) => {
         this.snackBar.open('Create pull request', 'Ok', {
           duration: 2000,
+        });
+      },
+      (data: any) => {
+        console.warn(data);
+        this.snackBar.open(data, 'Error', {
+          duration: 10000,
         });
       }
     );

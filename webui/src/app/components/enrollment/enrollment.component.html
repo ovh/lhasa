@@ -1,6 +1,6 @@
 <app-oui-progress-tracker #progress [steps]="steps" (select)="onSelect($event)"></app-oui-progress-tracker>
 
-<div style="float: right;">
+<div style="float: top;">
     <div class="oui-button-group">
       <button class="oui-button oui-button_full-width oui-button_icon-right oui-button_primary" (click)="prev()">
         Prev.
@@ -24,12 +24,6 @@
 <div *ngIf="selected === 'update'">
   <h2>App's identification</h2>
   <div class="ui-g-12">
-    <div class="oui-field">
-      <label for="text-1" class="oui-field__label oui-label">Domain</label>
-      <div class="oui-field__control">
-        <input type="text" class="oui-input" placeholder="Domain" [(ngModel)]="application.manifest.profile" disabled>
-      </div>
-    </div>
     <div class="oui-field">
       <label for="text-1" class="oui-field__label oui-label">Domain</label>
       <div class="oui-field__control">
@@ -134,6 +128,9 @@ Copy to clipboard
   </button>
   <button class="oui-button oui-button_primary" (click)="download()">
 Download manifest file
+  </button>
+  <button class="oui-button oui-button_primary" (click)="createPullRequest()">
+Create a pull request
   </button>
 </div>
       
