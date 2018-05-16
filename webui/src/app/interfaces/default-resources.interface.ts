@@ -16,7 +16,6 @@ export interface DefaultLinkResource<T extends EntityBean> {
 }
 
 export interface DefaultResource<T extends EntityBean> {
-    Task(id: string, task: string, args: any): Observable<any>;
     GetAll(): Observable<T[]>;
     GetAllFromContent(filter: string, params: {[key: string]: any | any[]}): Observable<ContentListResponse<T>>;
     GetSingle(id: string): Observable<T>;

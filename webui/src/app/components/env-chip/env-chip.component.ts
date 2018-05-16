@@ -1,8 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {EnvironmentsStoreService} from '../../stores/environments-store.service';
-import {EnvironmentBean} from '../../models/commons/applications-bean';
-import {Store} from '@ngrx/store';
-import {ISubscription} from 'rxjs/Subscription';
+import { Component, Input, OnInit } from '@angular/core';
+import { EnvironmentsStoreService } from '../../stores/environments-store.service';
+import { EnvironmentBean } from '../../models/commons/applications-bean';
+import { Store } from '@ngrx/store';
+import { ISubscription } from 'rxjs/Subscription';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 
 @Component({

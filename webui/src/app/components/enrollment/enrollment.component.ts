@@ -1,21 +1,17 @@
-import { DeploymentBean, PersonBean } from './../../models/commons/applications-bean';
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { ApplicationsStoreService, SelectApplicationAction } from '../../stores/applications-store.service';
+import { PersonBean } from './../../models/commons/applications-bean';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ApplicationsStoreService } from '../../stores/applications-store.service';
 import { Store } from '@ngrx/store';
 import { ApplicationBean } from '../../models/commons/applications-bean';
 import { DataApplicationService } from '../../services/data-application-version.service';
-import { ContentListResponse } from '../../models/commons/entity-bean';
 
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
 import { cloneDeep, remove } from 'lodash';
 import { ActivatedRoute } from '@angular/router';
-import { URLSearchParams } from '@angular/http';
 import { BitbucketService } from '../../services/data-bitbucket.service';
 import { MatSnackBar } from '@angular/material';
-import { environment } from '../../../environments/environment';
 import { ISubscription } from 'rxjs/Subscription';
-import { DatePipe } from '@angular/common';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { UiKitStep } from '../../models/kit/progress-tracker';
 import { OuiProgressTrackerComponent } from '../../kit/oui-progress-tracker/oui-progress-tracker.component';
@@ -106,32 +102,6 @@ export class EnrollmentComponent implements OnInit {
   }
 
   /**
-   * dispatch load applications
-   * @param event
-   */
-  protected createPullRequest() {
-    this.application.manifest.profile = this.application.domain;
-    this.application.manifest.name = this.application.name;
-    // load all applications from a content return
-    this.applicationsService.Tasks(`${this.application.domain}/${this.application.name}/assistant`, {
-      repository: 'bitbucket',
-      manifest: this.application.manifest
-    }).subscribe(
-      (data: any) => {
-        this.snackBar.open('Create pull request', 'Ok', {
-          duration: 2000,
-        });
-      },
-      (data: any) => {
-        console.warn(data);
-        this.snackBar.open(data, 'Error', {
-          duration: 10000,
-        });
-      }
-    );
-  }
-
-  /**
    * change selection
    */
   public onSelect(event: any) {
@@ -162,8 +132,7 @@ export class EnrollmentComponent implements OnInit {
       }
       this.enrollment = JSON.stringify(manifest, null, 2);
     } else {
-      this.application.manifest = {
-      };
+      this.application.manifest = {};
     }
   }
 
@@ -175,7 +144,7 @@ export class EnrollmentComponent implements OnInit {
     document.body.appendChild(a);
     a.value = this.enrollment;
     a.select();
-    document.execCommand( 'copy' );
+    document.execCommand('copy');
     a.style = 'display: none';
   }
 
@@ -193,11 +162,11 @@ export class EnrollmentComponent implements OnInit {
    */
   protected add(author: PersonBean) {
     this.application.manifest.authors.push({
-      email: 'nobody@exemple.com',
-      name: 'name',
-      role: 'MAINTAINER',
-      cisco: undefined
-    }
+        email: 'nobody@exemple.com',
+        name: 'name',
+        role: 'MAINTAINER',
+        cisco: undefined
+      }
     );
   }
 
@@ -209,7 +178,7 @@ export class EnrollmentComponent implements OnInit {
     const a: any = document.createElement('a');
     document.body.appendChild(a);
     a.style = 'display: none';
-    const file = new Blob([this.enrollment], { type: 'application/text' });
+    const file = new Blob([this.enrollment], {type: 'application/text'});
     const fileURL = window.URL.createObjectURL(file);
     a.href = fileURL;
     a.download = fileName;

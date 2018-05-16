@@ -9,42 +9,43 @@ import { DataDeploymentService } from '../services/data-deployment.service';
 
 @Injectable()
 export class ApplicationResolver implements Resolve<ApplicationBean> {
-    constructor(
-        private applicationsStoreService: ApplicationsStoreService,
-        private applicationsService: DataApplicationService,
-        private deploymentService: DataDeploymentService
-    ) { }
+  constructor(
+    private applicationsStoreService: ApplicationsStoreService,
+    private applicationsService: DataApplicationService,
+    private deploymentService: DataDeploymentService
+  ) {
+  }
 
-    resolve(
-        route: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot
-    ): Observable<any> | Promise<any> | any {
-        this.selectApplication(route.params.domain, route.params.name);
-    }
+  resolve(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<any> | Promise<any> | any {
+    this.selectApplication(route.params.domain, route.params.name);
+  }
 
-    /**
-     * dispatch load applications
-     * @param event
-     */
-    protected selectApplication(domain: string, name: string) {
-        // load all applications from a content return
-        this.applicationsService.GetAllFromContent(`/${domain}/${name}/versions`, <Map<string, string>>{ size: 1 })
-            .subscribe(
-                (data: ContentListResponse<ApplicationBean>) => {
-                    this.deploymentService.GetAllFromContent(
-                        '/?q=%7B%22properties._app_domain%22%3A%20%22' + domain +
-                        '%22%2C%20%22properties._app_name%22%3A%20%22' + name + '%22%7D',
-                        <Map<string, string>>{ size: 20 }).subscribe(
-                            (deployments: ContentListResponse<DeploymentBean>) => {
-                                this.applicationsStoreService.dispatch(
-                                    new SelectApplicationAction(
-                                        data.content[0],
-                                        deployments.content
-                                    )
-                                );
-                            }
-                        );
-                }
-            );
-    }
+  /**
+   * dispatch load applications
+   * @param event
+   */
+  protected selectApplication(domain: string, name: string) {
+    // load all applications from a content return
+    this.applicationsService.GetAllFromContent(`/${domain}/${name}/versions`, {'size': '1'})
+      .subscribe(
+        (data: ContentListResponse<ApplicationBean>) => {
+          this.deploymentService.GetAllFromContent(
+            '/?q=%7B%22properties._app_domain%22%3A%20%22' + domain +
+            '%22%2C%20%22properties._app_name%22%3A%20%22' + name + '%22%7D',
+            {'size': '20'}).subscribe(
+            (deployments: ContentListResponse<DeploymentBean>) => {
+              this.applicationsStoreService.dispatch(
+                new SelectApplicationAction(
+                  data.content[0],
+                  deployments.content
+                )
+              );
+            }
+          );
+        }
+      );
+  }
 }

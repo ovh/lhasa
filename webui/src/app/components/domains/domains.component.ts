@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {ApplicationsStoreService, LoadApplicationsAction, SelectApplicationAction} from '../../stores/applications-store.service';
-import {Store} from '@ngrx/store';
-import {ApplicationBean, DeploymentBean, DomainBean} from '../../models/commons/applications-bean';
-import {DataApplicationService} from '../../services/data-application-version.service';
-import {ContentListResponse} from '../../models/commons/entity-bean';
+import { Component, OnInit } from '@angular/core';
+import { ApplicationsStoreService, LoadApplicationsAction, SelectApplicationAction } from '../../stores/applications-store.service';
+import { Store } from '@ngrx/store';
+import { ApplicationBean, DeploymentBean, DomainBean } from '../../models/commons/applications-bean';
+import { DataApplicationService } from '../../services/data-application-version.service';
+import { ContentListResponse } from '../../models/commons/entity-bean';
 
-import {Edge, Node} from '../../models/graph/graph-bean';
-import {DataDeploymentService} from '../../services/data-deployment.service';
+import { Edge, Node } from '../../models/graph/graph-bean';
+import { DataDeploymentService } from '../../services/data-deployment.service';
 
 @Component({
   selector: 'app-domains',
@@ -86,13 +86,13 @@ export class DomainsComponent implements OnInit {
    */
   protected selectApplication(application: ApplicationBean) {
     // load all applications from a content return
-    this.applicationsService.GetAllFromContent(`/${application.domain}/${application.name}/versions`, <Map<string, string>> {size: 1})
+    this.applicationsService.GetAllFromContent(`/${application.domain}/${application.name}/versions`, {'size': '1'})
       .subscribe(
         (data: ContentListResponse<ApplicationBean>) => {
           this.deploymentService.GetAllFromContent(
             '/?q=%7B%22properties._app_domain%22%3A%20%22' + application.domain +
             '%22%2C%20%22properties._app_name%22%3A%20%22' + application.name + '%22%7D',
-            <Map<string, string>> {size: 20}).subscribe(
+            {'size': '20'}).subscribe(
             (deployments: ContentListResponse<DeploymentBean>) => {
               this.applicationsStoreService.dispatch(
                 new SelectApplicationAction(

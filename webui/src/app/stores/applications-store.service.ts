@@ -1,9 +1,8 @@
-import {Injectable} from '@angular/core';
-import {createFeatureSelector, createSelector, Store, Selector} from '@ngrx/store';
+import { Injectable } from '@angular/core';
+import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/store';
 
-import { ActionWithPayload, ActionWithPayloadAndPromise } from './action-with-payload';
-import {ApplicationBean, DeploymentBean, DomainBean, DomainPagesBean, ApplicationPagesBean} from '../models/commons/applications-bean';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ActionWithPayloadAndPromise } from './action-with-payload';
+import { ApplicationBean, ApplicationPagesBean, DeploymentBean, DomainBean, DomainPagesBean } from '../models/commons/applications-bean';
 import { Subject } from 'rxjs/Subject';
 
 /**
