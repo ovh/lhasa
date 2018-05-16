@@ -1,17 +1,10 @@
-<ul class="oui-progress-tracker">
-  <li class="oui-progress-tracker__step oui-progress-tracker__step_complete" (click)="onSelect($event, '0')">
-    <a class="oui-progress-tracker__status">
-      <span class="oui-progress-tracker__label">Description</span>
-    </a>
-  </li>
-  <li class="oui-progress-tracker__step oui-progress-tracker__step_complete" (click)="onSelect($event, '1')">
-    <a class="oui-progress-tracker__status">
-      <span class="oui-progress-tracker__label">Update your app's manifest</span>
-    </a>
-  </li>
-  <li class="oui-progress-tracker__step oui-progress-tracker__step_complete" (click)="onSelect($event, '2')">
-    <a class="oui-progress-tracker__status">
-      <span class="oui-progress-tracker__label">Add the manifest to your app's repository</span>
-    </a>
-  </li>
-</ul>
+<div class="oui-progress-tracker">
+  <ul class="oui-progress-tracker__step_container">
+    <li *ngFor="let step of _steps" class="oui-progress-tracker__step {{step.stepClass}}" (click)="onSelect($event, step)">
+      <a class="oui-progress-tracker__status" href="#"></a>
+    </li>
+  </ul>
+  <ul class="oui-progress-tracker__label_container">
+    <li *ngFor="let step of _steps" class="oui-progress-tracker__label {{step.labelClass}}" (click)="onSelect($event, step)">{{ step.label | translate }}</li>
+  </ul>
+</div>

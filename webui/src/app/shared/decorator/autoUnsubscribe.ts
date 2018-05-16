@@ -4,7 +4,7 @@ export function AutoUnsubscribe( blackList = [] ) {
         const original = constructor.prototype.ngOnDestroy;
 
         constructor.prototype.ngOnDestroy = function () {
-            for ( let prop in this ) {
+            for ( const prop in this ) {
                 if (prop) {
                     const property = this[ prop ];
                     if ( blackList.indexOf(prop) === -1 ) {

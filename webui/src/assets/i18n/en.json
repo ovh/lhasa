@@ -2,5 +2,8 @@
     "DOMAINS": "Domains",
     "APPLICATIONS": "Applications",
     "SEARCH": "Search for {{target}}",
-    "FILERED_BY_DOMAIN": "Filtered by domain {{target}}"
+    "FILERED_BY_DOMAIN": "Filtered by domain {{target}}",
+    "DESCRIPTION-MANIFEST": "Description",
+    "UPDATE-MANIFEST": "Update your app's manifest",
+    "SAVE-MANIFEST": "Add the manifest to your app's repository"
 }

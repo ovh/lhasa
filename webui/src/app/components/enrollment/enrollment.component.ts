@@ -1,5 +1,5 @@
 import { DeploymentBean, PersonBean } from './../../models/commons/applications-bean';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { ApplicationsStoreService, SelectApplicationAction } from '../../stores/applications-store.service';
 import { Store } from '@ngrx/store';
 import { ApplicationBean } from '../../models/commons/applications-bean';
@@ -17,6 +17,8 @@ import { environment } from '../../../environments/environment';
 import { ISubscription } from 'rxjs/Subscription';
 import { DatePipe } from '@angular/common';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
+import { UiKitStep } from '../../models/kit/progress-tracker';
+import { OuiProgressTrackerComponent } from '../../kit/oui-progress-tracker/oui-progress-tracker.component';
 
 @Component({
   selector: 'app-enrollment',
@@ -26,7 +28,10 @@ import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 @AutoUnsubscribe()
 export class EnrollmentComponent implements OnInit {
 
-  public selected = '';
+  public selected = 'description';
+  public steps: UiKitStep[] = [];
+
+  @ViewChild('progress') progress: OuiProgressTrackerComponent;
 
   /**
    * internal streams and store
@@ -57,6 +62,23 @@ export class EnrollmentComponent implements OnInit {
   isLinear = false;
 
   ngOnInit() {
+    this.steps = [];
+    this.steps.push({
+      id: 'description',
+      label: 'DESCRIPTION-MANIFEST',
+      status: 'active'
+    });
+    this.steps.push({
+      id: 'update',
+      label: 'UPDATE-MANIFEST',
+      status: 'disabled'
+    });
+    this.steps.push({
+      id: 'save',
+      label: 'SAVE-MANIFEST',
+      status: 'disabled'
+    });
+
     this.subscription = this.applicationStream.subscribe(
       (element: ApplicationBean) => {
         this.application = element;
@@ -74,7 +96,6 @@ export class EnrollmentComponent implements OnInit {
             cisco: ''
           };
         }
-        this.selected = '0';
       },
       error => {
         console.error(error);
@@ -82,8 +103,6 @@ export class EnrollmentComponent implements OnInit {
       () => {
       }
     );
-    // Default selection
-    this.onSelect({data: '2'});
   }
 
   /**
@@ -113,7 +132,15 @@ export class EnrollmentComponent implements OnInit {
    * change selection
    */
   public onSelect(event: any) {
-    this.selected = event.data;
+    this.selected = event.data.id;
+    this.steps.forEach((step) => {
+      if (this.selected === step.id) {
+        step.status = 'active';
+      } else {
+        step.status = 'complete';
+      }
+    });
+
     // upgrade manifest on each change
     const manifest = cloneDeep(this.application.manifest);
     if (manifest) {
@@ -184,5 +211,19 @@ export class EnrollmentComponent implements OnInit {
     a.href = fileURL;
     a.download = fileName;
     a.click();
+  }
+
+  /**
+   * previous step
+   */
+  public prev() {
+    this.progress.prev();
+  }
+
+  /**
+   * next step
+   */
+  public next() {
+    this.progress.next();
   }
 }
