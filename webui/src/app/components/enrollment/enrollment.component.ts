@@ -1,16 +1,12 @@
 import { Observable } from 'rxjs/Observable';
-import { DeploymentBean, PersonBean } from './../../models/commons/applications-bean';
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { ApplicationsStoreService, SelectApplicationAction } from '../../stores/applications-store.service';
+import { PersonBean } from './../../models/commons/applications-bean';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ApplicationsStoreService } from '../../stores/applications-store.service';
 import { Store } from '@ngrx/store';
 import { ApplicationBean } from '../../models/commons/applications-bean';
 import { DataApplicationService } from '../../services/data-application-version.service';
 
-import { FormBuilder } from '@angular/forms';
-
 import { cloneDeep, remove } from 'lodash';
-import { ActivatedRoute } from '@angular/router';
-import { BitbucketService } from '../../services/data-bitbucket.service';
 import { MatSnackBar } from '@angular/material';
 import { ISubscription } from 'rxjs/Subscription';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
@@ -18,7 +14,6 @@ import { UiKitStep } from '../../models/kit/progress-tracker';
 import { OuiProgressTrackerComponent } from '../../kit/oui-progress-tracker/oui-progress-tracker.component';
 import { DataContentService } from '../../services/data-content.service';
 import { ContentBean } from '../../models/commons/content-bean';
-import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'app-enrollment',
@@ -49,10 +44,7 @@ export class EnrollmentComponent implements OnInit {
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
     private applicationsService: DataApplicationService,
-    private bitbucketService: BitbucketService,
     private contentService: DataContentService,
-    private _formBuilder: FormBuilder,
-    private activatedRoute: ActivatedRoute,
     public snackBar: MatSnackBar
   ) {
     /**

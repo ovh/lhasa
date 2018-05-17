@@ -14,6 +14,6 @@ export class DataDomainService extends DataCoreResource<DomainBean> implements D
     private _http: HttpClient,
     private _configuration: ConfigurationService
   ) {
-    super(_configuration, _configuration.ServerCatalogWithApiUrl + 'v1/domains', _http);
+    super(_configuration, _configuration.ApiUrl + 'v1/domains', _http);
   }
 }

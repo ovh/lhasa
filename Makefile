@@ -3,6 +3,8 @@ TARGET_DIR = ./dist
 COMPOSE_BIN = $(TARGET_DIR)/docker-compose
 API_BIN = $(TARGET_DIR)/appcatalog
 VENOM_BIN = $(TARGET_DIR)/venom.$(ARCH)
+UI_BASE_HREF = /
+export UI_BASE_HREF
 
 all: api webui
 
@@ -21,24 +23,24 @@ $(COMPOSE_BIN): $(TARGET_DIR)
 	@chmod +x $(COMPOSE_BIN)
 
 $(API_BIN):
-	make -C api server
+	$(MAKE) -C api server
 
 api:
-	make -C api
+	$(MAKE) -C api
 
 webui:
-	make -C webui
+	$(MAKE) -C webui
 
 test:
-	make -C api test
-	make -C webui test
+	$(MAKE) -C api test
+	$(MAKE) -C webui test
 
 run: all
 	cd dist && ./appcatalog --config=../.config.json --auto-migrate
 
 clean:
-	make -C api clean
-	make -C webui clean
+	$(MAKE) -C api clean
+	$(MAKE) -C webui clean
 
 integration-test: $(COMPOSE_BIN) $(VENOM_BIN) $(API_BIN)
 	$(COMPOSE_BIN) up -d

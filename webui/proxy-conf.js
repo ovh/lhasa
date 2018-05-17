@@ -1,8 +1,8 @@
 /**
  * gateway deployment simulation
- * @param {*} req 
- * @param {*} res 
- * @param {*} proxyOptions 
+ * @param {*} req
+ * @param {*} res
+ * @param {*} proxyOptions
  */
 const redirect = function (req, res, proxyOptions) {
     console.log("Catch all.", req.originalUrl);

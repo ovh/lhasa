@@ -17,6 +17,6 @@ export class DataContentService extends DataStreamResource<ContentBean> implemen
     private _http: HttpClient,
     private _configuration: ConfigurationService
   ) {
-    super(_configuration, _configuration.ServerCatalogWithApiUrl + 'v1/contents', _http);
+    super(_configuration, _configuration.ApiUrl + 'v1/contents', _http);
   }
 }

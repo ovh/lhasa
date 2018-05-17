@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -23,13 +24,7 @@ import (
 	v1 "github.com/ovh/lhasa/api/v1/routing"
 )
 
-// checkHTML5Path check for HTML5 path in request
-func checkHTML5Path(c *gin.Context) bool {
-	if strings.HasPrefix(c.Request.URL.Path, "/api") {
-		return false
-	}
-	return true
-}
+const uiLocalPath = "./webui"
 
 // find existing resource on base webui (for security issue)
 func findResource(dir string, name string) (string, string, bool) {
@@ -44,10 +39,9 @@ func findResource(dir string, name string) (string, string, bool) {
 }
 
 // redirect unknown routes to angular
-func redirect(c *gin.Context) {
-	var basepath = "./webui"
-	if checkHTML5Path(c) {
-		dir, name, notfound := findResource(basepath+path.Dir(c.Request.URL.Path), path.Base(c.Request.URL.Path))
+func uiRedirectHandler(uiBasePath string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		dir, name, notfound := findResource(uiLocalPath+path.Dir(c.Request.URL.Path), path.Base(c.Request.URL.Path))
 		for notfound && dir != "." {
 			dir, name, notfound = findResource(dir, name)
 			if !notfound {
@@ -55,17 +49,16 @@ func redirect(c *gin.Context) {
 				return
 			}
 		}
+		if strings.HasPrefix(c.Request.URL.Path, "/ui") {
+			c.Redirect(301, fmt.Sprintf("%s/?redirect=%s", uiBasePath, strings.TrimPrefix(c.Request.URL.Path, "/ui")))
+			return
+		}
+		c.File(uiLocalPath + "/index.html")
 	}
-	if len(c.Request.URL.Path) > 1 {
-		// Path is not slash
-		c.Redirect(301, "/?redirect="+c.Request.URL.Path)
-		return
-	}
-	c.File(basepath + "/index.html")
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
+func NewRouter(db *gorm.DB, version, hateoasBaseBath, uiBasePath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
 	router := fizz.New()
 	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
 
@@ -75,7 +68,7 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))
 
 	// redirect root routes to angular assets
-	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/", static.LocalFile("./webui", true)))
+	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/ui", static.LocalFile("./webui", true)))
 
 	// Set specific hook
 	tonic.SetBindHook(ext.BindHook)
@@ -119,7 +112,7 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 	unsecured.GET("/openapi.yaml", nil, router.OpenAPI(infos, "yaml"))
 
 	// redirect unknown routes to angular
-	router.Engine().NoRoute(redirect)
+	router.Engine().NoRoute(uiRedirectHandler(uiBasePath))
 	return router
 }
 

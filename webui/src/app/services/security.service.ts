@@ -22,7 +22,7 @@ export class SecurityService extends DataCoreResource<EntityBean> implements Def
     private _http: HttpClient,
     private _router: Router,
     private _ConfigurationService: ConfigurationService) {
-    super(_ConfigurationService, _ConfigurationService.ServerAppCatalogCompanionWithUrl, _http);
+    super(_ConfigurationService, _ConfigurationService.ApiUrl, _http);
   }
 
   /**

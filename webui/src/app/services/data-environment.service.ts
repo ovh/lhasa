@@ -14,6 +14,6 @@ export class DataEnvironmentService extends DataCoreResource<EnvironmentBean> im
     private _http: HttpClient,
     private _configuration: ConfigurationService
   ) {
-    super(_configuration, _configuration.ServerCatalogWithApiUrl + 'v1/environments', _http);
+    super(_configuration, _configuration.ApiUrl + 'v1/environments', _http);
   }
 }

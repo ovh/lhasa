@@ -1,5 +1,7 @@
+UI_BASE_HREF = /ui
+
 all: ui-kit dep
-	ng build --output-path=../dist/webui --prod --aot
+	ng build --output-path=../dist/webui --prod --aot --environment prod --base-href ${UI_BASE_HREF} --deploy-url ${UI_BASE_HREF}
 
 dev: ui-kit dep
 	ng build --output-path=../dist/webui
@@ -23,11 +25,11 @@ dep:
 test: dep
 	ng test
 	ng e2e
-	
+
 run: all
 	npm start
 
-live: 
+live:
 	npm start
 
 clean:

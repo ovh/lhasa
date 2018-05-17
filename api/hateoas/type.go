@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Sorting directions
 const (
 	directionAsc  = "asc"
 	directionDesc = "desc"

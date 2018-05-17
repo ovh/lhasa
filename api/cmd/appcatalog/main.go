@@ -50,6 +50,7 @@ var (
 	cmdStart            = application.Command(cmdCodeStart, "Starts application.").Default()
 	flagStartPort       = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
 	flagHateoasBasePath = cmdStart.Flag("hateoas-base-path", "Base path to use for Hateoas links").Envar("APPCATALOG_HATEOAS_BASE_PATH").Default("/api").String()
+	flagUIBasePath      = cmdStart.Flag("ui-base-path", "Base path to use for UI redirections").Envar("APPCATALOG_UI_BASE_PATH").Default("/ui").String()
 )
 
 func main() {
@@ -75,7 +76,7 @@ func main() {
 		if *flagAutoMigrations {
 			runMigrationsUp(db.DB(), log)
 		}
-		router := routers.NewRouter(db, version, *flagHateoasBasePath, *flagDebug, log)
+		router := routers.NewRouter(db, version, *flagHateoasBasePath, *flagUIBasePath, *flagDebug, log)
 		srv := &http.Server{
 			Addr:    fmt.Sprintf(":%d", *flagStartPort),
 			Handler: router,

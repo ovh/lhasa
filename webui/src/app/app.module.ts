@@ -38,43 +38,49 @@ import { MatStepperModule } from '@angular/material/stepper';
 /**
  * primeng
  */
-import { ButtonModule, OrderListModule, EditorModule, OverlayPanelModule } from 'primeng/primeng';
+import {
+  AccordionModule,
+  ButtonModule,
+  CalendarModule,
+  CarouselModule,
+  ChartModule,
+  CheckboxModule,
+  CodeHighlighterModule,
+  ConfirmDialogModule,
+  DataGridModule,
+  DataListModule,
+  DataTableModule,
+  DialogModule,
+  DropdownModule,
+  EditorModule,
+  FieldsetModule,
+  GrowlModule,
+  InputTextareaModule,
+  InputTextModule,
+  MenubarModule,
+  MenuModule,
+  MessagesModule,
+  OrderListModule,
+  OverlayPanelModule,
+  PanelMenuModule,
+  PanelModule,
+  SharedModule,
+  SidebarModule,
+  SliderModule,
+  SpinnerModule,
+  SplitButtonModule,
+  StepsModule,
+  TabMenuModule,
+  TabViewModule,
+  ToggleButtonModule,
+  ToolbarModule,
+  TooltipModule,
+  TreeTableModule
+} from 'primeng/primeng';
 import { CardModule } from 'primeng/card';
-import { SidebarModule } from 'primeng/primeng';
-import { CarouselModule } from 'primeng/primeng';
-import { ChartModule } from 'primeng/primeng';
-import { DataTableModule, SharedModule } from 'primeng/primeng';
-import { MenubarModule, MenuModule } from 'primeng/primeng';
-import { CheckboxModule } from 'primeng/primeng';
-import { InputTextModule } from 'primeng/primeng';
-import { AccordionModule } from 'primeng/primeng';
-import { CodeHighlighterModule } from 'primeng/primeng';
-import { InputTextareaModule } from 'primeng/primeng';
-import { DataListModule } from 'primeng/primeng';
-import { TabViewModule } from 'primeng/primeng';
-import { DataGridModule } from 'primeng/primeng';
-import { PanelModule } from 'primeng/primeng';
-import { GrowlModule } from 'primeng/primeng';
-import { MessagesModule } from 'primeng/primeng';
-import { StepsModule } from 'primeng/primeng';
-import { PanelMenuModule } from 'primeng/primeng';
-import { DialogModule } from 'primeng/primeng';
-import { FieldsetModule } from 'primeng/primeng';
-import { DropdownModule } from 'primeng/primeng';
-import { ConfirmDialogModule, ConfirmationService } from 'primeng/primeng';
-import { SplitButtonModule } from 'primeng/primeng';
-import { ToolbarModule } from 'primeng/primeng';
-import { TooltipModule } from 'primeng/primeng';
-import { TreeTableModule } from 'primeng/primeng';
-import { CalendarModule } from 'primeng/primeng';
-import { SpinnerModule } from 'primeng/primeng';
-import { SliderModule } from 'primeng/primeng';
 import { MatSliderModule } from '@angular/material/slider';
-import { ToggleButtonModule } from 'primeng/primeng';
-import { TabMenuModule } from 'primeng/primeng';
 import { TableModule } from 'primeng/table';
 import { BlockUIModule } from 'primeng/blockui';
-
 /**
  * guard
  */
@@ -91,17 +97,14 @@ import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfigurationService } from './services/configuration.service';
 import { SecurityService } from './services/security.service';
-import { BitbucketService } from './services/data-bitbucket.service';
 import { OuiProgressTrackerComponent } from './kit/oui-progress-tracker/oui-progress-tracker.component';
 import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.component';
-import { environment } from '../environments/environment';
 import { AppdetailsActiveDeploymentsPipe } from './pipes/pipes-appdetails.component';
 import { DataEnvironmentService } from './services/data-environment.service';
 import { EnvironmentsStoreService } from './stores/environments-store.service';
 import { GraphComponent } from './widget/graph/graph.component';
 import { EnvChipComponent } from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
-import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { DomainsBrowseComponent } from './components/domains-browse/domains-browse.component';
 import { DomainsResolver } from './resolver/resolve-domains';
 import { DataDomainService } from './services/data-domain.service';
@@ -116,10 +119,11 @@ import { GraphsStoreService } from './stores/graphs-store.service';
 import { GraphBrowseComponent } from './components/graphs/graph-browse.component';
 import { GraphsResolver } from './resolver/resolve-graph';
 import { DataGraphService } from './services/data-graph.service';
+import { environment } from '../environments/environment';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  return new TranslateHttpLoader(http, environment.baseHref + '/assets/i18n/', '.json');
 }
 
 @NgModule({
@@ -243,7 +247,7 @@ export function createTranslateLoader(http: HttpClient) {
      * Base Href
      */
     {
-      provide: APP_BASE_HREF, useValue: environment.href
+      provide: APP_BASE_HREF, useValue: environment.baseHref
     },
     /**
      * guards
@@ -266,7 +270,6 @@ export function createTranslateLoader(http: HttpClient) {
     DataContentService,
     DataDeploymentService,
     DataEnvironmentService,
-    BitbucketService,
     TranslateService,
     DataDomainService,
     DataGraphService,
