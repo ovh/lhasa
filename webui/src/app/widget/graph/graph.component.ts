@@ -1,7 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {DataSet, IdType, Network} from 'vis';
-import {AfterViewInit} from '@angular/core/src/metadata/lifecycle_hooks';
-import {Edge, Node} from '../../models/graph/graph-bean';
+import { Component, Input, OnInit } from '@angular/core';
+import { DataSet, IdType, Network } from 'vis';
+import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { Edge, Node } from '../../models/graph/graph-bean';
 
 @Component({
     selector: 'app-graph',

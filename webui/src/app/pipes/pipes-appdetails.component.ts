@@ -1,5 +1,5 @@
-import {Pipe, PipeTransform} from '@angular/core';
-import {DeploymentBean} from '../models/commons/applications-bean';
+import { Pipe, PipeTransform } from '@angular/core';
+import { DeploymentBean } from '../models/commons/applications-bean';
 
 @Pipe({
   name: 'activeDeployment'

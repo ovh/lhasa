@@ -31,5 +31,5 @@ export class SecurityService extends DataCoreResource<EntityBean> implements Def
   public Connect = (): Observable<boolean> => {
     return this.http.get(this.actionUrl + 'api/connect', {headers: this.headers})
       .catch(this.handleError);
-  };
+  }
 }

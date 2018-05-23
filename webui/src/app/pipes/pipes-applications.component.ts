@@ -1,5 +1,5 @@
-import {Pipe, PipeTransform} from '@angular/core';
-import {ApplicationBean, DomainBean} from '../models/commons/applications-bean';
+import { Pipe, PipeTransform } from '@angular/core';
+import { ApplicationBean, DomainBean } from '../models/commons/applications-bean';
 
 import { sortBy } from 'lodash';
 

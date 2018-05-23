@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core';
-import {createFeatureSelector, createSelector, MemoizedSelector, Store} from '@ngrx/store';
+import { Injectable } from '@angular/core';
+import { createFeatureSelector, createSelector, MemoizedSelector, Store } from '@ngrx/store';
 
-import {ActionWithPayload} from './action-with-payload';
-import {EnvironmentBean} from '../models/commons/applications-bean';
+import { ActionWithPayload } from './action-with-payload';
+import { EnvironmentBean } from '../models/commons/applications-bean';
 
 /**
  * states

@@ -9,12 +9,14 @@ import { DataDeploymentService } from '../services/data-deployment.service';
 import { DataDomainService } from '../services/data-domain.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
+import { LoadersStoreService } from '../stores/loader-store.service';
 
 @Injectable()
 export class DomainsResolver implements Resolve<DomainBean[]> {
     constructor(
         private applicationsStoreService: ApplicationsStoreService,
-        private domainsService: DataDomainService
+        private domainsService: DataDomainService,
+        private loadersStoreService: LoadersStoreService
     ) { }
 
     resolve(
@@ -32,6 +34,7 @@ export class DomainsResolver implements Resolve<DomainBean[]> {
      * @param event
      */
     public selectDomains(metadata: PageMetaData, subject: Subject<any>): Subject<any> {
+        this.loadersStoreService.notify(subject);
         // load all domains
         const meta: {
             [key: string]: any | any[];

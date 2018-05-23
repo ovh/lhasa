@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { ApplicationsStoreService } from './stores/applications-store.service';
+import { ApplicationsStoreService, LoadApplicationsAction } from './stores/applications-store.service';
 import { DataApplicationService } from './services/data-application-version.service';
-import { EnvironmentBean } from './models/commons/applications-bean';
+import { ApplicationBean, EnvironmentBean, ApplicationPagesBean } from './models/commons/applications-bean';
 import { ContentListResponse } from './models/commons/entity-bean';
 import { Router } from '@angular/router';
 import { EnvironmentsStoreService, LoadEnvironmentsAction } from './stores/environments-store.service';
 import { DataEnvironmentService } from './services/data-environment.service';
-
-
 import { TranslateService } from '@ngx-translate/core';
 import { UiKitMenuItem } from './models/kit/navbar';
+import { Store } from '@ngrx/store';
+import { LoaderBean, LoadersStoreService } from './stores/loader-store.service';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +17,14 @@ import { UiKitMenuItem } from './models/kit/navbar';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
+
+  /**
+   * internal streams and store
+   */
+  protected loadersStream: Store<LoaderBean[]>;
+  public loaders: LoaderBean[] = [];
+
   title = 'app';
 
   public items: UiKitMenuItem[];
@@ -26,6 +34,7 @@ export class AppComponent implements OnInit {
     private applicationsStoreService: ApplicationsStoreService,
     private applicationsService: DataApplicationService,
     private environmentsStoreService: EnvironmentsStoreService,
+    private loaderstoreService: LoadersStoreService,
     private environmentService: DataEnvironmentService,
     private translate: TranslateService
   ) {
@@ -48,11 +57,20 @@ export class AppComponent implements OnInit {
         routerLink: '/applications'
       }
     ];
-    // the lang to use, if the lang isn't available, it will use the current loader to get them
-    this.translate.use('en');
+
+    // Loaders
+    this.loadersStream = this.loaderstoreService.loaders();
   }
 
   ngOnInit(): void {
+    // loaders
+    this.loadersStream.subscribe(
+      (loaders: LoaderBean[]) => {
+        console.warn('loaders', loaders);
+        this.loaders = loaders;
+      }
+    );
+    // read domains
     this.environmentService.GetAllFromContent('/', null).subscribe(
       (value: ContentListResponse<EnvironmentBean>) => {
         const environmentMap = new Map<string, EnvironmentBean>();

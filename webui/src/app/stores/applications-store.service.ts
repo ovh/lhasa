@@ -165,6 +165,11 @@ export class ApplicationsStoreService {
         const active = Object.assign({}, action.payload);
 
         const deployments = Object.assign([], action.deployments);
+
+        /**
+         * notify domains change
+         */
+        action.subject.complete();
         return {
           domainPages: state.domainPages,
           domains: state.domains,

@@ -6,7 +6,7 @@ import { DataCoreResource } from './data-core-resources.service';
 /**
  * data model
  */
-import {DeploymentBean} from '../models/commons/applications-bean';
+import { DeploymentBean } from '../models/commons/applications-bean';
 
 @Injectable()
 export class DataDeploymentService extends DataCoreResource<DeploymentBean> implements DefaultResource<DeploymentBean> {

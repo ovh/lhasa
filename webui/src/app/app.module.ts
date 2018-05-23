@@ -38,48 +38,43 @@ import { MatStepperModule } from '@angular/material/stepper';
 /**
  * primeng
  */
-import {
-  AccordionModule,
-  ButtonModule,
-  CalendarModule,
-  CarouselModule,
-  ChartModule,
-  CheckboxModule,
-  CodeHighlighterModule,
-  ConfirmDialogModule,
-  DataGridModule,
-  DataListModule,
-  DataTableModule,
-  DialogModule,
-  DropdownModule,
-  EditorModule,
-  FieldsetModule,
-  GrowlModule,
-  InputTextareaModule,
-  InputTextModule,
-  MenubarModule,
-  MenuModule,
-  MessagesModule,
-  OrderListModule,
-  OverlayPanelModule,
-  PanelMenuModule,
-  PanelModule,
-  SharedModule,
-  SidebarModule,
-  SliderModule,
-  SpinnerModule,
-  SplitButtonModule,
-  StepsModule,
-  TabMenuModule,
-  TabViewModule,
-  ToggleButtonModule,
-  ToolbarModule,
-  TooltipModule,
-  TreeTableModule
-} from 'primeng/primeng';
+import { ButtonModule, OrderListModule, EditorModule, OverlayPanelModule } from 'primeng/primeng';
 import { CardModule } from 'primeng/card';
+import { SidebarModule } from 'primeng/primeng';
+import { CarouselModule } from 'primeng/primeng';
+import { ChartModule } from 'primeng/primeng';
+import { DataTableModule, SharedModule } from 'primeng/primeng';
+import { MenubarModule, MenuModule } from 'primeng/primeng';
+import { CheckboxModule } from 'primeng/primeng';
+import { InputTextModule } from 'primeng/primeng';
+import { AccordionModule } from 'primeng/primeng';
+import { CodeHighlighterModule } from 'primeng/primeng';
+import { InputTextareaModule } from 'primeng/primeng';
+import { DataListModule } from 'primeng/primeng';
+import { TabViewModule } from 'primeng/primeng';
+import { DataGridModule } from 'primeng/primeng';
+import { PanelModule } from 'primeng/primeng';
+import { GrowlModule } from 'primeng/primeng';
+import { MessagesModule } from 'primeng/primeng';
+import { StepsModule } from 'primeng/primeng';
+import { PanelMenuModule } from 'primeng/primeng';
+import { DialogModule } from 'primeng/primeng';
+import { FieldsetModule } from 'primeng/primeng';
+import { DropdownModule } from 'primeng/primeng';
+import { ConfirmDialogModule, ConfirmationService } from 'primeng/primeng';
+import { SplitButtonModule } from 'primeng/primeng';
+import { ToolbarModule } from 'primeng/primeng';
+import { TooltipModule } from 'primeng/primeng';
+import { TreeTableModule } from 'primeng/primeng';
+import { CalendarModule } from 'primeng/primeng';
+import { SpinnerModule } from 'primeng/primeng';
+import { SliderModule } from 'primeng/primeng';
 import { MatSliderModule } from '@angular/material/slider';
+import { ToggleButtonModule } from 'primeng/primeng';
+import { TabMenuModule } from 'primeng/primeng';
 import { TableModule } from 'primeng/table';
+import { BlockUIModule } from 'primeng/blockui';
+
 /**
  * guard
  */
@@ -114,6 +109,7 @@ import { DataDomainService } from './services/data-domain.service';
 import { OuiPaginationComponent } from './kit/oui-pagination/oui-pagination.component';
 import { ApplicationsResolver } from './resolver/resolve-applications';
 import { OuiMessageComponent } from './kit/oui-message/oui-message.component';
+import { LoadersStoreService } from './stores/loader-store.service';
 import { OuiNavBarComponent } from './kit/oui-nav-bar/oui-nav-bar.component';
 
 // Cf. https://github.com/ngx-translate/core
@@ -211,6 +207,7 @@ export function createTranslateLoader(http: HttpClient) {
     TabMenuModule,
     CarouselModule,
     TableModule,
+    BlockUIModule,
     // Local modules
     AppRoutingModule,
     ArchwizardModule,
@@ -221,6 +218,7 @@ export function createTranslateLoader(http: HttpClient) {
     StoreModule.forRoot({
       applications: ApplicationsStoreService.reducer,
       environments: EnvironmentsStoreService.reducer,
+      loaders: LoadersStoreService.reducer,
     }),
     /**
      * i18n
@@ -250,6 +248,7 @@ export function createTranslateLoader(http: HttpClient) {
      */
     ApplicationsStoreService,
     EnvironmentsStoreService,
+    LoadersStoreService,
     /**
      * services
      */

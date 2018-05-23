@@ -69,9 +69,9 @@ export class OuiPaginationComponent implements OnInit {
 
   /**
    * emit selection
-   * @param event 
-   * @param type 
-   * @param page 
+   * @param event
+   * @param type
+   * @param page
    */
   onSelect(event: any, type: string, page: number) {
     event.data = {
