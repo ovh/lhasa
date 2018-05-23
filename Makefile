@@ -54,6 +54,6 @@ integration-test: $(COMPOSE_BIN) $(VENOM_BIN) $(API_BIN)
 	exit $$r
 
 sample-test: $(VENOM_BIN) $(API_BIN)
-	APP_HOST=http://localhost:8081 $(VENOM_BIN) run --log debug --format xml --output-dir=$(TARGET_DIR) tests/30* && cat $(TARGET_DIR)/test_results.xml
+	APP_HOST=http://localhost:8081 $(VENOM_BIN) run --log debug --format xml --output-dir=$(TARGET_DIR) tests/*.yml && cat $(TARGET_DIR)/test_results.xml
 
 .PHONY: all test run clean integration-test api webui

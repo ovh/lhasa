@@ -112,6 +112,7 @@ import { OuiMessageComponent } from './kit/oui-message/oui-message.component';
 import { LoadersStoreService } from './stores/loader-store.service';
 import { OuiNavBarComponent } from './kit/oui-nav-bar/oui-nav-bar.component';
 import { OuiActionMenuComponent } from './kit/oui-action-menu/oui-action-menu.component';
+import { DataContentService } from './services/data-content.service';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
@@ -257,6 +258,7 @@ export function createTranslateLoader(http: HttpClient) {
     ConfigurationService,
     SecurityService,
     DataApplicationService,
+    DataContentService,
     DataDeploymentService,
     DataEnvironmentService,
     BitbucketService,

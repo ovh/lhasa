@@ -20,6 +20,44 @@ const EnvironmentBasePath = "/environments"
 // DomainBasePath is the URL base path for this resource
 const DomainBasePath = "/domains"
 
+// ContentBasePath is the URL base path for this resource
+const ContentBasePath = "/content"
+
+// MediaResource defines a media resource behaviour
+type MediaResource interface {
+	GetContentType() string
+	GetBytes() []byte
+	SetBytes([]byte)
+}
+
+// Content define a content resource
+type Content struct {
+	ID          uint       `json:"-" binding:"-" gorm:"auto increment"`
+	Name        string     `json:"-" path:"name" description:"Content data"`
+	ContentType string     `json:"-" header:"content-type" description:"Content mime type"`
+	Locale      string     `json:"-" path:"locale" description:"Locale"`
+	Body        []byte     `json:"-" description:"Content body"`
+	CreatedAt   time.Time  `json:"-" binding:"-"`
+	UpdatedAt   time.Time  `json:"-" binding:"-"`
+	DeletedAt   *time.Time `json:"-" binding:"-"`
+	hateoas.Resource
+}
+
+// GetContentType get content type
+func (p *Content) GetContentType() string {
+	return p.ContentType
+}
+
+// GetBytes get all bytes
+func (p *Content) GetBytes() []byte {
+	return p.Body
+}
+
+// SetBytes set all bytes
+func (p *Content) SetBytes(data []byte) {
+	p.Body = data
+}
+
 // Domain define a business domain
 type Domain struct {
 	Name string `json:"name" path:"domain" description:"Application Domain"`

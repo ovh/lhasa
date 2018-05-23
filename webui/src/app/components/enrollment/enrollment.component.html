@@ -16,7 +16,7 @@
 <div *ngIf="selected === 'description'">
   <div class="ui-g-12" *ngIf="application.manifest">
 <h2>Register your app ({{application.manifest.profile}}/{{application.manifest.name}})</h2>
-<markdown [path]="'/assets/config/register-step1.md'">
+<markdown *ngIf="(observableStep1 | async) as value" [data]="value">
 </markdown>
   </div>
 </div>

@@ -23,3 +23,7 @@ export interface DefaultResource<T extends EntityBean> {
     Update(id: string, itemToUpdate: T): Observable<T>;
     Delete(id: string): Observable<T>;
 }
+
+export interface DefaultStreamResource<T> {
+    GetSingle(id: string): Observable<T>;
+}

@@ -6,17 +6,20 @@ import (
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/application"
+	"github.com/ovh/lhasa/api/v1/content"
 	"github.com/ovh/lhasa/api/v1/deployment"
 	"github.com/ovh/lhasa/api/v1/domain"
 	"github.com/ovh/lhasa/api/v1/environment"
 )
 
 // registerRoutes registers v1 API routes on a gin engine
-func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo *application.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend, metaAssistant application.MetaAssistant) {
+func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo *application.Repository, contRepo *content.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend, metaAssistant application.MetaAssistant) {
+
 	group.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
 		fizz.ID("IndexV1"),
 	}, hateoas.HandlerIndex(
+		hateoas.ResourceLink{Href: v1.ContentBasePath, Rel: "contents"},
 		hateoas.ResourceLink{Href: v1.ApplicationBasePath, Rel: "applications"},
 		hateoas.ResourceLink{Href: v1.EnvironmentBasePath, Rel: "environments"},
 		hateoas.ResourceLink{Href: v1.DeploymentBasePath, Rel: "deployments"},
@@ -30,6 +33,29 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 		fizz.Summary("Find one Domain"),
 		fizz.InputModel(v1.Domain{}),
 	), hateoas.HandlerFindOneBy(domRepo))
+
+	contRoutes := group.Group("/contents", "contents", "Content resource management")
+	contRoutes.DELETE("/", getOperationOptions("RemoveAll", contRepo,
+		fizz.Summary("Delete all Contents"),
+	), hateoas.HandlerRemoveAll(contRepo))
+	contRoutes.GET("/:name", getOperationOptions("FindOneByName", contRepo,
+		fizz.Summary("Find one Content"),
+		fizz.InputModel(v1.Content{}),
+	), content.HandlerGet(contRepo))
+	contRoutes.GET("/:name/:locale", getOperationOptions("FindOneByNameAndLocale", contRepo,
+		fizz.Summary("Find one Content"),
+		fizz.InputModel(v1.Content{}),
+	), content.HandlerGet(contRepo))
+	contRoutes.DELETE("/:name", getOperationOptions("RemoveOneBy", contRepo,
+		fizz.Summary("Remove an Content"),
+		fizz.InputModel(v1.Content{}),
+	), hateoas.HandlerRemoveOneBy(contRepo))
+	contRoutes.PUT("/:name/:locale", getOperationOptions("Create", contRepo,
+		fizz.Summary("Create an Content"),
+		fizz.Description("Use this route to create a new content. The `body` field must be plain raw text."),
+		fizz.StatusDescription("Updated"),
+		fizz.Response("201", "Created", nil, nil),
+	), content.HandlerCreate(contRepo))
 
 	appRoutes := group.Group("/applications", "applications", "Application versions resource management")
 	appRoutes.GET("/", getOperationOptions("FindByPage", appRepo,
@@ -126,13 +152,14 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 func Init(db *gorm.DB, group *fizz.RouterGroup) {
 	domRepo := domain.NewRepository(db)
 	appRepo := application.NewRepository(db)
+	contRepo := content.NewRepository(db)
 	envRepo := environment.NewRepository(db)
 	depRepo := deployment.NewRepository(db)
 	deployer := deployment.ApplicationDeployer(depRepo)
 	depend := deployment.Dependency(depRepo)
 	gitAssistant := application.GitMetaAssistant(appRepo)
 
-	registerRoutes(group, domRepo, appRepo, envRepo, depRepo, deployer, depend, gitAssistant)
+	registerRoutes(group, domRepo, appRepo, contRepo, envRepo, depRepo, deployer, depend, gitAssistant)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository

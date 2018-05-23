@@ -17,6 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
+	ext "github.com/ovh/lhasa/api/ext/binding"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
 	v1 "github.com/ovh/lhasa/api/v1/routing"
@@ -75,6 +76,10 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath string, debugMode bool, log
 
 	// redirect root routes to angular assets
 	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/", static.LocalFile("./webui", true)))
+
+	// Set specific hook
+	tonic.SetBindHook(ext.BindHook)
+	tonic.SetRenderHook(ext.RenderHook, "")
 
 	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath))
 	api.GET("/", []fizz.OperationOption{

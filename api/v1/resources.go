@@ -33,6 +33,38 @@ func (dom *Domain) GetSelfURL(baseURL string) string {
 }
 
 // GetID returns the public ID of the entity
+func (cont *Content) GetID() string {
+	return string(cont.ID)
+}
+
+// SetID sets up the new ID of the entity
+func (cont *Content) SetID(id string) error {
+	idInt, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return err
+	}
+	cont.ID = uint(idInt)
+	return nil
+}
+
+// GetDeletedAt implements SoftDeletableEntity
+func (cont *Content) GetDeletedAt() *time.Time {
+	return cont.DeletedAt
+}
+
+// ToResource implements Resourceable
+func (cont *Content) ToResource(baseURL string) {
+	cont.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "self", Href: cont.GetSelfURL(baseURL)},
+	}
+}
+
+// GetSelfURL implements Resourceable
+func (cont *Content) GetSelfURL(baseURL string) string {
+	return fmt.Sprintf("%s%s/%s", baseURL, ApplicationBasePath, cont.Name)
+}
+
+// GetID returns the public ID of the entity
 func (app *ApplicationVersion) GetID() string {
 	return string(app.ID)
 }

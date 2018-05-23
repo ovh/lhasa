@@ -1,0 +1,65 @@
+name: Deployments Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v1'
+  contsroute: '{{.baseroute}}/contents'
+testcases:
+- name: Reset the Database
+  steps:
+    - type: http
+      method: DELETE
+      url: '{{.contsroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+
+- name: ContentLifecycle
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.contsroute}}/just-a-test/fr-FR"
+      body: |
+        ## Just a tiny markdown
+        for testing FR
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.contsroute}}/just-a-test/fr-FR"
+      headers:
+      assertions:
+      - result.body ShouldContainSubstring "## Just a tiny markdown"
+      - result.body ShouldContainSubstring "for testing FR"
+    - type: http
+      method: PUT
+      url: "{{.contsroute}}/just-a-test/en-GB"
+      body: |
+        ## Just a tiny markdown
+        for testing GB
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: PUT
+      url: "{{.contsroute}}/just-a-test/en-US"
+      body: |
+        ## Just a tiny markdown
+        for testing US
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.contsroute}}/just-a-test/en-US"
+      headers:
+      assertions:
+      - result.body ShouldContainSubstring "## Just a tiny markdown"
+      - result.body ShouldContainSubstring "for testing US"
+    - type: http
+      method: GET
+      url: "{{.contsroute}}/just-a-test"
+      headers:
+      assertions:
+      - result.body ShouldContainSubstring "## Just a tiny markdown"
+      - result.body ShouldContainSubstring "for testing GB"
+
