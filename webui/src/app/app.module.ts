@@ -111,6 +111,7 @@ import { ApplicationsResolver } from './resolver/resolve-applications';
 import { OuiMessageComponent } from './kit/oui-message/oui-message.component';
 import { LoadersStoreService } from './stores/loader-store.service';
 import { OuiNavBarComponent } from './kit/oui-nav-bar/oui-nav-bar.component';
+import { OuiActionMenuComponent } from './kit/oui-action-menu/oui-action-menu.component';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
@@ -134,6 +135,7 @@ export function createTranslateLoader(http: HttpClient) {
     OuiNavBarComponent,
     OuiPaginationComponent,
     OuiMessageComponent,
+    OuiActionMenuComponent,
     ApplicationSortPipe,
     DomainSortPipe,
     AppdetailsActiveDeploymentsPipe,

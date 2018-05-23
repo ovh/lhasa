@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UiKitMenuItem } from './models/kit/navbar';
 import { Store } from '@ngrx/store';
 import { LoaderBean, LoadersStoreService } from './stores/loader-store.service';
+import { SidebarModule } from 'primeng/sidebar';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,8 @@ export class AppComponent implements OnInit {
   title = 'app';
 
   public items: UiKitMenuItem[];
+  public sideItems: UiKitMenuItem[];
+  public displaySidebar = false;
 
   constructor(
     private router: Router,
@@ -60,6 +63,37 @@ export class AppComponent implements OnInit {
 
     // Loaders
     this.loadersStream = this.loaderstoreService.loaders();
+
+    // Simple menu model
+    this.sideItems = [
+      {
+        id: 'domains',
+        label: 'DOMAINS',
+        items: [
+          {
+            id: 'domains-all',
+            label: 'DOMAINS-ALL',
+            routerLink: '/domains'
+          },
+          {
+            id: 'domains-graph',
+            label: 'DOMAINS-GRAPH',
+            routerLink: '/domains/graph'
+          }
+        ]
+      },
+      {
+        id: 'applications',
+        label: 'APPLICATIONS',
+        items: [
+          {
+            id: 'applications-all',
+            label: 'APPLICATIONS-ALL',
+            routerLink: '/applications'
+          }
+        ]
+      }
+    ];
   }
 
   ngOnInit(): void {
@@ -84,5 +118,15 @@ export class AppComponent implements OnInit {
         );
       }
     );
+  }
+
+  public handler(event) {
+    switch (event.data) {
+      case '/':
+      this.displaySidebar = true;
+        break;
+      default:
+        break;
+    }
   }
 }

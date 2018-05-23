@@ -8,6 +8,9 @@
 </div>
 </p-blockUI>
 <!--Integrate OVH UI Kit.-->
-<app-oui-nav-bar [home]="'/'" [items]="items"></app-oui-nav-bar>
+<app-oui-nav-bar (select)="handler($event)" [items]="items" ></app-oui-nav-bar>
+<p-sidebar [(visible)]="displaySidebar" [baseZIndex]="10000" [ngStyle]="{width:'30em'}">
+    <app-oui-action-menu [items]="sideItems"></app-oui-action-menu>
+</p-sidebar>
 
 <router-outlet></router-outlet>

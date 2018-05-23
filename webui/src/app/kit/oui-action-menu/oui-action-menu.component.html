@@ -1,0 +1,9 @@
+<div *ngFor="let menuitem of items">
+  <button class="adjust-width oui-button oui-button_primary">{{ menuitem.label | translate }}
+  </button>
+  <div role="menu" class="adjust-width oui-action-menu">
+    <div *ngFor="let submenuitem of menuitem.items" role="menuitem" class="oui-action-menu__item">
+      <button class="oui-button oui-button_action-menu" routerLink="{{submenuitem.routerLink}}"><i class="oui-icon oui-icon-chevron-right" aria-hidden="true"></i>{{ submenuitem.label | translate }}</button>
+    </div>
+  </div>
+</div>

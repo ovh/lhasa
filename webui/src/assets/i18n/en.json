@@ -1,6 +1,9 @@
 {
     "DOMAINS": "Domains",
+    "DOMAINS-ALL": "Domains (all)",
+    "DOMAINS-GRAPH": "Domains (graph)",
     "APPLICATIONS": "Applications",
+    "APPLICATIONS-ALL": "Applications (all)",
     "SEARCH": "Search for {{target}}",
     "FILERED_BY_DOMAIN": "Filtered by domain {{target}}",
     "DESCRIPTION-MANIFEST": "Description",
