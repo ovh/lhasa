@@ -120,11 +120,9 @@ export class LoadersStoreService {
        */
       case LoaderResolvedAction.getType(): {
         const loaders = <LoaderBean[]>Object.assign([], state.loaders);
-        console.error('complete', action.payload, loaders);
         remove(loaders, (loader) => {
           return loader.subject.isStopped;
         });
-        console.error('complete', action.payload, loaders);
         return {
           loaders: loaders,
         };

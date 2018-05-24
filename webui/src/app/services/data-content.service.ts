@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers } from '@angular/http';
 import { ConfigurationService } from './configuration.service';
-import { DefaultResource, DefaultLinkResource, DefaultStreamResource } from '../interfaces/default-resources.interface';
+import { DefaultResource, DefaultStreamResource } from '../interfaces/default-resources.interface';
 import { DataCoreResource } from './data-core-resources.service';
 
 /**

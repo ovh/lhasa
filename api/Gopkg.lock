@@ -17,12 +17,6 @@
   revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
 
 [[projects]]
-  name = "github.com/eapache/go-resiliency"
-  packages = ["retrier"]
-  revision = "ea41b0fad31007accc7f806884dcdf3da98b79ce"
-  version = "v1.1.0"
-
-[[projects]]
   name = "github.com/fabienm/go-logrus-formatters"
   packages = ["."]
   revision = "54b28d1fe0b946dea49c5244cf3f3b82d5ac8989"
@@ -192,12 +186,6 @@
   version = "1.0.0"
 
 [[projects]]
-  name = "github.com/ovh/cds"
-  packages = ["sdk/log/hook"]
-  revision = "d9c9beba7fa3c556ab70f0372f64eb058ee7f0dc"
-  version = "0.30.1"
-
-[[projects]]
   name = "github.com/ovh/venom"
   packages = ["."]
   revision = "cfe1b9fbc2b8772d6b879e784814c52ab9c93b6a"
@@ -320,6 +308,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "85d761f9d3570c01d45eeabf21648d45472bcff71d752f6db3f86d860ce69163"
+  inputs-digest = "4e239e027bb7105580920eaabc9271831a2a6d185c4250c1843396ab9d0daacb"
   solver-name = "gps-cdcl"
   solver-version = 1

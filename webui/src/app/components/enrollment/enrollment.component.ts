@@ -113,6 +113,32 @@ export class EnrollmentComponent implements OnInit {
   }
 
   /**
+   * dispatch load applications
+   * @param event
+   */
+  protected createPullRequest() {
+    this.application.manifest.profile = this.application.domain;
+    this.application.manifest.name = this.application.name;
+    // load all applications from a content return
+    this.applicationsService.Task(`${this.application.domain}/${this.application.name}/assistant`, {
+      repository: 'bitbucket',
+      manifest: this.application.manifest
+    }).subscribe(
+      (data: any) => {
+        this.snackBar.open('Create pull request', 'Ok', {
+          duration: 2000,
+        });
+      },
+      (data: any) => {
+        console.warn(data);
+        this.snackBar.open(JSON.stringify(data, null, 2), 'Error', {
+          duration: 10000,
+        });
+      }
+    );
+  }
+
+  /**
    * change selection
    */
   public onSelect(event: any) {

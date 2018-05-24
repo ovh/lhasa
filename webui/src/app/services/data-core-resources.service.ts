@@ -65,6 +65,15 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
   }
 
   /**
+   * call api backend with a POST to execute task
+   */
+  public Task = (path: String, payload: any): Observable<T> => {
+    this.headers.set('AuthToken', this.configuration.getAuthToken());
+    return this.http.post(this.actionUrl + '/' + path, JSON.stringify(payload), {headers: this.headers})
+      .catch(this.handleError);
+  }
+
+  /**
    * add a new resource
    */
   public Add = (itemToAdd: T): Observable<T> => {
