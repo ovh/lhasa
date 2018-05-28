@@ -34,7 +34,7 @@ test:
 	make -C webui test
 
 run: all
-	./dist/appcatalog
+	cd dist && ./appcatalog --config=../.config.json --auto-migrate
 
 clean:
 	make -C api clean
