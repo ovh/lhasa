@@ -1,3 +1,4 @@
+import { GraphBrowseComponent } from './components/graphs/graph-browse.component';
 import { environment } from '../environments/environment';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
@@ -8,11 +9,11 @@ import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { ProfileGuard } from './guards/profile.guard';
 import { EnrollmentComponent } from './components/enrollment/enrollment.component';
 import { RoutingGuard } from './guards/routing.guard';
-import { DomainsComponent } from './components/domains/domains.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
 import { DomainsBrowseComponent } from './components/domains-browse/domains-browse.component';
 import { DomainsResolver } from './resolver/resolve-domains';
 import { ApplicationsResolver } from './resolver/resolve-applications';
+import { GraphsResolver } from './resolver/resolve-graph';
 
 const routes: Routes = [
   {
@@ -21,11 +22,11 @@ const routes: Routes = [
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {
-    path: 'domains/graph',
+    path: 'graph/deployments',
     resolve: {
-      applications: ApplicationsResolver
+      graph: GraphsResolver
     },
-    component: DomainsComponent,
+    component: GraphBrowseComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {

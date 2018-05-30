@@ -18,3 +18,7 @@ export interface DefaultResource<T extends EntityBean> {
 export interface DefaultStreamResource<T> {
     GetSingle(id: string): Observable<T>;
 }
+
+export interface DefaultGraphResource<T> {
+    Get(params: any): Observable<T>;
+}

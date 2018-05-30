@@ -8,7 +8,9 @@ import (
 )
 
 const (
-	DirectionAsc  = "asc"
+	// DirectionAsc asc
+	DirectionAsc = "asc"
+	// DirectionDesc desc
 	DirectionDesc = "desc"
 )
 

@@ -4,6 +4,7 @@ vars:
   depsroute: '{{.baseroute}}/deployments'
   envsroute: '{{.baseroute}}/environments'
   appsroute: '{{.baseroute}}/applications'
+  graphroute: '{{.baseroute}}/graphs'
 testcases:
 - name: Reset the Database
   steps:
@@ -238,6 +239,13 @@ testcases:
       headers:
       assertions:
       - result.bodyjson.id ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.graphroute}}/"
+      headers:
+      assertions:
+      - result.bodyjson ShouldNotBeEmpty
       - result.statuscode ShouldEqual 200
 
 

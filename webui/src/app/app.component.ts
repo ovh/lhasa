@@ -58,8 +58,13 @@ export class AppComponent implements OnInit {
         id: 'applications',
         label: 'APPLICATIONS',
         routerLink: '/applications'
+      },
+      {
+        id: 'maps',
+        label: 'MAPS',
+        routerLink: '/graph/deployments'
       }
-    ];
+];
 
     // Loaders
     this.loadersStream = this.loaderstoreService.loaders();
@@ -74,11 +79,6 @@ export class AppComponent implements OnInit {
             id: 'domains-all',
             label: 'DOMAINS-ALL',
             routerLink: '/domains'
-          },
-          {
-            id: 'domains-graph',
-            label: 'DOMAINS-GRAPH',
-            routerLink: '/domains/graph'
           }
         ]
       },
@@ -92,7 +92,18 @@ export class AppComponent implements OnInit {
             routerLink: '/applications'
           }
         ]
-      }
+      },
+      {
+        id: 'maps',
+        label: 'MAPS',
+        items: [
+          {
+            id: 'deployments-graph',
+            label: 'MAPS-ALL',
+            routerLink: '/graph/deployments'
+          }
+        ]
+      },
     ];
   }
 
@@ -100,7 +111,6 @@ export class AppComponent implements OnInit {
     // loaders
     this.loadersStream.subscribe(
       (loaders: LoaderBean[]) => {
-        console.warn('loaders', loaders);
         this.loaders = loaders;
       }
     );

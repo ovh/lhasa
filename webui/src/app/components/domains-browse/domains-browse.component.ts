@@ -7,7 +7,6 @@ import { DataApplicationService } from '../../services/data-application-version.
 import { ContentListResponse, PageMetaData } from '../../models/commons/entity-bean';
 import { find } from 'lodash';
 
-import { Edge, Node } from '../../models/graph/graph-bean';
 import { DataDeploymentService } from '../../services/data-deployment.service';
 import { UiKitPaginate } from '../../models/kit/paginate';
 import { ActivatedRoute } from '@angular/router';

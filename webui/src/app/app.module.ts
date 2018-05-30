@@ -98,7 +98,6 @@ import { environment } from '../environments/environment';
 import { AppdetailsActiveDeploymentsPipe } from './pipes/pipes-appdetails.component';
 import { DataEnvironmentService } from './services/data-environment.service';
 import { EnvironmentsStoreService } from './stores/environments-store.service';
-import { DomainsComponent } from './components/domains/domains.component';
 import { GraphComponent } from './widget/graph/graph.component';
 import { EnvChipComponent } from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
@@ -113,6 +112,10 @@ import { LoadersStoreService } from './stores/loader-store.service';
 import { OuiNavBarComponent } from './kit/oui-nav-bar/oui-nav-bar.component';
 import { OuiActionMenuComponent } from './kit/oui-action-menu/oui-action-menu.component';
 import { DataContentService } from './services/data-content.service';
+import { GraphsStoreService } from './stores/graphs-store.service';
+import { GraphBrowseComponent } from './components/graphs/graph-browse.component';
+import { GraphsResolver } from './resolver/resolve-graph';
+import { DataGraphService } from './services/data-graph.service';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
@@ -123,7 +126,7 @@ export function createTranslateLoader(http: HttpClient) {
   declarations: [
     AppComponent,
     ApplicationsComponent,
-    DomainsComponent,
+    GraphBrowseComponent,
     DomainsBrowseComponent,
     GraphComponent,
     EnrollmentComponent,
@@ -221,6 +224,7 @@ export function createTranslateLoader(http: HttpClient) {
     StoreModule.forRoot({
       applications: ApplicationsStoreService.reducer,
       environments: EnvironmentsStoreService.reducer,
+      graphs: GraphsStoreService.reducer,
       loaders: LoadersStoreService.reducer,
     }),
     /**
@@ -252,6 +256,7 @@ export function createTranslateLoader(http: HttpClient) {
     ApplicationsStoreService,
     EnvironmentsStoreService,
     LoadersStoreService,
+    GraphsStoreService,
     /**
      * services
      */
@@ -264,12 +269,14 @@ export function createTranslateLoader(http: HttpClient) {
     BitbucketService,
     TranslateService,
     DataDomainService,
+    DataGraphService,
     /**
      * resolvers
      */
     ApplicationResolver,
     ApplicationsResolver,
-    DomainsResolver
+    DomainsResolver,
+    GraphsResolver
   ],
   bootstrap: [AppComponent]
 })

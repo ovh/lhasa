@@ -1,2 +1,5 @@
-<div id="mynetwork" style="height: 640px;">
-</div>
+<div #graphvis></div>
+<button (click)="configure()" >configure</button>
+<p-dialog header="Configure" [(visible)]="display">
+    <div #graphvisconfig></div>
+</p-dialog>

@@ -1,7 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { DomHandler } from 'primeng/primeng';
+import { Component, Input, OnInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { DataSet, IdType, Network } from 'vis';
 import { AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
-import { Edge, Node } from '../../models/graph/graph-bean';
+import { GraphVis } from '../../models/graph/graph-bean';
+import { DataContentService } from '../../services/data-content.service';
+import { ContentBean } from '../../models/commons/content-bean';
 
 @Component({
     selector: 'app-graph',
@@ -10,14 +13,26 @@ import { Edge, Node } from '../../models/graph/graph-bean';
 })
 export class GraphComponent implements OnInit, AfterViewInit {
 
-    protected _nodes: Node[];
-    protected _edges: Edge[];
+    /**
+     * internal members
+     */
+    public display = false;
+    protected _graph: GraphVis;
+    protected _options: any;
+    protected netOptions: any;
+    protected network: any;
+
+    @ViewChild('graphvis') container: any;
+    @ViewChild('graphvisconfig') config: any;
+    @Output() handler: EventEmitter<any> = new EventEmitter();
 
     /**
      * internal
      */
 
     constructor(
+        private elementRef: ElementRef,
+        private contentService: DataContentService,
     ) {
     }
 
@@ -31,93 +46,92 @@ export class GraphComponent implements OnInit, AfterViewInit {
      * init component
      */
     ngAfterViewInit() {
-        setTimeout(() => {
-            this.update();
-        }, 1000);
+        this.update();
     }
 
-    @Input() get nodes(): Node[] {
-        return this._nodes;
+    @Input() get graph(): GraphVis {
+        return this._graph;
     }
 
-    set nodes(val: Node[]) {
-        this._nodes = val;
+    set graph(val: GraphVis) {
+        this._graph = val;
     }
 
-    @Input() get edges(): Edge[] {
-        return this._edges;
+    @Input() get options(): any {
+        return this._options;
     }
 
-    set edges(val: Edge[]) {
-        this._edges = val;
+    set options(val: any) {
+        this._options = val;
+    }
+
+    /**
+     * configure network
+     */
+    public configure() {
+        if (this.netOptions.configure && this.netOptions.configure.container) {
+            this.display = true;
+            return;
+        }
+        // Not initialized
+        this.netOptions.configure = {};
+        this.netOptions.configure.enabled = true;
+        this.netOptions.configure.showButton = true;
+        this.netOptions.configure.container = this.config.nativeElement;
+        this.network.setOptions(this.netOptions);
+        this.display = true;
     }
 
     /**
      * update edge
      */
     public update() {
-        // create a network
-        const container = document.getElementById('mynetwork');
         const data = {
-            nodes: this._nodes,
-            edges: this._edges
+            nodes: this._graph.nodes,
+            edges: this._graph.edges
         };
-        const options = {
-            groups: {
-                failure: {
-                    color: {
-                        background: 'red'
-                    }
-                },
-                state: {
-                    color: {
-                        background: 'lime'
-                    }
-                },
-                startstate: {
-                    font: {
-                        size: 33,
-                        color: 'white'
-                    },
-                    color: {
-                        background: 'blueviolet'
-                    }
-                },
-                finalstate: {
-                    font: {
-                        size: 33,
-                        color: 'white'
-                    },
-                    color: {
-                        background: 'blue'
-                    }
-                }
-            },
-            edges: {
-                arrows: {
-                    to: {
-                        enabled: true
-                    }
-                },
-                smooth: false
-            },
-            physics: {
-                adaptiveTimestep: true,
-                solver: 'barnesHut',
-                stabilization: {
-                    enabled: true,
-                    iterations: 1000,
-                    updateInterval: 100,
-                    onlyDynamicEdges: false,
-                    fit: true
-                },
-            },
-            layout: {
-                randomSeed: 191006,
-                improvedLayout: false
-            }
-        };
-        const network = new Network(container, data, options);
-    }
 
+        this.contentService.GetSingle(this._options).subscribe(
+            (content: ContentBean) => {
+                this.netOptions = JSON.parse(<any>content);
+
+                if (this.network) {
+                    // Cf. http://visjs.org/docs/network for documentation
+                    this.network.setData(data.nodes, data.edges);
+                } else {
+                    // create a network
+                    this.network = new Network(this.container.nativeElement, data, this.netOptions);
+
+                    [
+                        'click',
+                        'doubleClick',
+                        'oncontext',
+                        'dragStart',
+                        'dragging',
+                        'dragEnd',
+                        'zoom',
+                        'showPopup',
+                        'hidePopup',
+                        'showPopup',
+                        'select',
+                        'selectNode',
+                        'selectEdge',
+                        'deselectNode',
+                        'deselectEdge',
+                        'hoverNode',
+                        'hoverEdge',
+                        'blurNode',
+                        'blurEdge'
+                    ].forEach(name => {
+                        this.network.on(name, (params) => {
+                            params.type = name;
+                            this.handler.emit(params);
+                        });
+                    });
+                }
+                this.network.redraw();
+                this.network.setSize(this.container.nativeElement.width, 800);
+            }
+        )
+    }
 }

@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	// BINARY Simple binary binding
-	BINARY = binaryBinding{}
-	// WHITELIST Simple content white list
-	WHITELIST = []string{"text/plain"}
+	// binary Simple binary binding
+	binary binaryBinding
+	// whitelist Simple content white list
+	whitelist = []string{"text/plain", "application/json"}
 )
 
 type binaryBinding struct{}
@@ -44,7 +44,7 @@ func (binaryBinding) Bind(req *http.Request, obj interface{}) error {
 		for header, values := range req.Header {
 			if strings.ToLower(header) == "content-type" {
 				for _, value := range values {
-					if !stringInSlice(value, WHITELIST) {
+					if !stringInSlice(value, whitelist) {
 						return errors.New("content-type " + value + " is white listed")
 					}
 				}
@@ -68,7 +68,7 @@ func BindHook(c *gin.Context, i interface{}) error {
 		return nil
 	}
 	// If tag binary is on any field binding will override json binding
-	if err := c.ShouldBindWith(i, BINARY); err != nil && err != io.EOF {
+	if err := c.ShouldBindWith(i, binary); err != nil && err != io.EOF {
 		return fmt.Errorf("error parsing request body: %s", err.Error())
 	}
 	if err := c.ShouldBindWith(i, binding.JSON); err != nil && err != io.EOF {

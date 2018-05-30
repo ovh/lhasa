@@ -1,10 +1,13 @@
 package v1
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/lib/pq"
+	uuid "github.com/satori/go.uuid"
+	"github.com/ovh/lhasa/api/graphapi"
 	"github.com/ovh/lhasa/api/hateoas"
 )
 
@@ -133,4 +136,118 @@ type Environment struct {
 	UpdatedAt  time.Time      `json:"_updatedAt" binding:"-"`
 	DeletedAt  *time.Time     `json:"-" binding:"-"`
 	hateoas.Resource
+}
+
+// ApplicationVersionGraph is an application version instance on a given environment
+type ApplicationVersionGraph struct {
+	PublicID  string          `json:"id" description:"Application public identifier"`
+	Domain    string          `json:"domain" description:"Application Domain"`
+	Name      string          `json:"name" description:"Application Name"`
+	Version   string          `json:"version" description:"Application Version"`
+	Manifest  json.RawMessage `json:"manifest"`
+	Tags      []string        `json:"tags,omitempty" `
+	CreatedAt time.Time       `json:"_createdAt" `
+	UpdatedAt time.Time       `json:"_updatedAt" `
+}
+
+// GetID return ID
+func (a *ApplicationVersionGraph) GetID() string {
+	return a.PublicID
+}
+
+// GetName get all dependencies
+func (a *ApplicationVersionGraph) GetName() string {
+	return a.Domain + "/" + a.Name + " v" + a.Version
+}
+
+// GetType get entity type
+func (a *ApplicationVersionGraph) GetType() string {
+	return "application"
+}
+
+// GetEdges get all dependencies
+func (a *ApplicationVersionGraph) GetEdges() []graphapi.ImplementEdge {
+	return []graphapi.ImplementEdge{}
+}
+
+// DeploymentGraph is an application version instance on a given environment
+type DeploymentGraph struct {
+	PublicID     string                 `json:"id" description:"Deployment public identifier"`
+	Application  graphapi.ImplementNode `json:"application"`
+	Environment  graphapi.ImplementNode `json:"environnement"`
+	Dependencies json.RawMessage        `json:"dependencies,omitempty" binding:"-"`
+	Properties   json.RawMessage        `json:"properties,omitempty"`
+	UndeployedAt *time.Time             `json:"undeployedAt,omitempty" binding:"-"`
+	CreatedAt    time.Time              `json:"_createdAt" binding:"-"`
+	UpdatedAt    time.Time              `json:"_updatedAt" binding:"-"`
+}
+
+// GetID get deployment ID
+func (d *DeploymentGraph) GetID() string {
+	return d.PublicID
+}
+
+// GetName get all dependencies
+func (d *DeploymentGraph) GetName() string {
+	return d.Application.GetName() + " on (" + d.Environment.GetName() + ")"
+}
+
+// GetType get entity type
+func (d *DeploymentGraph) GetType() string {
+	return "deployment"
+}
+
+// GetEdges get all dependencies
+func (d *DeploymentGraph) GetEdges() []graphapi.ImplementEdge {
+	dependencies := []graphapi.ImplementEdge{}
+	if d.Dependencies != nil {
+		rawDependencies := []DeploymentDependency{}
+		json.Unmarshal(d.Dependencies, &rawDependencies)
+		for _, entity := range rawDependencies {
+			uid, err := uuid.NewV4()
+			if err == nil {
+				edge := graphapi.Edge{
+					ID:   uid.String(),
+					From: d.PublicID,
+					To:   entity.TargetID,
+					Type: entity.Type,
+					Properties: map[string]interface{}{
+						"Type": entity.Type,
+					},
+				}
+				dependencies = append(dependencies, &edge)
+			}
+		}
+	}
+	return dependencies
+}
+
+// EnvironmentGraph is an application version instance on a given environment
+type EnvironmentGraph struct {
+	PublicID   string          `json:"id" description:"Environnement public identifier"`
+	Slug       string          `json:"slug" description:"Environment identifier"`
+	Name       string          `json:"name"`
+	Properties json.RawMessage `json:"properties,omitempty"`
+	CreatedAt  time.Time       `json:"_createdAt" binding:"-"`
+	UpdatedAt  time.Time       `json:"_updatedAt" binding:"-"`
+}
+
+// GetID return ID
+func (e *EnvironmentGraph) GetID() string {
+	return e.PublicID
+}
+
+// GetName get all dependencies
+func (e *EnvironmentGraph) GetName() string {
+	return e.Slug + "/" + e.Name
+}
+
+// GetType get entity type
+func (e *EnvironmentGraph) GetType() string {
+	return "environnement"
+}
+
+// GetEdges get all dependencies
+func (e *EnvironmentGraph) GetEdges() []graphapi.ImplementEdge {
+	return []graphapi.ImplementEdge{}
 }

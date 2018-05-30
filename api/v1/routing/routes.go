@@ -3,6 +3,7 @@ package routing
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/wI2L/fizz"
+	"github.com/ovh/lhasa/api/graphapi"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/application"
@@ -10,10 +11,11 @@ import (
 	"github.com/ovh/lhasa/api/v1/deployment"
 	"github.com/ovh/lhasa/api/v1/domain"
 	"github.com/ovh/lhasa/api/v1/environment"
+	"github.com/ovh/lhasa/api/v1/graph"
 )
 
 // registerRoutes registers v1 API routes on a gin engine
-func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo *application.Repository, contRepo *content.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend, metaAssistant application.MetaAssistant) {
+func registerRoutes(group *fizz.RouterGroup, graphRepo *graph.Repository, domRepo *domain.Repository, appRepo *application.Repository, contRepo *content.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend, metaAssistant application.MetaAssistant) {
 
 	group.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
@@ -24,6 +26,11 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 		hateoas.ResourceLink{Href: v1.EnvironmentBasePath, Rel: "environments"},
 		hateoas.ResourceLink{Href: v1.DeploymentBasePath, Rel: "deployments"},
 	))
+
+	graphRoutes := group.Group("/graphs", "graph", "Graphs node and edge management")
+	graphRoutes.GET("/", getGraphOperationOptions("FindAllActive", graphRepo,
+		fizz.Summary("Find a page of node and all associated edge"),
+	), graphapi.HandlerFindAllActive(graphRepo))
 
 	domRoutes := group.Group("/domains", "domains", "Domains resource management")
 	domRoutes.GET("/", getOperationOptions("FindByPage", domRepo,
@@ -150,6 +157,7 @@ func registerRoutes(group *fizz.RouterGroup, domRepo *domain.Repository, appRepo
 
 // Init initialize the API v1 module
 func Init(db *gorm.DB, group *fizz.RouterGroup) {
+	graphRepo := graph.NewRepository(db)
 	domRepo := domain.NewRepository(db)
 	appRepo := application.NewRepository(db)
 	contRepo := content.NewRepository(db)
@@ -159,10 +167,15 @@ func Init(db *gorm.DB, group *fizz.RouterGroup) {
 	depend := deployment.Dependency(depRepo)
 	gitAssistant := application.GitMetaAssistant(appRepo)
 
-	registerRoutes(group, domRepo, appRepo, contRepo, envRepo, depRepo, deployer, depend, gitAssistant)
+	registerRoutes(group, graphRepo, domRepo, appRepo, contRepo, envRepo, depRepo, deployer, depend, gitAssistant)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository
 func getOperationOptions(baseName string, repository hateoas.Repository, options ...fizz.OperationOption) []fizz.OperationOption {
+	return append(options, fizz.ID(baseName+repository.GetType().Name()))
+}
+
+// getOperationOptions returns an OperationOption list including generated ID for this repository
+func getGraphOperationOptions(baseName string, repository graphapi.Repository, options ...fizz.OperationOption) []fizz.OperationOption {
 	return append(options, fizz.ID(baseName+repository.GetType().Name()))
 }
