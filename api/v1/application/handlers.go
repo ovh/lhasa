@@ -48,7 +48,7 @@ type manifestRequest struct {
 	Manifest   map[string]interface{} `body:"manifest" description:"Application Manifest"`
 }
 
-// HandlerAssistant help to create manifest with assistant (butbucket, ...)
+// HandlerAssistant help to create manifest with assistant (bitbucket, ...)
 func HandlerAssistant(appRepo *Repository, assistant MetaAssistant) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *manifestRequest) (*v1.ApplicationVersion, error) {
 		// Find the application
@@ -70,11 +70,16 @@ func HandlerAssistant(appRepo *Repository, assistant MetaAssistant) gin.HandlerF
 			return nil, errors.Unauthorizedf("User is not authorized")
 		}
 
+		name := ""
+		manifest, ok := config.ExtractValue("manifest").(map[string]interface{})
+		if ok {
+			name, _ = manifest["name"].(string)
+		}
 		parameters := PullRequest{
 			Repository:   request.Repository,
 			Manifest:     request.Manifest,
 			Creator:      c.GetHeader("X-Remote-User"),
-			ManifestName: config.ExtractValue("manifest").(map[string]interface{})["name"].(string),
+			ManifestName: name,
 		}
 
 		// launch assistant behaviour

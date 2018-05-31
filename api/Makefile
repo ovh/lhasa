@@ -2,6 +2,7 @@ OUT := ../dist/appcatalog
 PKG := github.com/ovh/lhasa/api
 VERSION := $(shell git describe --always --tags --dirty)
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
+PKG_LIST_COMMA := $(shell go list ${PKG}/... | grep -v /vendor/ | paste -s -d, -)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/)
 PACKR = ${GOPATH}/bin/packr
 GO_LINT = ${GOPATH}/bin/golint
@@ -40,12 +41,18 @@ server: vet lint install
 	packr
 	go build -i -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}/cmd/appcatalog
 
-test: install
-	@go test -short ${PKG_LIST}
+test:
+	@go test ./...
 
-test-coverage: $(GO_COV_MERGE) $(TARGET_DIR)
-	@$(GO_COV_MERGE) ./**/*.coverprofile > $(TARGET_DIR)/cover.out
-	@go tool cover -html=$(TARGET_DIR)/cover.out -o=$(TARGET_DIR)/cover.html
+unused:
+	codecoroner -ignore vendor funcs ./...
+
+test-coverage:
+	@for pkg in ${PKG_LIST}; do go test --coverprofile $(TARGET_DIR)/$${pkg//\//-}.single.cov $${pkg}; done;
+	@for pkg in ${PKG_LIST}; do go test --coverprofile $(TARGET_DIR)/$${pkg//\//-}.global.cov --coverpkg=${PKG_LIST_COMMA} $${pkg}; done;
+	@$(GO_COV_MERGE) *.global.cov > $(TARGET_DIR)/global.cov
+	@go tool cover -html=$(TARGET_DIR)/global.cov -o=$(TARGET_DIR)/cover.html
+	@go tool cover -func=$(TARGET_DIR)/global.cov
 
 vet: install
 	@go vet ${PKG_LIST}

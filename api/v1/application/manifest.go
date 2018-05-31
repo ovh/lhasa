@@ -44,12 +44,21 @@ func GitMetaAssistant(depRepo *Repository) MetaAssistant {
 // CreatePullRequestBitBucket create a pull request on bitbucket
 func CreatePullRequestBitBucket(parameters *PullRequest) error {
 	// Create client
-	conf := config.ExtractValue("bitbucket").(map[string]interface{})
-	client := bitbucket.NewAccessToken(conf["token"].(string))
+	token := ""
+	conf, ok := config.ExtractValue("bitbucket").(map[string]interface{})
+	if ok {
+		token, _ = conf["token"].(string)
+	}
+	client := bitbucket.NewAccessToken(token)
 
 	// Extract repo and project from repository url
-	var project = strings.Split(parameters.Manifest["repository"].(string), "/")[4]
-	var repo = strings.Split(parameters.Manifest["repository"].(string), "/")[6]
+	var project, repo string
+	repositoryURL, ok := parameters.Manifest["repository"].(string)
+	repository := strings.Split(repositoryURL, "/")
+	if !ok && len(repository) > 6 {
+		project = repository[4]
+		repo = repository[6]
+	}
 
 	logrus.WithFields(logrus.Fields{
 		"project":    project,
@@ -60,7 +69,7 @@ func CreatePullRequestBitBucket(parameters *PullRequest) error {
 	branch, errBranch := client.Repositories.Branch.Create(&bitbucket.BranchOptions{
 		Owner:      project,
 		RepoSlug:   repo,
-		Name:       "branch-to-update-manifest",
+		Name:       "branch-to-update-repository",
 		StartPoint: "master",
 		Message:    "Message de test",
 	})
@@ -84,15 +93,15 @@ func CreatePullRequestBitBucket(parameters *PullRequest) error {
 	content, _ := json.MarshalIndent(_checkJSONManifest, "", "\t")
 
 	logrus.WithFields(logrus.Fields{
-		"manifest": string(content),
+		"repository": string(content),
 	}).Info("Create path")
 
 	path, errPath := client.Repositories.Path.Create(&bitbucket.PathOptions{
 		Owner:    project,
 		RepoSlug: repo,
 		Name:     parameters.ManifestName,
-		Message:  "Create manifest initial version",
-		Branch:   "branch-to-update-manifest",
+		Message:  "Create repository initial version",
+		Branch:   "branch-to-update-repository",
 		Content:  string(content),
 	})
 	if errPath != nil {
@@ -111,8 +120,8 @@ func CreatePullRequestBitBucket(parameters *PullRequest) error {
 	res, errPullRequest := client.Repositories.PullRequests.Create(&bitbucket.PullRequestsOptions{
 		Owner:        project,
 		RepoSlug:     repo,
-		SourceBranch: "branch-to-update-manifest",
-		Title:        "Update manifest data",
+		SourceBranch: "branch-to-update-repository",
+		Title:        "Update repository data",
 		Reviewers:    []string{parameters.Creator},
 	})
 	if errPullRequest != nil {

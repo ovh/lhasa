@@ -8,10 +8,8 @@ import (
 )
 
 const (
-	// DirectionAsc asc
-	DirectionAsc = "asc"
-	// DirectionDesc desc
-	DirectionDesc = "desc"
+	directionAsc  = "asc"
+	directionDesc = "desc"
 )
 
 // Entity defines and identifiable REST entity

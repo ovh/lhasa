@@ -47,3 +47,16 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[constraint]]
   name = "github.com/wI2L/fizz"
   version = "~0.10.2"
+
+[[constraint]]
+  name = "github.com/Selvatico/go-mocket"
+  version = "~1.0.4"
+
+
+[[constraint]]
+  name = "github.com/gavv/httpexpect"
+  branch = "v1"
+
+[[override]]
+  name = "github.com/valyala/fasthttp"
+  branch = "master"

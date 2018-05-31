@@ -115,11 +115,11 @@ func (p Pageable) GetSortClause() interface{} {
 	fields := strings.Split(p.Sort, ",")
 	for i, field := range fields {
 		// for each field to sort, read sort direction after a semicolon, asc will be used as default
-		direction := DirectionAsc
+		direction := directionAsc
 		if fieldClause := strings.Split(field, ";"); len(fieldClause) == 2 {
 			field = fieldClause[0]
-			if strings.ToLower(fieldClause[1]) == DirectionDesc {
-				direction = DirectionDesc
+			if strings.ToLower(fieldClause[1]) == directionDesc {
+				direction = directionDesc
 			}
 		}
 		// %q sanitizes the field double-quotes to prevent sql injections

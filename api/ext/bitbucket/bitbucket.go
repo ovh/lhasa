@@ -5,8 +5,12 @@ import (
 )
 
 func getAPIBaseURL() string {
-	baseURL := config.ExtractValue("bitbucket").(map[string]interface{})
-	return baseURL["url"].(string)
+	baseURL := ""
+	bitbucket, ok := config.ExtractValue("bitbucket").(map[string]interface{})
+	if ok {
+		baseURL, _ = bitbucket["url"].(string)
+	}
+	return baseURL
 }
 
 // RepositoriesOptions options
