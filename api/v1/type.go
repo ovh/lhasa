@@ -72,17 +72,19 @@ type Domain struct {
 
 // Application defines an application
 type Application struct {
-	Domain string `path:"domain" description:"Application Domain"`
-	Name   string `path:"name" description:"Application Name"`
+	ID              uint       `json:"-" gorm:"auto increment" binding:"-"`
+	Domain          string     `json:"domain" path:"domain" description:"Application Domain"`
+	Name            string     `json:"name" path:"name" description:"Application Name"`
+	LatestRelease   *Release   `json:"-" binding:"-"`
+	LatestReleaseID *uint      `json:"-" binding:"-"`
+	CreatedAt       time.Time  `json:"_createdAt" binding:"-"`
+	UpdatedAt       time.Time  `json:"_updatedAt" binding:"-"`
+	DeletedAt       *time.Time `json:"-" binding:"-"`
+	hateoas.Resource
 }
 
-// TableName Set ApplicationVersion's table name to be `applications`
-func (ApplicationVersion) TableName() string {
-	return "applications"
-}
-
-// ApplicationVersion defines the model properties of an application version
-type ApplicationVersion struct {
+// Release defines the model properties of an application version
+type Release struct {
 	ID           uint            `json:"-" gorm:"auto increment" binding:"-"`
 	Domain       string          `json:"domain" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"domain" description:"Application Domain"`
 	Name         string          `json:"name" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"name" description:"Application Name"`
@@ -101,26 +103,26 @@ type ApplicationVersion struct {
 // Dependency defines a inter-application link
 type Dependency struct {
 	ID       uint `json:"-" gorm:"auto increment"`
-	Owner    ApplicationVersion
+	Owner    Release
 	OwnerID  uint `json:"-" gorm:"type:bigint;not null;default:0"`
-	Target   ApplicationVersion
+	Target   Release
 	TargetID uint `json:"-" gorm:"type:bigint;not null;default:0"`
 }
 
 // Deployment is an application version instance on a given environment
 type Deployment struct {
-	ID            uint                `json:"-" gorm:"auto increment" binding:"-"`
-	PublicID      string              `json:"id" path:"public_id" gorm:"type:varchar(255);not null;unique" validate:"omitempty,uuid4" binding:"omitempty,uuid4" description:"Deployment public identifier"`
-	ApplicationID uint                `json:"-" gorm:"not null;type:bigint;default:0"`
-	Application   *ApplicationVersion `json:"-"`
-	EnvironmentID uint                `json:"-" gorm:"not null;type:bigint;default:0"`
-	Environment   *Environment        `json:"-"`
-	Dependencies  postgres.Jsonb      `json:"dependencies,omitempty" binding:"-"`
-	Properties    postgres.Jsonb      `json:"properties,omitempty"`
-	UndeployedAt  *time.Time          `json:"undeployedAt,omitempty" binding:"-"`
-	CreatedAt     time.Time           `json:"_createdAt" binding:"-"`
-	UpdatedAt     time.Time           `json:"_updatedAt" binding:"-"`
-	DeletedAt     *time.Time          `json:"-" binding:"-"`
+	ID            uint           `json:"-" gorm:"auto increment" binding:"-"`
+	PublicID      string         `json:"id" path:"public_id" gorm:"type:varchar(255);not null;unique" validate:"omitempty,uuid4" binding:"omitempty,uuid4" description:"Deployment public identifier"`
+	ApplicationID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
+	Application   *Release       `json:"-"`
+	EnvironmentID uint           `json:"-" gorm:"not null;type:bigint;default:0"`
+	Environment   *Environment   `json:"-"`
+	Dependencies  postgres.Jsonb `json:"dependencies,omitempty" binding:"-"`
+	Properties    postgres.Jsonb `json:"properties,omitempty"`
+	UndeployedAt  *time.Time     `json:"undeployedAt,omitempty" binding:"-"`
+	CreatedAt     time.Time      `json:"_createdAt" binding:"-"`
+	UpdatedAt     time.Time      `json:"_updatedAt" binding:"-"`
+	DeletedAt     *time.Time     `json:"-" binding:"-"`
 	hateoas.Resource
 }
 

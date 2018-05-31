@@ -4,6 +4,7 @@ import (
 	"net/http/httptest"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/ovh/lhasa/api/db"
 
 	"github.com/jinzhu/gorm"
 
@@ -17,9 +18,10 @@ func StartTestHTTPServer() *httptest.Server {
 	mocket.Catcher.Register()
 	mocket.Catcher.Reset()
 	mocket.Catcher.Logging = true
-	db, _ := gorm.Open(mocket.DRIVER_NAME, "any_string")
+	dbHandle, _ := gorm.Open(mocket.DRIVER_NAME, "any_string")
+	tm := db.NewTransactionManager(dbHandle, log)
 
-	router := routers.NewRouter(db, "1.0.0", "/api", "/ui", true, log)
+	router := routers.NewRouter(tm, "1.0.0", "/api", "/ui", true, log)
 	server := httptest.NewServer(router)
 	return server
 }

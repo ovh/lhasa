@@ -56,7 +56,7 @@ func HandlerFindBy(repository Repository) gin.HandlerFunc {
 // HandlerFindOneBy returns the first resource matching path params
 func HandlerFindOneBy(repository Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (interface{}, error) {
-		result, err := findByPath(c, repository)
+		result, err := FindByPath(c, repository)
 		if resource, ok := result.(Resourceable); ok {
 			resource.ToResource(BaseURL(c))
 		}
@@ -70,7 +70,7 @@ func HandlerFindOneBy(repository Repository) gin.HandlerFunc {
 // HandlerRemoveOneBy removes a given resource
 func HandlerRemoveOneBy(repository Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) error {
-		result, err := findByPath(c, repository)
+		result, err := FindByPath(c, repository)
 		if err != nil {
 			return err
 		}
@@ -92,7 +92,7 @@ func HandlerUpsert(repository Repository) gin.HandlerFunc {
 		if err := c.Bind(resource); err != nil {
 			return err
 		}
-		oldres, err := findByPath(c, repository)
+		oldres, err := FindByPath(c, repository)
 		if IsEntityDoesNotExistError(err) || err == ErrorGone {
 			if c.Request.Method == http.MethodPost {
 				c.Header("Location", fmt.Sprintf("%s/%s", c.Request.URL.Path, resource.GetID()))
@@ -149,7 +149,8 @@ func AddToBasePath(basePath string) gin.HandlerFunc {
 	}
 }
 
-func findByPath(c *gin.Context, repository Repository) (Entity, error) {
+// FindByPath find one entity in the given repository, using paths parameters as matching criterias
+func FindByPath(c *gin.Context, repository Repository) (Entity, error) {
 	params := parsePathParams(c)
 	if repo, ok := repository.(SoftDeletableRepository); ok {
 		result, err := repo.FindOneByUnscoped(params)

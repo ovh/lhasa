@@ -11,13 +11,13 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
 	"github.com/sirupsen/logrus"
 	"github.com/wI2L/fizz"
 	"github.com/wI2L/fizz/openapi"
+	"github.com/ovh/lhasa/api/db"
 	ext "github.com/ovh/lhasa/api/ext/binding"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
@@ -58,7 +58,7 @@ func uiRedirectHandler(uiBasePath string) gin.HandlerFunc {
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(db *gorm.DB, version, hateoasBaseBath, uiBasePath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
+func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
 	router := fizz.New()
 	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
 
@@ -83,7 +83,7 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath, uiBasePath string, debugMo
 		hateoas.ResourceLink{Rel: "unsecured", Href: "/unsecured"},
 	))
 
-	v1.Init(db, api.Group("/v1", "", "", hateoas.AddToBasePath("/v1")))
+	v1.Init(tm, api.Group("/v1", "", "", hateoas.AddToBasePath("/v1")), log)
 
 	// unsecured group does not check incoming signatures
 	unsecured := api.Group("/unsecured", "unsecured", "Authentication-free routes", hateoas.AddToBasePath("/unsecured"))
@@ -95,7 +95,7 @@ func NewRouter(db *gorm.DB, version, hateoasBaseBath, uiBasePath string, debugMo
 		hateoas.ResourceLink{Rel: "version", Href: "/version"},
 	))
 	// health check route
-	unsecured.GET("/mon", []fizz.OperationOption{fizz.ID("Monitoring"), fizz.Summary("Check application and subcomponents health")}, tonic.Handler(handlers.PingHandler(db.DB()), http.StatusOK))
+	unsecured.GET("/mon", []fizz.OperationOption{fizz.ID("Monitoring"), fizz.Summary("Check application and subcomponents health")}, tonic.Handler(handlers.PingHandler(tm.DB().DB()), http.StatusOK))
 	// API version
 	unsecured.GET("/version", []fizz.OperationOption{fizz.ID("Version"), fizz.Summary("Show the current version of the server")}, tonic.Handler(handlers.VersionHandler(version), http.StatusOK))
 

@@ -106,11 +106,20 @@ func BaseURL(c *gin.Context) string {
 	return c.Request.URL.EscapedPath()
 }
 
+// GetGormSortClause returns the SQL-escaped sort clause
+func (p Pageable) GetGormSortClause() interface{} {
+	if sortClause := p.GetSortClause(); sortClause != "1" {
+		return sortClause
+	}
+	// wrap column pointer in a gorm expression to avoid quote-surrounding
+	return gorm.Expr("1")
+}
+
 // GetSortClause returns the SQL-escaped sort clause
-func (p Pageable) GetSortClause() interface{} {
+func (p Pageable) GetSortClause() string {
 	// if not sort column was specified, optimistically use first column to preserve page consistency
 	if p.Sort == "" {
-		return gorm.Expr("1")
+		return "1"
 	}
 	fields := strings.Split(p.Sort, ",")
 	for i, field := range fields {

@@ -41,7 +41,7 @@ server: vet lint install
 	packr
 	go build -i -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}/cmd/appcatalog
 
-test:
+test: install
 	@go test ./...
 
 unused:

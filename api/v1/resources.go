@@ -65,12 +65,12 @@ func (cont *Content) GetSelfURL(baseURL string) string {
 }
 
 // GetID returns the public ID of the entity
-func (app *ApplicationVersion) GetID() string {
+func (app *Application) GetID() string {
 	return string(app.ID)
 }
 
 // SetID sets up the new ID of the entity
-func (app *ApplicationVersion) SetID(id string) error {
+func (app *Application) SetID(id string) error {
 	idInt, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		return err
@@ -80,12 +80,45 @@ func (app *ApplicationVersion) SetID(id string) error {
 }
 
 // GetDeletedAt implements SoftDeletableEntity
-func (app *ApplicationVersion) GetDeletedAt() *time.Time {
+func (app *Application) GetDeletedAt() *time.Time {
 	return app.DeletedAt
 }
 
 // ToResource implements Resourceable
-func (app *ApplicationVersion) ToResource(baseURL string) {
+func (app *Application) ToResource(baseURL string) {
+	app.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "self", Href: app.GetSelfURL(baseURL)},
+		{Rel: "latest", Href: app.GetSelfURL(baseURL) + "/latest"},
+		{Rel: "versions", Href: app.GetSelfURL(baseURL) + "/versions"}}
+}
+
+// GetSelfURL implements Resourceable
+func (app *Application) GetSelfURL(baseURL string) string {
+	return fmt.Sprintf("%s%s/%s/%s", baseURL, ApplicationBasePath, app.Domain, app.Name)
+}
+
+// GetID returns the public ID of the entity
+func (app *Release) GetID() string {
+	return string(app.ID)
+}
+
+// SetID sets up the new ID of the entity
+func (app *Release) SetID(id string) error {
+	idInt, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return err
+	}
+	app.ID = uint(idInt)
+	return nil
+}
+
+// GetDeletedAt implements SoftDeletableEntity
+func (app *Release) GetDeletedAt() *time.Time {
+	return app.DeletedAt
+}
+
+// ToResource implements Resourceable
+func (app *Release) ToResource(baseURL string) {
 	app.Resource.Links = []hateoas.ResourceLink{
 		{Rel: "self", Href: app.GetSelfURL(baseURL)},
 		{Rel: "deployments", Href: app.GetSelfURL(baseURL) + "/deployments"},
@@ -93,8 +126,8 @@ func (app *ApplicationVersion) ToResource(baseURL string) {
 }
 
 // GetSelfURL implements Resourceable
-func (app *ApplicationVersion) GetSelfURL(baseURL string) string {
-	return fmt.Sprintf("%s%s/%s/%s/%s", baseURL, ApplicationBasePath, app.Domain, app.Name, app.Version)
+func (app *Release) GetSelfURL(baseURL string) string {
+	return fmt.Sprintf("%s%s/%s/%s/versions/%s", baseURL, ApplicationBasePath, app.Domain, app.Name, app.Version)
 }
 
 // GetID returns the public ID of the entity

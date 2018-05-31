@@ -13,18 +13,50 @@ testcases:
       - result.statuscode ShouldEqual 204
     - type: http
       method: PUT
-      url: "{{.appsroute}}/agora/api/versions/1"
-      body: '{"domain": "agora", "name":"api", "version":"1", "manifest":{"description":"Sample app"}}'
+      url: "{{.appsroute}}/agora/api/versions/1.0.0"
+      body: '{"domain": "agora", "name":"api", "version":"1.0.0", "manifest":{"description":"Sample app"}}'
       headers:
       assertions:
       - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/latest"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/versions/1.0.1"
+      body: '{"domain": "agora", "name":"api", "version":"1.0.1", "manifest":{"description":"Sample app"}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/latest"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/versions/1.0.0"
+      body: '{"domain": "agora", "name":"api", "version":"1.0.0", "manifest":{"description":"Sample app"}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/latest"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
     - type: http
       method: PUT
       url: "{{.appsroute}}/agora/api/versions/1"
       body: '{"domain": "agora", "name":"api", "version":"1", "manifest":{"description":"Sample app"}}'
       headers:
       assertions:
-      - result.statuscode ShouldEqual 200
+      - result.statuscode ShouldEqual 201
     - type: http
       method: GET
       url: "{{.appsroute}}/agora/api/versions/1"
@@ -57,7 +89,7 @@ testcases:
       headers:
       assertions:
       - result.statuscode ShouldEqual 206
-      - result.bodyjson.content.__len__ ShouldEqual 0
+      - result.bodyjson.content.__len__ ShouldEqual 1
     - type: http
       method: DELETE
       url: "{{.appsroute}}/batch_mailer/batch_mailer/versions/2"

@@ -1,8 +1,9 @@
 package routing
 
 import (
-	"github.com/jinzhu/gorm"
+	"github.com/sirupsen/logrus"
 	"github.com/wI2L/fizz"
+	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/graphapi"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
@@ -20,13 +21,14 @@ func registerRoutes(group *fizz.RouterGroup,
 	graphRepo *graph.Repository,
 	domRepo *domain.Repository,
 	appRepo *application.Repository,
+	appLatestRepo *application.RepositoryLatest,
 	contRepo *content.Repository,
 	envRepo *environment.Repository,
 	depRepo *deployment.Repository,
 	badgeRepo *badge.Repository,
 	deployer deployment.Deployer,
-	depend deployment.Depend) {
-
+	depend deployment.Depend,
+	latestUpdater application.LatestUpdater) {
 	group.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
 		fizz.ID("IndexV1"),
@@ -74,39 +76,47 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.Response("201", "Created", nil, nil),
 	), content.HandlerCreate(contRepo))
 
-	appRoutes := group.Group("/applications", "applications", "Application versions resource management")
+	appRoutes := group.Group("/applications", "applications", "Application management")
 	appRoutes.GET("/", getOperationOptions("FindByPage", appRepo,
 		fizz.Summary("Find a page of Applications"),
-	), hateoas.HandlerFindByPage(appRepo))
+	), hateoas.HandlerFindByPage(appLatestRepo))
 	appRoutes.DELETE("/", getOperationOptions("RemoveAll", appRepo,
 		fizz.Summary("Delete all Applications"),
 	), hateoas.HandlerRemoveAll(appRepo))
-	appRoutes.GET("/:domain", getOperationOptions("FindByPageDomain", appRepo,
+	appRoutes.GET("/:domain", getOperationOptions("FindLatestByPageDomain", appLatestRepo,
 		fizz.Summary("Find a page of Applications"),
 		fizz.InputModel(v1.Domain{}),
-	), hateoas.HandlerFindByPage(appRepo))
-	appRoutes.GET("/:domain/:name/versions", getOperationOptions("FindByPageDomainName", appRepo,
-		fizz.Summary("Find a page of Applications"),
+	), hateoas.HandlerFindByPage(appLatestRepo))
+	appRoutes.GET("/:domain/:name/latest", getOperationOptions("FindLatestBy", appLatestRepo,
+		fizz.Summary("Find latest available version for an Application"),
+	), application.HandlerRedirectLatest(appLatestRepo))
+	appRoutes.GET("/:domain/:name/versions", getOperationOptions("FindPageOfReleases", appRepo,
+		fizz.Summary("Find a page of Releases"),
 		fizz.InputModel(v1.Application{}),
 	), hateoas.HandlerFindByPage(appRepo))
+	appRoutes.GET("/:domain/:name/deployments", getOperationOptions("ListActiveDeploymentsLatest", appLatestRepo,
+		fizz.Summary("List active deployments for the latest release of this application"),
+		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
+			"Only a single deployment can be active at a time on a given environment."),
+	), deployment.HandlerListActiveDeployments(appLatestRepo, depRepo))
 	appRoutes.GET("/:domain/:name/versions/:version", getOperationOptions("FindOneBy", appRepo,
-		fizz.Summary("Find one Application"),
-		fizz.InputModel(v1.ApplicationVersion{}),
+		fizz.Summary("Find one Release"),
+		fizz.InputModel(v1.Release{}),
 	), hateoas.HandlerFindOneBy(appRepo))
 	appRoutes.DELETE("/:domain/:name/versions/:version", getOperationOptions("RemoveOneBy", appRepo,
-		fizz.Summary("Remove an Application"),
-		fizz.InputModel(v1.ApplicationVersion{}),
+		fizz.Summary("Remove a Release"),
+		fizz.InputModel(v1.Release{}),
 	), hateoas.HandlerRemoveOneBy(appRepo))
 	appRoutes.PUT("/:domain/:name/versions/:version", getOperationOptions("Create", appRepo,
-		fizz.Summary("Create an Application Version"),
+		fizz.Summary("Create a Release"),
 		fizz.Description("Use this route to create a new application version. The `manifest` field can contains "+
 			"any properties useful to track applications in your information system. It is recommended to track it as "+
 			"a file in your source-control repository."),
 		fizz.StatusDescription("Updated"),
 		fizz.Response("201", "Created", nil, nil),
-	), application.HandlerCreate(appRepo))
+	), application.HandlerCreate(appRepo, latestUpdater))
 
-	appRoutes.GET("/:domain/:name/versions/:version/deployments/", getOperationOptions("ListActiveDeployments", appRepo,
+	appRoutes.GET("/:domain/:name/versions/:version/deployments", getOperationOptions("ListActiveDeploymentsVersion", appRepo,
 		fizz.Summary("List active deployments for this application version"),
 		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
 			"Only a single deployment can be active at a time on a given environment."),
@@ -191,18 +201,20 @@ func registerRoutes(group *fizz.RouterGroup,
 }
 
 // Init initialize the API v1 module
-func Init(db *gorm.DB, group *fizz.RouterGroup) {
-	graphRepo := graph.NewRepository(db)
-	domRepo := domain.NewRepository(db)
-	appRepo := application.NewRepository(db)
-	contRepo := content.NewRepository(db)
-	envRepo := environment.NewRepository(db)
-	depRepo := deployment.NewRepository(db)
-	badgeRepo := badge.NewRepository(db)
+func Init(tm db.TransactionManager, group *fizz.RouterGroup, log *logrus.Logger) {
+	graphRepo := graph.NewRepository(tm.DB())
+	domRepo := domain.NewRepository(tm.DB())
+	appRepo := application.NewRepository(tm.DB())
+	appLatestRepo := application.NewRepositoryLatest(tm.DB())
+	contRepo := content.NewRepository(tm.DB())
+	envRepo := environment.NewRepository(tm.DB())
+	depRepo := deployment.NewRepository(tm.DB())
+	badgeRepo := badge.NewRepository(tm.DB())
 	deployer := deployment.ApplicationDeployer(depRepo)
 	depend := deployment.Dependency(depRepo)
+	latestUpdater := application.NewLatestUpdater(tm, application.NewRepository, application.NewRepositoryLatest, appLatestRepo, log)
 
-	registerRoutes(group, graphRepo, domRepo, appRepo, contRepo, envRepo, depRepo, badgeRepo, deployer, depend)
+	registerRoutes(group, graphRepo, domRepo, appRepo, appLatestRepo, contRepo, envRepo, depRepo, badgeRepo, deployer, depend, latestUpdater)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository

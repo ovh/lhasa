@@ -14,7 +14,7 @@ func TestApplicationListEmpty(t *testing.T) {
 	defer server.Close()
 
 	countReply := []map[string]interface{}{{"count(*)": 0}}
-	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "applications"  WHERE "applications"."deleted_at" IS NULL`).WithReply(countReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "releases"  WHERE "releases"."deleted_at" IS NULL`).WithReply(countReply)
 
 	e := httpexpect.New(t, server.URL)
 	jsonObj := e.GET("/api/v1/applications/").
@@ -42,8 +42,12 @@ func TestApplicationList(t *testing.T) {
 	countReply := []map[string]interface{}{{"count(*)": 2}}
 	listReply := []map[string]interface{}{{"name": "myapp1", "domain": "mydomain"}, {"name": "myapp2", "domain": "mydomain"}}
 
-	mocket.Catcher.NewMock().WithQuery(`SELECT * FROM "applications"  WHERE`).WithReply(listReply)
-	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "applications"  WHERE "applications"."deleted_at" IS NULL`).WithReply(countReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT "av".* FROM "releases" as "av"
+JOIN "applications" ON "applications"."latest_release_id" = "av"."id"
+WHERE`).WithReply(listReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT count(1) as nbApp FROM "releases" as "av"
+JOIN "applications" ON "applications"."latest_release_id" = "av"."id"
+WHERE "av"."deleted_at" IS NULL`).WithReply(countReply)
 
 	e := httpexpect.New(t, server.URL)
 	jsonObj := e.GET("/api/v1/applications/").
@@ -71,7 +75,7 @@ func TestApplicationAdd(t *testing.T) {
 	defer server.Close()
 
 	countReply := []map[string]interface{}{{"count(*)": 0}}
-	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "applications"`).WithReply(countReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "releases"`).WithReply(countReply)
 
 	e := httpexpect.New(t, server.URL)
 	app := map[string]interface{}{
@@ -93,10 +97,10 @@ func TestApplicationUpdate(t *testing.T) {
 	defer server.Close()
 
 	countReply := []map[string]interface{}{{"count(*)": 1}}
-	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "applications"`).WithReply(countReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT count(*) FROM "releases"`).WithReply(countReply)
 
 	listReply := []map[string]interface{}{{"id": 12}}
-	mocket.Catcher.NewMock().WithQuery(`SELECT * FROM "applications"  WHERE`).WithReply(listReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT * FROM "releases"  WHERE`).WithReply(listReply)
 
 	e := httpexpect.New(t, server.URL)
 	app := map[string]interface{}{
@@ -118,7 +122,7 @@ func TestApplicationDelete(t *testing.T) {
 	defer server.Close()
 
 	listReply := []map[string]interface{}{{"id": 12}}
-	mocket.Catcher.NewMock().WithQuery(`SELECT * FROM "applications"  WHERE`).WithReply(listReply)
+	mocket.Catcher.NewMock().WithQuery(`SELECT * FROM "releases"  WHERE`).WithReply(listReply)
 
 	e := httpexpect.New(t, server.URL)
 

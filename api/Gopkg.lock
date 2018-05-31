@@ -14,6 +14,12 @@
   version = "v1.5"
 
 [[projects]]
+  name = "github.com/alecthomas/gometalinter"
+  packages = ["_linters/src/honnef.co/go/tools/version"]
+  revision = "46cc1ea3778b247666c2949669a3333c532fa9c6"
+  version = "v2.0.5"
+
+[[projects]]
   branch = "master"
   name = "github.com/alecthomas/template"
   packages = [
@@ -27,6 +33,12 @@
   name = "github.com/alecthomas/units"
   packages = ["."]
   revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+
+[[projects]]
+  name = "github.com/coreos/go-semver"
+  packages = ["semver"]
+  revision = "8ab6407b697782a06568d4b7f1db25550ec2e4c6"
+  version = "v0.2.0"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -462,6 +474,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "392c45cbe5bcee5273aee31cb670633647dc3b9a5f3ea9639b2b0e5b724f87a7"
+  inputs-digest = "5f7223d9d6e2301c70048dd885365b37ea387888e7ecf8f3532709ec75f93c44"
   solver-name = "gps-cdcl"
   solver-version = 1

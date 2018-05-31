@@ -85,7 +85,7 @@ func (repo *Repository) internalMap(entity interface{}, mappers map[string]graph
 		}
 		return "deployemnt", &graphEntity
 	}
-	application, isApplication := entity.(*v1.ApplicationVersion)
+	application, isApplication := entity.(*v1.Release)
 	if isApplication {
 		if application == nil {
 			graphEntity := v1.ApplicationVersionGraph{}

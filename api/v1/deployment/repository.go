@@ -14,7 +14,7 @@ const (
 
 	queryUndeployByApplicationNameEnvSlug = "UPDATE \"deployments\" AS \"d\" " +
 		"SET \"undeployed_at\" = now(), \"updated_at\" = now() " +
-		"FROM \"applications\" as \"a\" " +
+		"FROM \"releases\" as \"a\" " +
 		"WHERE \"d\".\"deleted_at\" IS NULL " +
 		"AND \"a\".\"id\" = \"d\".\"application_id\" " +
 		"AND \"a\".\"domain\" = ? " +
@@ -60,7 +60,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 
 	// Apply request
 	db := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).
-		Order(page.Pageable.GetSortClause()).
+		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset())
 	db = hateoas.JSONBFilter(db, jsonbCriterias)

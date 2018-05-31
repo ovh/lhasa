@@ -192,7 +192,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	var badges []*v1.Badge
 
 	if err := repo.db.Where(criterias).
-		Order(page.Pageable.GetSortClause()).
+		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
 		Find(&badges).Error; err != nil {

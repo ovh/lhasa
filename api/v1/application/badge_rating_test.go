@@ -21,7 +21,7 @@ func mockSelectBadges(jsonOutput []map[string]interface{}) *mocket.FakeResponse 
 }
 
 func mockSelectApplications(jsonOutput []map[string]interface{}) *mocket.FakeResponse {
-	return mockSQLQuery(`SELECT * FROM "applications"  WHERE "applications"."deleted_at" IS NULL`, jsonOutput)
+	return mockSQLQuery(`SELECT * FROM "releases"  WHERE`, jsonOutput)
 }
 
 func TestBadgeRatingList(t *testing.T) {
@@ -163,7 +163,7 @@ func TestBadgeRatingSetSuccess(t *testing.T) {
 		},
 	)
 
-	m := mocket.Catcher.NewMock().WithQuery(`UPDATE "applications" SET "domain" = ?, "name" = ?, "version" = ?, "manifest" = ?, "tags" = ?, "created_at" = ?, "updated_at" = ?, "deleted_at" = ?, "badge_ratings" = ?  WHERE "applications"."id" = ?`)
+	m := mocket.Catcher.NewMock().WithQuery(`UPDATE "releases" SET "domain" = ?, "name" = ?, "version" = ?, "manifest" = ?, "tags" = ?, "created_at" = ?, "updated_at" = ?, "deleted_at" = ?, "badge_ratings" = ?  WHERE "releases"."id" = ?`)
 
 	bdgRating := `
 	{
@@ -178,7 +178,7 @@ func TestBadgeRatingSetSuccess(t *testing.T) {
 		Status(http.StatusCreated)
 
 	if m.Triggered == false {
-		t.Fatal("expected the database to trigger an `UPDATE applications` statement but it has not been triggered")
+		t.Fatal("expected the database to trigger an `UPDATE releases` statement but it has not been triggered")
 	}
 }
 
@@ -295,7 +295,7 @@ func TestBadgeRatingSetAppNotFound(t *testing.T) {
 		Status(http.StatusNotFound).
 		JSON().
 		Object().
-		ValueEqual("error", "entity v1.ApplicationVersion[domain=mydomain name=myapp version=1.0.0] does not exist: entity v1.ApplicationVersion[domain=mydomain name=myapp version=1.0.0] does not exist")
+		ValueEqual("error", "entity v1.Release[domain=mydomain name=myapp version=1.0.0] does not exist: entity v1.Release[domain=mydomain name=myapp version=1.0.0] does not exist")
 }
 
 func TestBadgeRatingRequestMalformedJSON(t *testing.T) {
@@ -348,13 +348,13 @@ func TestBadgeRatingDeleteSuccess(t *testing.T) {
 		},
 	)
 
-	m := mocket.Catcher.NewMock().WithQuery(`INSERT INTO "applications" ("manifest","tags","created_at","updated_at","deleted_at","badge_ratings")`)
+	m := mocket.Catcher.NewMock().WithQuery(`INSERT INTO "releases" ("manifest","tags","created_at","updated_at","deleted_at","badge_ratings")`)
 
 	e := httpexpect.New(t, server.URL)
 	e.DELETE("/api/v1/applications/mydomain/myapp/versions/1.0.0/badgeratings/mybadge2").
 		Expect().
 		Status(http.StatusOK)
 	if m.Triggered == false {
-		t.Fatal("expected the database to trigger an `INSERT INTO applications` statement but it has not been triggered")
+		t.Fatal("expected the database to trigger an `INSERT INTO releases` statement but it has not been triggered")
 	}
 }

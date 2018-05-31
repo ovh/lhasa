@@ -54,9 +54,12 @@ var (
 )
 
 func main() {
-	command := kingpin.MustParse(application.Parse(os.Args[1:]))
-
 	log := logger.NewLogger(*flagVerbose, *flagDebug, *flagQuiet, *flagJSONOutput)
+
+	command, err := application.Parse(os.Args[1:])
+	if err != nil {
+		log.WithError(err).Fatal("cannot start appcatalog")
+	}
 
 	switch command {
 	case cmdCodeVersion:
@@ -75,11 +78,11 @@ func main() {
 		return
 	case cmdCodeStart:
 		parseConf(log)
-		db := waitForDB(log)
+		tm := db.NewTransactionManager(waitForDB(log), log)
 		if *flagAutoMigrations {
-			runMigrationsUp(db.DB(), log)
+			runMigrationsUp(tm.DB().DB(), log)
 		}
-		router := routers.NewRouter(db, version, *flagHateoasBasePath, *flagUIBasePath, *flagDebug, log)
+		router := routers.NewRouter(tm, version, *flagHateoasBasePath, *flagUIBasePath, *flagDebug, log)
 		srv := &http.Server{
 			Addr:    fmt.Sprintf(":%d", *flagStartPort),
 			Handler: router,

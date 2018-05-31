@@ -116,9 +116,9 @@ testcases:
       assertions:
       - result.statuscode ShouldEqual 200
       - result.bodyjson.bodyjson0.badgeslug ShouldEqual readme
-      - result.bodyjson.bodyjson0.title ShouldEqual README.md
-      - result.bodyjson.bodyjson0.color ShouldEqual green
+      - result.bodyjson.bodyjson0.badgetitle ShouldEqual README.md
+      - result.bodyjson.bodyjson0.level.color ShouldEqual green
       - result.bodyjson.bodyjson0.comment ShouldEqual "340 lines"
-      - result.bodyjson.bodyjson0.label ShouldEqual ✔
+      - result.bodyjson.bodyjson0.level.label ShouldEqual ✔
       - result.bodyjson.bodyjson0.value ShouldEqual exists
-      - result.bodyjson.bodyjson0.description ShouldEqual desc5
+      - result.bodyjson.bodyjson0.level.description ShouldEqual desc5

@@ -30,12 +30,12 @@ type badgeRatingsRequest struct {
 }
 
 // HandlerCreate replace or create a resource
-func HandlerCreate(repository *Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, application *v1.ApplicationVersion) error {
+func HandlerCreate(repository *Repository, updater LatestUpdater) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, application *v1.Release) error {
 		oldres, err := repository.FindOneByUnscoped(map[string]interface{}{"domain": application.Domain, "name": application.Name, "version": application.Version})
-		oldapp := oldres.(*v1.ApplicationVersion)
+		oldapp := oldres.(*v1.Release)
 		if hateoas.IsEntityDoesNotExistError(err) {
-			if err := repository.Save(application); err != nil {
+			if err := updater(application); err != nil {
 				return err
 			}
 			return hateoas.ErrorCreated
@@ -46,7 +46,8 @@ func HandlerCreate(repository *Repository) gin.HandlerFunc {
 
 		application.ID = oldapp.ID
 		application.CreatedAt = oldapp.CreatedAt
-		if err := repository.Save(application); err != nil {
+
+		if err := updater(application); err != nil {
 			return err
 		}
 		if oldapp.DeletedAt != nil {
@@ -57,7 +58,7 @@ func HandlerCreate(repository *Repository) gin.HandlerFunc {
 	}, http.StatusOK)
 }
 
-func retrieveBadgeRatings(appv *v1.ApplicationVersion) ([]badgeRating, error) {
+func retrieveBadgeRatings(appv *v1.Release) ([]badgeRating, error) {
 	badgeRatings := make([]badgeRating, 0)
 	if appv.BadgeRatings != nil {
 		if len(appv.BadgeRatings.RawMessage) > 0 {
@@ -213,4 +214,16 @@ func HandlerDeleteBadgeRatingForAppVersion(repository *Repository) gin.HandlerFu
 
 		return repository.Save(appv)
 	}, http.StatusOK)
+}
+
+// HandlerRedirectLatest perform a 303 redirection to
+func HandlerRedirectLatest(appLatestRepo *RepositoryLatest) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, _ *v1.Application) error {
+		app, err := hateoas.FindByPath(c, appLatestRepo)
+		if err != nil {
+			return err
+		}
+		c.Header("location", app.(*v1.Release).GetSelfURL(hateoas.BaseURL(c)))
+		return nil
+	}, http.StatusSeeOther)
 }

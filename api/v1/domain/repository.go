@@ -50,12 +50,12 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DomainBasePath)
 	var domainNames []string
 
-	if err := repo.db.Model(&v1.ApplicationVersion{}).
+	if err := repo.db.Model(&v1.Release{}).
 		Where(criterias).
-		Order(page.Pageable.GetSortClause()).
+		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
-		Pluck("DISTINCT \"applications\".\"domain\" as \"name\"", &domainNames).Error; err != nil {
+		Pluck("DISTINCT \"releases\".\"domain\" as \"name\"", &domainNames).Error; err != nil {
 		return page, err
 	}
 
@@ -66,7 +66,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page.Content = domains
 
 	count := 0
-	rows, err := repo.db.Raw("select count(distinct \"applications\".\"domain\") \"totalElements\" from \"applications\" where \"applications\".\"deleted_at\" is null").Rows()
+	rows, err := repo.db.Raw("select count(distinct \"releases\".\"domain\") \"totalElements\" from \"releases\" where \"releases\".\"deleted_at\" is null").Rows()
 	if err != nil {
 		return page, err
 	}
@@ -105,7 +105,7 @@ func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, e
 
 // FindOneBy find by criterias
 func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
-	var app v1.ApplicationVersion
+	var app v1.Release
 	err := repo.db.First(&app, criterias).Error
 	if gorm.IsRecordNotFoundError(err) {
 		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)

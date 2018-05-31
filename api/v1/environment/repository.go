@@ -127,7 +127,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	var environments []*v1.Environment
 
 	if err := repo.db.Where(criterias).
-		Order(page.Pageable.GetSortClause()).
+		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
 		Find(&environments).Error; err != nil {

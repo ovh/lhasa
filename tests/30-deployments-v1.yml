@@ -88,6 +88,13 @@ testcases:
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
+      url: "{{.appsroute}}/urba/appcatalog/deployments"
+      headers:
+      assertions:
+      - result.bodyjson.bodyjson0 ShouldNotBeEmpty
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
       url: "{{.appsroute}}/urba/appcatalog/versions/1/deployments/depenv"
       headers:
       assertions:

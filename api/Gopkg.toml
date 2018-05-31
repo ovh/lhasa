@@ -57,6 +57,10 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
   name = "github.com/gavv/httpexpect"
   branch = "v1"
 
+[[constraint]]
+  name = "github.com/coreos/go-semver"
+  version = "~0.2.0"
+
 [[override]]
   name = "github.com/valyala/fasthttp"
   branch = "master"

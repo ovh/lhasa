@@ -48,7 +48,7 @@ integration-test: $(COMPOSE_BIN) $(VENOM_BIN) $(API_BIN)
 	{ ./${API_BIN} ${DEBUG} --auto-migrate & }; \
 	pid=$$!; \
 	sleep 5; \
-	REPO_SLASH_TEST=xxx APP_HOST=http://localhost:8081 $(VENOM_BIN) run --strict --output-dir=$(TARGET_DIR) tests/; \
+	APP_HOST=http://localhost:8081 $(VENOM_BIN) run --strict --output-dir=$(TARGET_DIR) tests/; \
 	r=$$?; \
 	kill $$pid; \
 	./${API_BIN} ${DEBUG} migrate down; \
@@ -56,6 +56,6 @@ integration-test: $(COMPOSE_BIN) $(VENOM_BIN) $(API_BIN)
 	exit $$r
 
 sample-test: $(VENOM_BIN) $(API_BIN)
-	REPO_SLASH_TEST=xxx APP_HOST=http://localhost:8081 $(VENOM_BIN) run --log debug --format xml --output-dir=$(TARGET_DIR) tests/10-samples-v1.yml && cat $(TARGET_DIR)/test_results.xml
+	APP_HOST=http://localhost:8081 $(VENOM_BIN) run --log debug --format xml --output-dir=$(TARGET_DIR) tests/10-samples-v1.yml && cat $(TARGET_DIR)/test_results.xml
 
 .PHONY: all test run clean integration-test api webui
