@@ -1,0 +1,93 @@
+
+    <h2 class="oui-header_2">{{ application.domain }}/{{ application.name }} [{{ application.version }}]</h2>
+
+
+  <h2>{{ 'DESCRIPTION' | translate }}</h2>
+  <div class="ui-g-12" *ngIf="application.manifest">
+    <textarea class="oui-textarea oui-textarea_active" style="height: 356px; padding: 0rem 0rem;" [(ngModel)]="application.manifest.description"></textarea>
+  </div>
+  <div class="ui-g-12" *ngIf="application.manifest.support">
+    <h2>{{ 'SUPPORT' | translate }}</h2>
+    <div class="oui-field">
+      <label for="text-1" class="oui-field__label oui-label">{{ 'TEAM-NAME' | translate }}</label>
+      <div class="oui-field__control">
+        <input type="text" class="oui-input" placeholder="{{ 'TEAM-NAME' | translate }}" [(ngModel)]="application.manifest.support.name" require>
+      </div>
+    </div>
+    <div class="oui-field">
+      <label for="text-1" class="oui-field__label oui-label">{{ 'TEAM-EMAIL' | translate }}</label>
+      <div class="oui-field__control">
+        <input type="text" class="oui-input" placeholder="{{ 'TEAM-EMAIL' | translate }}" [(ngModel)]="application.manifest.support.email" require>
+      </div>
+    </div>
+    <div class="oui-field">
+      <label for="text-1" class="oui-field__label oui-label">{{ 'TEAM-CISCO' | translate }}</label>
+      <div class="oui-field__control oui-field__control_xl">
+        <input type="text" class="oui-input" placeholder="{{ 'TEAM-CISCO' | translate }}" [(ngModel)]="application.manifest.support.cisco" require>
+      </div>
+    </div>
+  </div>
+  <div class="ui-g-12" *ngIf="application.manifest">
+    <h2>{{ 'CONTRIBUTORS' | translate }}</h2>
+    <p-table [value]="application.manifest.authors" class="oui-datagrid">
+      <ng-template pTemplate="header">
+        <tr class="oui-datagrid__headers">
+          <th class="oui-datagrid__header oui-datagrid__header_sortable">{{ 'NAME' | translate }}</th>
+          <th class="oui-datagrid__header oui-datagrid__header_sortable">{{ 'ROLE' | translate }}</th>
+          <th class="oui-datagrid__header oui-datagrid__header_sortable">{{ 'EMAIL' | translate }}</th>
+          <th class="oui-datagrid__header oui-datagrid__header"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-author>
+        <tr class="oui-datagrid__row">
+          <td class="oui-datagrid__cell" pEditableColumn>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <input type="text" placeholder="Name" [(ngModel)]="author.name">
+              </ng-template>
+              <ng-template pTemplate="output">
+                {{author.name}}
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td class="oui-datagrid__cell" pEditableColumn>
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <label class="oui-select">                        
+                    <select id="select" name="select" class="oui-select__input" [(ngModel)]="author.role">
+                        <option value="MAINTAINER">MAINTAINER</option>
+                        <option value="CONTRIBUTOR">CONTRIBUTOR</option>
+                    </select>
+                    <i class="oui-icon oui-icon-chevron-down" aria-hidden="true"></i>
+                  </label>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{author.role}}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+          <td class="oui-datagrid__cell" pEditableColumn>
+            <p-cellEditor>
+              <ng-template pTemplate="input">
+                <input type="text" placeholder="email@example.com" [(ngModel)]="author.email">
+              </ng-template>
+              <ng-template pTemplate="output">
+                {{author.email}}
+              </ng-template>
+            </p-cellEditor>
+          </td>
+          <td class="oui-datagrid__cell" pEditableColumn>
+            <button class="oui-button oui-button_secondary oui-button_icon-only oui-button_small-width" (click)="drop(author)">
+              <i class="oui-icon oui-icon-close" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <button class="oui-button oui-button_secondary oui-button_icon-only oui-button_small-width" (click)="add()">
+      <i class="oui-icon oui-icon-add" aria-hidden="true"></i>
+    </button>
+
+      
+  </div>
+  <button class="oui-button oui-button_primary" (click)="save()">{{ 'SAVE' | translate }}</button>

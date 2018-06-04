@@ -7,7 +7,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ApplicationsComponent } from './components/applications/applications.component';
 import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { ProfileGuard } from './guards/profile.guard';
-import { EnrollmentComponent } from './components/enrollment/enrollment.component';
+import { AppEditComponent } from './components/appedit/appedit.component';
 import { RoutingGuard } from './guards/routing.guard';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
 import { DomainsBrowseComponent } from './components/domains-browse/domains-browse.component';
@@ -42,15 +42,23 @@ const routes: Routes = [
     resolve: {
       application: ApplicationResolver
     },
-    component: EnrollmentComponent,
+    component: AppEditComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {
-    path: 'applications/:domain/:name',
+    path: 'applications/:domain/:name/versions/:version',
     resolve: {
       application: ApplicationResolver
     },
     component: AppdetailComponent,
+    canActivate: [ProfileGuard, RoutingGuard]
+  },
+  {
+    path: 'applications/:domain/:name/versions/:version/edit',
+    resolve: {
+      application: ApplicationResolver
+    },
+    component: AppEditComponent,
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {

@@ -50,7 +50,7 @@ unused:
 test-coverage:
 	@for pkg in ${PKG_LIST}; do go test --coverprofile $(TARGET_DIR)/$${pkg//\//-}.single.cov $${pkg}; done;
 	@for pkg in ${PKG_LIST}; do go test --coverprofile $(TARGET_DIR)/$${pkg//\//-}.global.cov --coverpkg=${PKG_LIST_COMMA} $${pkg}; done;
-	@$(GO_COV_MERGE) *.global.cov > $(TARGET_DIR)/global.cov
+	@$(GO_COV_MERGE) $(TARGET_DIR)/*.global.cov > $(TARGET_DIR)/global.cov
 	@go tool cover -html=$(TARGET_DIR)/global.cov -o=$(TARGET_DIR)/cover.html
 	@go tool cover -func=$(TARGET_DIR)/global.cov
 

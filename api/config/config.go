@@ -40,16 +40,14 @@ func readFile(configFile string) (string, error) {
 	return string(b), nil
 }
 
-// extractFile extract configuration file
-func extractFile(configFile *os.File) (map[string]interface{}, error) {
+// LoadFromFile extract configuration file
+func LoadFromFile(configFile *os.File) error {
 	// Init config file
 	connConfigStr, err := readFile(configFile.Name())
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot read configuration file %s", configFile)
+		return err
 	}
-	// Extract key
-	json.Unmarshal([]byte(connConfigStr), &config)
-	return config, nil
+	return json.Unmarshal([]byte(connConfigStr), &config)
 }
 
 // ExtractValue return value from key
@@ -68,11 +66,8 @@ func extractKey(key string) (string, error) {
 	return string(payload), nil
 }
 
-// NewFromFile provides the database handle to its callers
-func NewFromFile(configFile *os.File, dbAlias string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
-	// Init config file
-	extractFile(configFile)
-	// Init config file
+// NewDBHandle provides the database handle to its callers
+func NewDBHandle(configFile *os.File, dbAlias string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
 	connConfigStr, err := extractKey(dbAlias)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot read alias %s from configuration file", configFile)

@@ -4,22 +4,10 @@
 <div class="ui-g-12" *ngFor="let domain of domains | orderByDomains">
   <h1 class="oui-header_1 oui-header_underline header">{{ domain.name | uppercase }}</h1>
   <div class="ui-g-4 ui-md-4 pad-tile" *ngFor="let app of domain.applications | orderByApps">
-    <p-card title="{{ app.name }}" subtitle="{{ app.domain }}">
+    <p-card title="{{ app.name }}" subtitle="{{ app.domain }}" routerLink="/applications/{{ app.domain }}/{{ app.name }}/versions/{{ app.version }}">
       <p class="application-description">
       {{ app.description }}
       </p>
-      <p-footer class="ui-g">
-        <p class="ui-g-8">
-          <button class="oui-button" routerLink="/applications/{{ app.domain }}/{{ app.name }}">
-            More info ...
-          </button>
-        </p>
-        <p class="ui-g-4">
-          <button class="oui-button oui-button_primary" routerLink="/register/{{ app.domain }}/{{ app.name }}">
-            Registration ...
-          </button>
-        </p>
-      </p-footer>
     </p-card>
   </div>
 </div>

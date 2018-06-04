@@ -1,6 +1,6 @@
 export class EntityBean {
-    id: string;
-    timestamp: Date;
+    id?: string;
+    timestamp?: Date;
 }
 
 export class HrefLinks {

@@ -64,14 +64,17 @@ func main() {
 		return
 	case cmdCodeMigrate:
 	case fmt.Sprintf("%s %s", cmdCodeMigrate, cmdCodeMigrateUp):
+		parseConf(log)
 		db := waitForDB(log)
 		runMigrationsUp(db.DB(), log)
 		return
 	case fmt.Sprintf("%s %s", cmdCodeMigrate, cmdCodeMigrateDown):
+		parseConf(log)
 		db := waitForDB(log)
 		runMigrationsDown(db.DB(), log)
 		return
 	case cmdCodeStart:
+		parseConf(log)
 		db := waitForDB(log)
 		if *flagAutoMigrations {
 			runMigrationsUp(db.DB(), log)
@@ -85,12 +88,18 @@ func main() {
 	}
 }
 
+func parseConf(log *logrus.Logger) {
+	if err := config.LoadFromFile(*flagConfigFile); err != nil {
+		log.WithError(err).Fatalf("cannot read configuration file")
+	}
+}
+
 func waitForDB(log *logrus.Logger) *gorm.DB {
-	dbHandle, err := config.NewFromFile(*flagConfigFile, *flagDBAlias, *flagDebug, log)
+	dbHandle, err := config.NewDBHandle(*flagConfigFile, *flagDBAlias, *flagDebug, log)
 	for err != nil {
 		log.WithError(err).Errorf("cannot get DB handle, retrying in %d seconds", dbRetryDuration)
 		time.Sleep(dbRetryDuration * time.Second)
-		dbHandle, err = config.NewFromFile(*flagConfigFile, *flagDBAlias, *flagDebug, log)
+		dbHandle, err = config.NewDBHandle(*flagConfigFile, *flagDBAlias, *flagDebug, log)
 	}
 	return dbHandle
 }

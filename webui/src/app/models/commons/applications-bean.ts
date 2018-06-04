@@ -5,14 +5,14 @@ import { Timestamp } from 'rxjs/operators/timestamp';
 export class ApplicationBean extends EntityBean {
   domain: string;
   name: string;
-  type: string;
-  language: string;
-  project: string;
-  repo: string;
-  description: string;
+  type?: string;
+  language?: string;
+  project?: string;
+  repo?: string;
+  description?: string;
   manifest: ManifestBean;
-  tags: string[];
-  deployments: DeploymentBean[];
+  tags?: string[];
+  deployments?: DeploymentBean[];
   version: string;
 }
 
@@ -82,8 +82,4 @@ export class DomainPagesBean {
     size: 0,
     number: 0
   };
-}
-
-// Bitbucket
-export class BitbucketBean extends EntityBean {
 }

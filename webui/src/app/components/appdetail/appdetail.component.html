@@ -1,10 +1,10 @@
 <div *ngIf="application" class="ui-g">
-  <div class="oui-back-button">
-    <button type="button" class="oui-button oui-button_icon-alone" routerLink="/applications">
-      <i class="oui-icon oui-icon-chevron-left" aria-hidden="true"></i>
-    </button>
-  </div>
-  <h2 class="oui-back-button_title oui-header_2">{{ application.domain }}/{{ application.name }}</h2>
+  <h2 class="oui-header_2">{{ application.domain }}/{{ application.name }} [{{ application.version }}]</h2>
+  
+  <button type="button" class="oui-button oui-button_secondary oui-button_icon-only oui-button_small-width" routerLink="/applications/{{ application.domain }}/{{ application.name }}/versions/{{ application.version }}/edit">
+    <i class="oui-icon oui-icon-pen_line" aria-hidden="true"></i>
+  </button>
+  
   <div class="oui-box ui-g-12">
     <div class="ui-g-7">
       <p *ngIf="application.tags">

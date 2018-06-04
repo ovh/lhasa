@@ -23,19 +23,18 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<any> | Promise<any> | any {
-        this.selectApplication(route.params.domain, route.params.name, new BehaviorSubject<any>('select one applications'));
+        this.selectApplication(route.params.domain, route.params.name, route.params.version, new BehaviorSubject<any>('select an application'));
     }
 
     /**
-     * dispatch load applications
+     * dispatch  SelectApplicationAction
      * @param event
      */
-    protected selectApplication(domain: string, name: string, subject: Subject<any>) {
+    protected selectApplication(domain: string, name: string, version: string, subject: Subject<any>) {
         this.loadersStoreService.notify(subject);
-        // load all applications from a content return
-        this.applicationsService.GetAllFromContent(`/${domain}/${name}/versions`, { 'size': '1' })
+        this.applicationsService.GetSingle(`${domain}/${name}/versions/${version}`)
             .subscribe(
-                (data: ContentListResponse<ApplicationBean>) => {
+                (data: ApplicationBean) => {
                     this.deploymentService.GetAllFromContent(
                         '/?q=%7B%22properties._app_domain%22%3A%20%22' + domain +
                         '%22%2C%20%22properties._app_name%22%3A%20%22' + name + '%22%7D',
@@ -43,9 +42,9 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
                             (deployments: ContentListResponse<DeploymentBean>) => {
                                 this.applicationsStoreService.dispatch(
                                     new SelectApplicationAction(
-                                        data.content[0],
-                                        deployments.content
-                                        , subject)
+                                        data,
+                                        deployments.content, 
+                                        subject)
                                 );
                             }
                         );

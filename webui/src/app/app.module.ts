@@ -11,7 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
 import { ApplicationsComponent } from './components/applications/applications.component';
-import { EnrollmentComponent } from './components/enrollment/enrollment.component';
+import { AppEditComponent } from './components/appedit/appedit.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -133,7 +133,7 @@ export function createTranslateLoader(http: HttpClient) {
     GraphBrowseComponent,
     DomainsBrowseComponent,
     GraphComponent,
-    EnrollmentComponent,
+    AppEditComponent,
     DashboardComponent,
     AppdetailComponent,
     /**
