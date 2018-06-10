@@ -1,0 +1,9 @@
+
+dl{
+  margin: 0.5em;
+}
+dl dt {
+  float:left; 
+  font-weight:bold; 
+  width:7em;
+}

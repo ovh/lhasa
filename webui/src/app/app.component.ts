@@ -60,6 +60,11 @@ export class AppComponent implements OnInit {
         routerLink: '/applications'
       },
       {
+        id: 'badges',
+        label: 'BADGES',
+        routerLink: '/badges'
+      },
+      {
         id: 'maps',
         label: 'MAPS',
         routerLink: '/graph/deployments'
@@ -90,6 +95,17 @@ export class AppComponent implements OnInit {
             id: 'applications-all',
             label: 'APPLICATIONS-ALL',
             routerLink: '/applications'
+          }
+        ]
+      },
+      {
+        id: 'badges',
+        label: 'BADGES',
+        items: [
+          {
+            id: 'badges-all',
+            label: 'BADGES-ALL',
+            routerLink: '/badges'
           }
         ]
       },

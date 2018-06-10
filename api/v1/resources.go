@@ -157,3 +157,31 @@ func (env *Environment) ToResource(baseURL string) {
 func (env *Environment) GetSelfURL(baseURL string) string {
 	return fmt.Sprintf("%s%s/%s", baseURL, EnvironmentBasePath, env.Slug)
 }
+
+// BADGES
+
+// GetID returns the public ID of the entity
+func (badge *Badge) GetID() string {
+	return badge.Slug
+}
+
+// SetID sets up the new ID of the entity
+func (badge *Badge) SetID(id string) error {
+	badge.Slug = id
+	return nil
+}
+
+// GetDeletedAt implements SoftDeletableEntity
+func (badge *Badge) GetDeletedAt() *time.Time {
+	return badge.DeletedAt
+}
+
+// ToResource implements Resourceable
+func (badge *Badge) ToResource(baseURL string) {
+	badge.Resource.Links = []hateoas.ResourceLink{{Rel: "self", Href: badge.GetSelfURL(baseURL)}}
+}
+
+// GetSelfURL implements Resourceable
+func (badge *Badge) GetSelfURL(baseURL string) string {
+	return fmt.Sprintf("%s%s/%s", baseURL, BadgeBasePath, badge.Slug)
+}

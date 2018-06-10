@@ -4,12 +4,17 @@
   <button type="button" class="oui-button oui-button_secondary oui-button_icon-only oui-button_small-width" routerLink="/applications/{{ application.domain }}/{{ application.name }}/versions/{{ application.version }}/edit">
     <i class="oui-icon oui-icon-pen_line" aria-hidden="true"></i>
   </button>
-  
+
   <div class="oui-box ui-g-12">
     <div class="ui-g-7">
       <p *ngIf="application.tags">
         <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
       </p>
+      <div>
+          <span *ngFor="let badgeRating of _badgeRatingShields">
+            <app-badge-shieldsio [badge]="badgeRating"></app-badge-shieldsio>
+          </span>
+      </div>
       <div *ngIf="application.manifest && application.manifest.description">
         <h3 class="oui-header_3">Description</h3>
         <p>
@@ -48,7 +53,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr class="oui-datagrid__row" *ngFor="let deployment of deployments | activeDeployment">
+      <tr class="oui-datagrid__row" *ngFor="let deployment of application.deployments | activeDeployment">
         <td class="oui-datagrid__cell">
           <app-env-chip slug="{{ deployment.properties._env_slug }}"></app-env-chip>
         </td>

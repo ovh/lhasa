@@ -26,6 +26,9 @@ const DomainBasePath = "/domains"
 // ContentBasePath is the URL base path for this resource
 const ContentBasePath = "/content"
 
+// BadgeBasePath is the URL base path for this resource
+const BadgeBasePath = "/badges"
+
 // MediaResource defines a media resource behaviour
 type MediaResource interface {
 	GetContentType() string
@@ -91,6 +94,7 @@ type ApplicationVersion struct {
 	CreatedAt    time.Time       `json:"_createdAt" binding:"-"`
 	UpdatedAt    time.Time       `json:"_updatedAt" binding:"-"`
 	DeletedAt    *time.Time      `json:"-" binding:"-"`
+	BadgeRatings *postgres.Jsonb `json:"-" binding:"-"`
 	hateoas.Resource
 }
 
@@ -135,6 +139,28 @@ type Environment struct {
 	CreatedAt  time.Time      `json:"_createdAt" binding:"-"`
 	UpdatedAt  time.Time      `json:"_updatedAt" binding:"-"`
 	DeletedAt  *time.Time     `json:"-" binding:"-"`
+	hateoas.Resource
+}
+
+// BadgeLevel is a gamification badge level type
+type BadgeLevel struct {
+	ID          string `json:"id" validate:"not null; not empty" description:"Badge level identifier"`
+	Label       string `json:"label" validate:"not null; not empty"`
+	Description string `json:"description"`
+	Color       string `json:"color" validate:"not null"`
+	IsDefault   bool   `json:"isdefault" validate:"not null" default:"false"`
+}
+
+// Badge is a gamification badge type
+type Badge struct {
+	ID        uint           `json:"-" gorm:"auto increment" binding:"-"`
+	Slug      string         `json:"slug" gorm:"type:varchar(255);unique;not null;default:''" path:"slug" description:"Badge identifier"`
+	Title     string         `json:"title" gorm:"type:varchar(255);not null;"`
+	Type      string         `json:"type" enum:"enum"`
+	Levels    postgres.Jsonb `json:"levels,omitempty" validate:"required"`
+	CreatedAt time.Time      `json:"_createdAt" binding:"-"`
+	UpdatedAt time.Time      `json:"_updatedAt" binding:"-"`
+	DeletedAt *time.Time     `json:"-" binding:"-"`
 	hateoas.Resource
 }
 

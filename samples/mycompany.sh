@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -ex
 curl --request DELETE \
   --url $API_BASE_URL/v1/applications/
 
@@ -238,3 +239,104 @@ curl --request PUT \
 		"description": "Public web application"
 	}
 }'
+
+
+curl --request PUT \
+  --url $API_BASE_URL/v1/badges/readme \
+  --header 'content-type: application/json' \
+  --data '{
+	"title": "README.md",
+	"type": "enum",
+	"levels": 
+	[
+		{
+			"id": "unset",
+			"label": "Unknown", 
+			"color": "lightgrey",
+			"description": "No data about the availability of README.md",
+			"isdefault": true
+		},
+		 
+		{
+			"id": "notrelevant",
+			"label": "Not relevant", 
+			"color": "grey",
+			"description": "This application will not have a README.md"
+		},
+		{
+			"id": "notfound",
+			"label": "Not Found", 
+			"color": "red",
+			"description": "The README.md file was not found in the repository"
+		},
+		{
+			"id": "tooshort",
+			"label": "Too Short", 
+			"color": "orange",
+			"description": "The README.md has been found but it is too short to contain valuable information"
+		},
+		{
+			"id": "exists",
+			"label": "✔", 
+			"color": "green",
+			"description": "The README.md has been found in the git repository"
+		}
+	]}'
+
+	curl --request PUT \
+  --url $API_BASE_URL/v1/badges/license \
+  --header 'content-type: application/json' \
+  --data '{
+	"title": "License",
+	"type": "enum",
+	"levels": 
+	[
+		{
+			"id": "unset",
+			"label": "Unknown", 
+			"color": "lightgrey",
+			"description": "No data about the availability of a LICENSE file",
+			"isdefault": true
+		},
+		 
+		{
+			"id": "notrelevant",
+			"label": "Not relevant", 
+			"color": "grey",
+			"description": "This application will not have a LICENSE file"
+		},
+		{
+			"id": "notfound",
+			"label": "Not Found", 
+			"color": "red",
+			"description": "The LICENSE file was not found in the repository"
+		},
+		{
+			"id": "gpl",
+			"label": "GPL", 
+			"color": "orange",
+			"description": "A GPL License has been detected in LICENSE file"
+		},
+		{
+			"id": "bsd",
+			"label": "BSD", 
+			"color": "green",
+			"description": "A BSD License has been detected in LICENSE file"
+		}
+	]}'
+
+curl --request PUT \
+  --url $API_BASE_URL/v1/applications/billing/api/versions/1.0.0/badgeratings/readme \
+  --header 'content-type: application/json' \
+  --data '{
+		"value": "exists",
+		"comment": "340 lines"
+	}'
+
+curl --request PUT \
+  --url $API_BASE_URL/v1/applications/billing/api/versions/1.0.0/badgeratings/license \
+  --header 'content-type: application/json' \
+  --data '{
+		"level": "bsd",
+		"comment": "confidence level 85%"
+	}'

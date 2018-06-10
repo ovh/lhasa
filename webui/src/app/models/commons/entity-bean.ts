@@ -21,3 +21,13 @@ export class ContentListResponse<T extends EntityBean> {
     pageMetadata: PageMetaData;
     _links: {};
 }
+
+
+export abstract class AbstractPaginatedResource {
+    metadata: PageMetaData = {
+      totalElements: 0,
+      totalPages: 0,
+      size: 0,
+      number: 0
+    };
+  }

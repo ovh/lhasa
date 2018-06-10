@@ -1,0 +1,124 @@
+name: Deployments Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v1'
+  badgesroute: '{{.baseroute}}/badges'
+  appsroute: '{{.baseroute}}/applications'
+testcases:
+- name: Reset the Database
+  steps:
+    - type: http
+      method: DELETE
+      url: '{{.badgesroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+    - type: http
+      method: DELETE
+      url: '{{.appsroute}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+
+- name: List empty badge list
+  steps:
+    - type: http
+      method: GET
+      url: "{{.badgesroute}}"
+      assertions:
+      - result.statuscode ShouldEqual 206
+      - result.bodyjson.pagemetadata.totalelements ShouldEqual 0
+
+- name: Add a Badge and list it 
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.badgesroute}}/readme"
+      body: |
+        {
+          "title": "README.md",
+          "type": "enum",
+          "levels": 
+          [
+            {
+              "id": "unset",
+              "label": "Unknown", 
+              "color": "lightgrey",
+              "description": "desc1",
+              "isdefault": true
+            },
+            
+            {
+              "id": "notrelevant",
+              "label": "Not relevant", 
+              "color": "grey",
+              "description": "desc2"
+            },
+            {
+              "id": "notfound",
+              "label": "Not Found", 
+              "color": "red",
+              "description": "desc3"
+            },
+            {
+              "id": "tooshort",
+              "label": "Too Short", 
+              "color": "orange",
+              "description": "desc4"
+            },
+            {
+              "id": "exists",
+              "label": "✔", 
+              "color": "green",
+              "description": "desc5"
+            }
+          ]
+        }
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.badgesroute}}"
+      assertions:
+      - result.statuscode ShouldEqual 206
+      - result.bodyjson.pagemetadata.totalelements ShouldEqual 1
+
+- name: Add an application and check that its badge value is unset
+  steps:
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/mydomain/myappp/versions/1.0.0"
+      body: |
+        {
+          "domain": "mydomain",
+          "name": "myappp",
+          "version": "1.0.0",
+          "manifest": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eget enim turpis. Sed at nunc a lectus malesuada vehicula vitae tempus ante. Ut nec consequat augue. Aliquam imperdiet id tortor ut maximus. Phasellus facilisis nibh nec mauris tristique consequat. Donec nisi mauris, lobortis eu turpis vulputate, malesuada vehicula dolor. Ut mattis libero a sagittis faucibus. Fusce enim enim, consectetur at ultrices ut, mollis nec felis. In vehicula leo nec ex accumsan iaculis. Phasellus tempor dui sem, vel pulvinar enim molestie ut. Cras sit amet lacus eleifend velit consequat ultricies sed vitae."
+          }
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/mydomain/myappp/versions/1.0.0/badgeratings/readme"
+      body: |
+        {
+          "level": "exists",
+          "comment": "340 lines"
+        }
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/mydomain/myappp/versions/1.0.0/badges"
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.bodyjson0.badgeslug ShouldEqual readme
+      - result.bodyjson.bodyjson0.title ShouldEqual README.md
+      - result.bodyjson.bodyjson0.color ShouldEqual green
+      - result.bodyjson.bodyjson0.comment ShouldEqual "340 lines"
+      - result.bodyjson.bodyjson0.label ShouldEqual ✔
+      - result.bodyjson.bodyjson0.value ShouldEqual exists
+      - result.bodyjson.bodyjson0.description ShouldEqual desc5

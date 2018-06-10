@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ActivatedRoute } from '@angular/router';
-import { ApplicationBean, DeploymentBean, EnvironmentBean } from '../../models/commons/applications-bean';
+import { ApplicationBean, DeploymentBean, EnvironmentBean, BadgeRatingBean } from '../../models/commons/applications-bean';
 import { Store } from '@ngrx/store';
 import { ApplicationsStoreService } from '../../stores/applications-store.service';
 import { EnvironmentsStoreService } from '../../stores/environments-store.service';
 import { element } from 'protractor';
 import { ISubscription } from 'rxjs/Subscription';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
-
+import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
 
 @Component({
   selector: 'app-appdetail',
@@ -24,10 +24,8 @@ export class AppdetailComponent implements OnInit {
    */
   protected applicationStream: Store<ApplicationBean>;
   protected applicationSubscription: ISubscription;
-  protected deploymentStream: Store<DeploymentBean[]>;
-  protected deploymentSubscription: ISubscription;
   public application: ApplicationBean;
-  protected deployments: DeploymentBean[];
+  private _badgeRatingShields: BadgeShieldsIOBean[];
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
@@ -36,24 +34,31 @@ export class AppdetailComponent implements OnInit {
      * subscribe
      */
     this.applicationStream = this.applicationsStoreService.active();
-    this.deploymentStream = this.applicationsStoreService.deployments();
   }
 
   ngOnInit(): void {
     this.applicationSubscription = this.applicationStream.subscribe(
       (app: ApplicationBean) => {
         this.application = app;
-      },
-      error => {
-        console.error(error);
-      },
-      () => {
-      }
-    );
-
-    this.deploymentSubscription = this.deploymentStream.subscribe(
-      (app: DeploymentBean[]) => {
-        this.deployments = app;
+        if (this.application.deployments == undefined) {
+          this.application.deployments = []
+        }
+        if (this.application.badgeRatings == undefined){
+          this.application.badgeRatings = []
+        }
+        this._badgeRatingShields = []
+        app.badgeRatings.forEach((bdgRating) => {
+          this._badgeRatingShields.push(<BadgeShieldsIOBean>{
+              id: bdgRating.badgeslug,
+              value: bdgRating.value,
+              title: bdgRating.badgetitle,
+              comment: bdgRating.comment,
+              label: bdgRating.level.label,
+              color: bdgRating.level.color,
+              description: bdgRating.level.description,
+            }
+          )
+        })
       },
       error => {
         console.error(error);

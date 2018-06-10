@@ -1,7 +1,7 @@
 -- +migrate Down
 
-DROP INDEX idx_deployments_application_id;
-DROP INDEX idx_deployments_environment_id;
+DROP INDEX IF EXISTS idx_deployments_application_id;
+DROP INDEX IF EXISTS idx_deployments_environment_id;
 
 -- +migrate Up
 

@@ -1,6 +1,9 @@
 package hateoas
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // UnsupportedEntityError is raised when a repository method is called with a wrong type
 type UnsupportedEntityError struct {
@@ -36,7 +39,17 @@ func (err UnsupportedEntityError) Error() string {
 
 // Error implements error interface for EntityDoesNotExistError
 func (err EntityDoesNotExistError) Error() string {
-	return fmt.Sprintf("entity %s of type %s does not exist", err.Criteria, err.EntityName)
+	// sorting the criteria so the error messages are predictable (useful for testing)
+	sortedCriteria := make([]string, 0)
+	keys := make([]string, 0)
+	for k := range err.Criteria {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		sortedCriteria = append(sortedCriteria, fmt.Sprintf("%s=%s", k, err.Criteria[k]))
+	}
+	return fmt.Sprintf("entity %s%s does not exist", err.EntityName, sortedCriteria)
 }
 
 // Error implements error interface for UnsupportedIndexError

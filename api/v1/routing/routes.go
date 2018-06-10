@@ -7,6 +7,7 @@ import (
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/application"
+	"github.com/ovh/lhasa/api/v1/badge"
 	"github.com/ovh/lhasa/api/v1/content"
 	"github.com/ovh/lhasa/api/v1/deployment"
 	"github.com/ovh/lhasa/api/v1/domain"
@@ -15,7 +16,16 @@ import (
 )
 
 // registerRoutes registers v1 API routes on a gin engine
-func registerRoutes(group *fizz.RouterGroup, graphRepo *graph.Repository, domRepo *domain.Repository, appRepo *application.Repository, contRepo *content.Repository, envRepo *environment.Repository, depRepo *deployment.Repository, deployer deployment.Deployer, depend deployment.Depend) {
+func registerRoutes(group *fizz.RouterGroup,
+	graphRepo *graph.Repository,
+	domRepo *domain.Repository,
+	appRepo *application.Repository,
+	contRepo *content.Repository,
+	envRepo *environment.Repository,
+	depRepo *deployment.Repository,
+	badgeRepo *badge.Repository,
+	deployer deployment.Deployer,
+	depend deployment.Depend) {
 
 	group.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
@@ -109,6 +119,15 @@ func registerRoutes(group *fizz.RouterGroup, graphRepo *graph.Repository, domRep
 		fizz.Description("Note that previous versions of this application on this environments will be marked as undeployed."),
 		fizz.Header("location", "URI of the created deployment", nil),
 	), deployment.HandlerDeploy(appRepo, envRepo, deployer))
+	appRoutes.GET("/:domain/:name/versions/:version/badges", getOperationOptions("FindBadgeRatingsForAnApplicationVersion", appRepo,
+		fizz.Summary("Find badge values for an application version"),
+	), application.HandlerGetBadgeRatingsForAppVersion(appRepo))
+	appRoutes.PUT("/:domain/:name/versions/:version/badgeratings/:badgeslug", getOperationOptions("SetBadgeRatingForAnApplicationVersion", appRepo,
+		fizz.Summary("Set badge value for an application version"),
+	), application.HandlerSetBadgeRatingForAppVersion(appRepo))
+	appRoutes.DELETE("/:domain/:name/versions/:version/badgeratings/:badgeslug", getOperationOptions("DeleteBadgeRatingForAnApplicationVersion", appRepo,
+		fizz.Summary("Delete badge value for an application version"),
+	), application.HandlerDeleteBadgeRatingForAppVersion(appRepo))
 
 	envRoutes := group.Group("/environments", "environments", "Environments resource management")
 	envRoutes.GET("/", getOperationOptions("FindByPage", envRepo,
@@ -149,6 +168,26 @@ func registerRoutes(group *fizz.RouterGroup, graphRepo *graph.Repository, domRep
 	depRoutes.POST("/:public_id/add_link/:target_public_id", getOperationOptions("AddLink", depRepo,
 		fizz.Summary("Create a dependency link between two deployments"),
 	), deployment.HandlerDepend(depRepo, depend))
+
+	badgeRoutes := group.Group("/badges", "badges", "Badges resource management")
+	badgeRoutes.GET("/", getOperationOptions("FindByPage", badgeRepo,
+		fizz.Summary("Find a page of Badges"),
+	), hateoas.HandlerFindByPage(badgeRepo))
+	badgeRoutes.DELETE("/", getOperationOptions("RemoveAll", badgeRepo,
+		fizz.Summary("Delete all Badges"),
+	), hateoas.HandlerRemoveAll(badgeRepo))
+	badgeRoutes.GET("/:slug", getOperationOptions("FindOneBy", badgeRepo,
+		fizz.Summary("Find one Badge"),
+		fizz.InputModel(v1.Badge{}),
+	), hateoas.HandlerFindOneBy(badgeRepo))
+	badgeRoutes.PUT("/:slug", getOperationOptions("Create", badgeRepo,
+		fizz.Summary("Create a Badge"),
+	), badge.HandlerCreate(badgeRepo))
+	badgeRoutes.DELETE("/:slug", getOperationOptions("RemoveOneBy", badgeRepo,
+		fizz.Summary("Remove a Badge"),
+		fizz.InputModel(v1.Badge{}),
+	), hateoas.HandlerRemoveOneBy(badgeRepo))
+
 }
 
 // Init initialize the API v1 module
@@ -159,10 +198,11 @@ func Init(db *gorm.DB, group *fizz.RouterGroup) {
 	contRepo := content.NewRepository(db)
 	envRepo := environment.NewRepository(db)
 	depRepo := deployment.NewRepository(db)
+	badgeRepo := badge.NewRepository(db)
 	deployer := deployment.ApplicationDeployer(depRepo)
 	depend := deployment.Dependency(depRepo)
 
-	registerRoutes(group, graphRepo, domRepo, appRepo, contRepo, envRepo, depRepo, deployer, depend)
+	registerRoutes(group, graphRepo, domRepo, appRepo, contRepo, envRepo, depRepo, badgeRepo, deployer, depend)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository

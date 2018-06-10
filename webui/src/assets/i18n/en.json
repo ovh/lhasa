@@ -20,5 +20,7 @@
     "NAME": "Name",
     "ROLE": "Role",
     "EMAIL": "Email",
-    "SAVE": "Save"
+    "SAVE": "Save",
+    "BADGES": "Badges",
+    "LEVELS": "Levels"
 }

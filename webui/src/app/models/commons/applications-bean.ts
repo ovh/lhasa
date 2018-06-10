@@ -1,5 +1,7 @@
-import { EntityBean, PageMetaData, HrefLinks } from './entity-bean';
+import { EntityBean, PageMetaData, HrefLinks, AbstractPaginatedResource } from './entity-bean';
 import { Timestamp } from 'rxjs/operators/timestamp';
+import { BadgeLevelBean } from './badges-bean';
+
 
 // Application
 export class ApplicationBean extends EntityBean {
@@ -13,6 +15,7 @@ export class ApplicationBean extends EntityBean {
   manifest: ManifestBean;
   tags?: string[];
   deployments?: DeploymentBean[];
+  badgeRatings?: BadgeRatingBean[];
   version: string;
 }
 
@@ -55,17 +58,6 @@ export class TeamBean {
   cisco: string;
 }
 
-// Domain for page browse
-export class ApplicationPagesBean {
-  applications: ApplicationBean[] = [];
-  metadata: PageMetaData = {
-    totalElements: 0,
-    totalPages: 0,
-    size: 0,
-    number: 0
-  };
-}
-
 // Domain
 export class DomainBean extends EntityBean {
   name: string;
@@ -74,12 +66,20 @@ export class DomainBean extends EntityBean {
 }
 
 // Domain for page browse
-export class DomainPagesBean {
+export class ApplicationPagesBean extends AbstractPaginatedResource {
+  applications: ApplicationBean[] = [];
+}
+
+// Domain for page browse
+export class DomainPagesBean extends AbstractPaginatedResource {
   domains: DomainBean[] = [];
-  metadata: PageMetaData = {
-    totalElements: 0,
-    totalPages: 0,
-    size: 0,
-    number: 0
-  };
+}
+
+// BadgeRatingBean for a gamification badge value for an application version
+export class BadgeRatingBean {
+  badgeslug: string;
+  badgetitle: string;
+  value: string;
+  comment: string;
+  level: BadgeLevelBean;
 }

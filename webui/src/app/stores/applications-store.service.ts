@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/store';
 
 import { ActionWithPayloadAndPromise } from './action-with-payload';
-import { ApplicationBean, ApplicationPagesBean, DeploymentBean, DomainBean, DomainPagesBean } from '../models/commons/applications-bean';
+import { ApplicationBean, ApplicationPagesBean, DeploymentBean, DomainBean, DomainPagesBean, BadgeRatingBean } from '../models/commons/applications-bean';
 import { Subject } from 'rxjs/Subject';
 
 /**
@@ -19,7 +19,6 @@ export interface ApplicationState {
   domains: Array<DomainBean>;
   applications: ApplicationPagesBean;
   active: ApplicationBean;
-  deployments: Array<DeploymentBean>;
 }
 
 /**
@@ -43,7 +42,7 @@ export class SelectApplicationAction implements ActionWithPayloadAndPromise<Appl
     return 'SelectApplicationAction';
   }
 
-  constructor(public payload: ApplicationBean, public deployments: Array<DeploymentBean>, public subject?: Subject<any>) {
+  constructor(public payload: ApplicationBean , public subject?: Subject<any>) {
   }
 }
 
@@ -71,6 +70,7 @@ export class ApplicationsStoreService {
   readonly getApplications: Selector<object, ApplicationPagesBean>;
   readonly getActive: Selector<object, ApplicationBean>;
   readonly getDeployments: Selector<object, Array<DeploymentBean>>;
+  readonly getBadgeRatings: Selector<object, Array<BadgeRatingBean>>;
 
   /**
    *
@@ -83,8 +83,6 @@ export class ApplicationsStoreService {
     this.getApplications = createSelector(createFeatureSelector<ApplicationState>('applications'),
       (state: ApplicationState) => state.applications);
     this.getActive = createSelector(createFeatureSelector<ApplicationState>('applications'), (state: ApplicationState) => state.active);
-    this.getDeployments = createSelector(createFeatureSelector<ApplicationState>('applications'),
-      (state: ApplicationState) => state.deployments);
     this.getDomainPages = ApplicationsStoreService.create((state: ApplicationState) => state.domainPages);
   }
 
@@ -106,7 +104,6 @@ export class ApplicationsStoreService {
     domains: new Array<DomainBean>(),
     applications: new ApplicationPagesBean(),
     active: new ApplicationBean(),
-    deployments: new Array<DeploymentBean>(),
   }, action: AllStoreActions): ApplicationState {
 
     switch (action.type) {
@@ -134,7 +131,6 @@ export class ApplicationsStoreService {
           domains: domains,
           applications: pages,
           active: pages.applications[0],
-          deployments: new Array<DeploymentBean>(),
         };
       }
 
@@ -153,7 +149,6 @@ export class ApplicationsStoreService {
           domains: state.domains,
           applications: state.applications,
           active: state.active,
-          deployments: state.deployments,
         };
       }
 
@@ -162,9 +157,7 @@ export class ApplicationsStoreService {
        */
       case SelectApplicationAction.getType(): {
         action = action as SelectApplicationAction;
-        const active = Object.assign({}, action.payload);
-
-        const deployments = Object.assign([], action.deployments);
+        var active = Object.assign({}, action.payload);
 
         /**
          * notify domains change
@@ -175,7 +168,6 @@ export class ApplicationsStoreService {
           domains: state.domains,
           applications: state.applications,
           active: active,
-          deployments: deployments,
         };
       }
 
@@ -217,6 +209,13 @@ export class ApplicationsStoreService {
    */
   public deployments(): Store<Array<DeploymentBean>> {
     return this._store.select(this.getDeployments);
+  }
+
+  /**
+   * select this store service
+   */
+  public badgeRatings(): Store<Array<BadgeRatingBean>> {
+    return this._store.select(this.getBadgeRatings);
   }
 
   /**

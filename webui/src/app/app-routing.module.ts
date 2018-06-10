@@ -14,6 +14,9 @@ import { DomainsBrowseComponent } from './components/domains-browse/domains-brow
 import { DomainsResolver } from './resolver/resolve-domains';
 import { ApplicationsResolver } from './resolver/resolve-applications';
 import { GraphsResolver } from './resolver/resolve-graph';
+import { BadgesComponent } from './components/badges/badges.component';
+import { BadgesResolver } from './resolver/resolve-badges';
+
 
 const routes: Routes = [
   {
@@ -68,7 +71,15 @@ const routes: Routes = [
     },
     component: DomainsBrowseComponent,
     canActivate: [ProfileGuard, RoutingGuard]
-  }
+  },
+  {
+    path: 'badges',
+    resolve: {
+      badges: BadgesResolver
+    },
+    component: BadgesComponent,
+    canActivate: [ProfileGuard, RoutingGuard]
+  },
 ];
 
 @NgModule({

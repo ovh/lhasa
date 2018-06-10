@@ -92,6 +92,7 @@ import { RoutingGuard } from './guards/routing.guard';
 import { ApplicationsStoreService } from './stores/applications-store.service';
 import { DataApplicationService } from './services/data-application-version.service';
 import { DataDeploymentService } from './services/data-deployment.service';
+import { DataBadgeRatingsService } from './services/data-badgeratings.service';
 import { StoreModule } from '@ngrx/store';
 import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -103,6 +104,7 @@ import { AppdetailsActiveDeploymentsPipe } from './pipes/pipes-appdetails.compon
 import { DataEnvironmentService } from './services/data-environment.service';
 import { EnvironmentsStoreService } from './stores/environments-store.service';
 import { GraphComponent } from './widget/graph/graph.component';
+import { BadgeWidgetComponent } from './widget/badgewidget/badgewidget.component';
 import { EnvChipComponent } from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
 import { DomainsBrowseComponent } from './components/domains-browse/domains-browse.component';
@@ -120,6 +122,10 @@ import { GraphBrowseComponent } from './components/graphs/graph-browse.component
 import { GraphsResolver } from './resolver/resolve-graph';
 import { DataGraphService } from './services/data-graph.service';
 import { environment } from '../environments/environment';
+import { BadgesComponent } from './components/badges/badges.component';
+import { BadgesResolver } from './resolver/resolve-badges';
+import { DataBadgeService } from './services/data-badge.service';
+import { BadgesStoreService } from './stores/badges-store.service';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
@@ -133,9 +139,11 @@ export function createTranslateLoader(http: HttpClient) {
     GraphBrowseComponent,
     DomainsBrowseComponent,
     GraphComponent,
+    BadgeWidgetComponent,
     AppEditComponent,
     DashboardComponent,
     AppdetailComponent,
+    BadgesComponent,
     /**
      * UI Kit component
      */
@@ -229,6 +237,7 @@ export function createTranslateLoader(http: HttpClient) {
       applications: ApplicationsStoreService.reducer,
       environments: EnvironmentsStoreService.reducer,
       graphs: GraphsStoreService.reducer,
+      badges: BadgesStoreService.reducer,
       loaders: LoadersStoreService.reducer,
     }),
     /**
@@ -258,6 +267,7 @@ export function createTranslateLoader(http: HttpClient) {
      * stores
      */
     ApplicationsStoreService,
+    BadgesStoreService,
     EnvironmentsStoreService,
     LoadersStoreService,
     GraphsStoreService,
@@ -269,9 +279,11 @@ export function createTranslateLoader(http: HttpClient) {
     DataApplicationService,
     DataContentService,
     DataDeploymentService,
+    DataBadgeRatingsService,
     DataEnvironmentService,
     TranslateService,
     DataDomainService,
+    DataBadgeService,
     DataGraphService,
     /**
      * resolvers
@@ -279,6 +291,7 @@ export function createTranslateLoader(http: HttpClient) {
     ApplicationResolver,
     ApplicationsResolver,
     DomainsResolver,
+    BadgesResolver,
     GraphsResolver
   ],
   bootstrap: [AppComponent]
