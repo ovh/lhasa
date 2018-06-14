@@ -163,7 +163,7 @@ func TestBadgeRatingSetSuccess(t *testing.T) {
 		},
 	)
 
-	m := mocket.Catcher.NewMock().WithQuery(`UPDATE "releases" SET "domain" = ?, "name" = ?, "version" = ?, "manifest" = ?, "tags" = ?, "created_at" = ?, "updated_at" = ?, "deleted_at" = ?, "badge_ratings" = ?  WHERE "releases"."id" = ?`)
+	m := mocket.Catcher.NewMock().WithQuery(`UPDATE "releases" SET "domain" = ?, "name" = ?, "version" = ?, "properties" = ?, "manifest" = ?, "tags" = ?, "created_at" = ?, "updated_at" = ?, "deleted_at" = ?, "badge_ratings" = ?  WHERE "releases"."id" = ?`)
 
 	bdgRating := `
 	{
@@ -348,7 +348,7 @@ func TestBadgeRatingDeleteSuccess(t *testing.T) {
 		},
 	)
 
-	m := mocket.Catcher.NewMock().WithQuery(`INSERT INTO "releases" ("manifest","tags","created_at","updated_at","deleted_at","badge_ratings")`)
+	m := mocket.Catcher.NewMock().WithQuery(`INSERT INTO "releases" ("properties","manifest","tags","created_at","updated_at","deleted_at","badge_ratings")`)
 
 	e := httpexpect.New(t, server.URL)
 	e.DELETE("/api/v1/applications/mydomain/myapp/versions/1.0.0/badgeratings/mybadge2").
