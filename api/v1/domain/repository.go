@@ -48,20 +48,16 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DomainBasePath)
-	var domainNames []string
-
-	if err := repo.db.Model(&v1.Release{}).
+	var domains []*v1.Domain
+	if err := repo.db.Model(&v1.Application{}).
 		Where(criterias).
 		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
-		Pluck("DISTINCT \"releases\".\"domain\" as \"name\"", &domainNames).Error; err != nil {
+		Select("\"applications\".\"domain\" as \"name\", count(*) as app_count").
+		Group("\"applications\".\"domain\"").
+		Scan(&domains).Error; err != nil {
 		return page, err
-	}
-
-	var domains []*v1.Domain
-	for _, value := range domainNames {
-		domains = append(domains, &v1.Domain{Name: value})
 	}
 	page.Content = domains
 

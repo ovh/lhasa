@@ -24,7 +24,7 @@ export class BadgesResolver implements Resolve<BadgeBean[]> {
     ): Observable<any> | Promise<any> | any {
         return this.selectBadges({
             number: route.queryParams.page || 0,
-            size: 20
+            size: 40
         }, new BehaviorSubject<any>('select all badges'));
     }
 

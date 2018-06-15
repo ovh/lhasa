@@ -66,7 +66,8 @@ func (p *Content) SetBytes(data []byte) {
 
 // Domain define a business domain
 type Domain struct {
-	Name string `json:"name" path:"domain" description:"Application Domain"`
+	Name     string `json:"name" path:"domain" description:"Application Domain"`
+	AppCount uint   `json:"_app_count" binding:"-"`
 	hateoas.Resource
 }
 

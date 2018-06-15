@@ -1,15 +1,7 @@
 <br>
 <app-oui-pagination #pagination [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
-<p-table [value]="domains" class="oui-datagrid">
-    <ng-template pTemplate="header">
-        <tr class="oui-datagrid__headers">
-            <th class="oui-datagrid__header">{{ 'DOMAINS' | translate }}</th>
-        </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-domain>
-        <tr class="oui-datagrid__row">
-            <td class="oui-datagrid__cell" routerLink="/applications" [queryParams]="{domain: domain.name, page: 0}">{{domain.name}}</td>
-        </tr>
-    </ng-template>
-</p-table>
-<br>
+<h1 class="oui-header_1 oui-header_underline header">{{ 'DOMAINS' | translate }}</h1>
+<div class="ui-g-3 ui-md-3 pad-tile" *ngFor="let domain of domains">
+    <p-card title="{{domain.name}}" subtitle="{{domain.app_count}} apps" routerLink="/applications" [queryParams]="{domain: domain.name, page: 0}">
+    </p-card>
+</div>
