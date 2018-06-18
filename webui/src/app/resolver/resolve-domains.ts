@@ -25,7 +25,7 @@ export class DomainsResolver implements Resolve<DomainBean[]> {
     ): Observable<any> | Promise<any> | any {
         return this.selectDomains({
             number: route.queryParams.page || 0,
-            size: 5
+            size: 50
         }, new BehaviorSubject<any>('select all domains'));
     }
 
