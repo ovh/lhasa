@@ -7,6 +7,7 @@ import { ApplicationsStoreService } from '../../stores/applications-store.servic
 import { UiKitMenuItem } from '../../models/kit/navbar';
 import { DomHandler } from 'primeng/primeng';
 import { each } from 'lodash';
+import { HelpsStoreService } from '../../stores/help-store.service';
 
 @Component({
   selector: 'app-oui-nav-bar',
@@ -25,7 +26,8 @@ export class OuiNavBarComponent implements OnInit {
   constructor(
     private el: ElementRef,
     private domHandler: DomHandler,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public help: HelpsStoreService
   ) {
   }
 

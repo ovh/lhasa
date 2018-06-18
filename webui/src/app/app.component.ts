@@ -1,3 +1,4 @@
+import { HelpsStoreService, HelpBean } from './stores/help-store.service';
 import { Component, OnInit } from '@angular/core';
 import { ApplicationsStoreService, LoadApplicationsAction } from './stores/applications-store.service';
 import { DataApplicationService } from './services/data-application-version.service';
@@ -11,6 +12,7 @@ import { UiKitMenuItem } from './models/kit/navbar';
 import { Store } from '@ngrx/store';
 import { LoaderBean, LoadersStoreService } from './stores/loader-store.service';
 import { SidebarModule } from 'primeng/sidebar';
+import { ContentBean } from './models/commons/content-bean';
 
 @Component({
   selector: 'app-root',
@@ -25,12 +27,15 @@ export class AppComponent implements OnInit {
    */
   protected loadersStream: Store<LoaderBean[]>;
   public loaders: LoaderBean[] = [];
+  protected helpStream: Store<HelpBean>;
 
   title = 'app';
 
   public items: UiKitMenuItem[];
   public sideItems: UiKitMenuItem[];
   public displaySidebar = false;
+  public displayHelp = false;
+  public helpContent: ContentBean;
 
   constructor(
     private router: Router,
@@ -39,7 +44,8 @@ export class AppComponent implements OnInit {
     private environmentsStoreService: EnvironmentsStoreService,
     private loaderstoreService: LoadersStoreService,
     private environmentService: DataEnvironmentService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private helpsStoreService: HelpsStoreService,
   ) {
     // this language will be used as a fallback when a translation isn't found in the current language
     this.translate.setDefaultLang('en');
@@ -69,10 +75,13 @@ export class AppComponent implements OnInit {
         label: 'MAPS',
         routerLink: '/graph/deployments'
       }
-];
+    ];
 
     // Loaders
     this.loadersStream = this.loaderstoreService.loaders();
+
+    // help
+    this.helpStream = this.helpsStoreService.help();
 
     // Simple menu model
     this.sideItems = [
@@ -130,6 +139,15 @@ export class AppComponent implements OnInit {
         this.loaders = loaders;
       }
     );
+    // help
+    this.helpStream.subscribe(
+      (help: HelpBean) => {
+        if (help.token) {
+          this.displayHelp = true;
+          this.helpContent = help.content;
+        }
+      }
+    );
     // read domains
     this.environmentService.GetAllFromContent('/', null).subscribe(
       (value: ContentListResponse<EnvironmentBean>) => {
@@ -149,7 +167,7 @@ export class AppComponent implements OnInit {
   public handler(event) {
     switch (event.data) {
       case '/':
-      this.displaySidebar = true;
+        this.displaySidebar = true;
         break;
       default:
         break;

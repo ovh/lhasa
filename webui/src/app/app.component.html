@@ -9,8 +9,13 @@
 </p-blockUI>
 <!--Integrate OVH UI Kit.-->
 <app-oui-nav-bar (select)="handler($event)" [items]="items" ></app-oui-nav-bar>
-<p-sidebar [(visible)]="displaySidebar" [baseZIndex]="10000" [ngStyle]="{width:'30em'}">
+<p-sidebar [(visible)]="displaySidebar" [baseZIndex]="10000" [style]="{width:'30em'}">
     <app-oui-action-menu [items]="sideItems"></app-oui-action-menu>
+</p-sidebar>
+
+<!--Help.-->
+<p-sidebar [(visible)]="displayHelp" [baseZIndex]="10000" [style]="{width:'50%'}" position="right">
+    <ngx-md [data]="helpContent"></ngx-md>
 </p-sidebar>
 
 <router-outlet></router-outlet>
