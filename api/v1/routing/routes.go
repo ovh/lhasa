@@ -212,7 +212,7 @@ func Init(tm db.TransactionManager, group *fizz.RouterGroup, log *logrus.Logger)
 	badgeRepo := badge.NewRepository(tm.DB())
 	deployer := deployment.ApplicationDeployer(depRepo)
 	depend := deployment.Dependency(depRepo)
-	latestUpdater := application.NewLatestUpdater(tm, application.NewRepository, application.NewRepositoryLatest, appLatestRepo, log)
+	latestUpdater := application.NewLatestUpdater(tm, application.NewRepository, application.NewRepositoryLatest, log)
 
 	registerRoutes(group, graphRepo, domRepo, appRepo, appLatestRepo, contRepo, envRepo, depRepo, badgeRepo, deployer, depend, latestUpdater)
 }

@@ -13,29 +13,30 @@ import (
 type LatestUpdater func(*v1.Release) error
 
 // NewLatestUpdater instantiates a LatestUpdater
-func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory, latestRepoFactory RepositoryLatestFactory, latestRepo *RepositoryLatest, log *logrus.Logger) LatestUpdater {
+func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory, latestRepoFactory RepositoryLatestFactory, log *logrus.Logger) LatestUpdater {
 	return func(version *v1.Release) error {
-		log := log.WithFields(logrus.Fields{
-			"domain":  version.Domain,
-			"name":    version.Name,
-			"version": version.Version,
-		})
-		application, err := latestRepo.FindApplication(version.Domain, version.Name)
-		if err != nil && !hateoas.IsEntityDoesNotExistError(err) {
-			return err
-		}
-		if hateoas.IsEntityDoesNotExistError(err) || application.LatestReleaseID == nil {
-			log.Debugf("application doesn't exist or doesn't have a latest so it will be created to the given version")
-			application = &v1.Application{
-				ID:     application.ID,
-				Domain: version.Domain,
-				Name:   version.Name,
-			}
-		}
-
 		return tm.Transaction(func(db *gorm.DB) error {
 			appRepo := appRepoFactory(db)
 			latestRepo := latestRepoFactory(db)
+
+			log := log.WithFields(logrus.Fields{
+				"domain":  version.Domain,
+				"name":    version.Name,
+				"version": version.Version,
+			})
+			application, err := latestRepo.FindApplication(version.Domain, version.Name)
+			if err != nil && !hateoas.IsEntityDoesNotExistError(err) {
+				return err
+			}
+			if hateoas.IsEntityDoesNotExistError(err) || application.LatestReleaseID == nil {
+				log.Debugf("application doesn't exist or doesn't have a latest so it will be created to the given version")
+				application = &v1.Application{
+					ID:     application.ID,
+					Domain: version.Domain,
+					Name:   version.Name,
+				}
+			}
+
 			if err := appRepo.Save(version); err != nil {
 				return err
 			}
