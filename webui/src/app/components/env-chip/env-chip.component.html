@@ -1,5 +1,5 @@
 <span class="oui-chip">
-  <img [src]="blankImageURL" *ngIf="environments[slug].properties && environments[slug].properties.region"
+  <img [src]="blankImageURL" *ngIf="environments[slug] && environments[slug].properties && environments[slug].properties.region"
   class="flag flag-{{ environments[slug].properties.region }}"/>
 {{ environments[slug].name }}
 </span>
