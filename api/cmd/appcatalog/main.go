@@ -54,9 +54,9 @@ var (
 )
 
 func main() {
-	log := logger.NewLogger(*flagVerbose, *flagDebug, *flagQuiet, *flagJSONOutput)
-
 	command, err := application.Parse(os.Args[1:])
+
+	log := logger.NewLogger(*flagVerbose, *flagDebug, *flagQuiet, *flagJSONOutput)
 	if err != nil {
 		log.WithError(err).Fatal("cannot start appcatalog")
 	}
