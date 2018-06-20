@@ -5,3 +5,14 @@
 .oui-navbar-menu .oui-navbar-link {
     width: auto;
 }
+
+.navbar-container {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1;
+}
+
+.navbar-spacer {
+    height: 5em;
+}
