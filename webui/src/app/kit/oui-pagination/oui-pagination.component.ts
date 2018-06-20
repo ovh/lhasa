@@ -18,7 +18,7 @@ class LogicalPage {
 @Component({
   selector: 'app-oui-pagination',
   templateUrl: './oui-pagination.component.html',
-  styleUrls: [],
+  styleUrls: ['./oui-pagination.component.css'],
   providers: [DomHandler]
 })
 export class OuiPaginationComponent implements OnInit {
