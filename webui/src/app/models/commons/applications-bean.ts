@@ -13,6 +13,7 @@ export class ApplicationBean extends EntityBean {
   repo?: string;
   description?: string;
   manifest: ManifestBean;
+  properties: any;
   tags?: string[];
   deployments?: DeploymentBean[];
   badgeRatings?: BadgeRatingBean[];

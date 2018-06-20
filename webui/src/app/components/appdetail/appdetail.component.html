@@ -9,15 +9,18 @@
   </h1>
   <div class="ui-g-12 oui-font-semibold">
     <div class="ui-g-8  ">
-
-      <h2 *ngIf="application.manifest && application.manifest.description">
-        {{ application.manifest.description }}
-      </h2>
+      <h3 *ngIf="description">
+        {{ description }}
+      </h3>
       <div>
         <span *ngFor="let badgeRating of _badgeRatingShields">
           <app-badge-shieldsio [badge]="badgeRating"></app-badge-shieldsio>
         </span>
       </div>
+      <h3 *ngIf="readme">
+        <a *ngIf="readme.startsWith('http')" href="{{ readme }}" target="_blank">readme</a>
+        <ngx-md *ngIf="!readme.startsWith('http')" >{{ readme }}</ngx-md>
+      </h3>
     </div>
 
     <div class="oui-list ui-g-4" *ngIf="application.manifest">
@@ -87,10 +90,4 @@
       </p-card>
     </div>
   </div>
-
-  <!--
-  <div class="ui-g-12">
-    <h2 class="oui-header_2">Readme</h2>
-    <markdown *ngIf="application.manifest && application.manifest.description" [data]="application.manifest.description"></markdown>
-  </div>-->
 </div>

@@ -27,6 +27,9 @@ export class AppdetailComponent implements OnInit {
   public application: ApplicationBean;
   private _badgeRatingShields: BadgeShieldsIOBean[];
 
+  public description: string;
+  public readme: string;
+
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
     private route: ActivatedRoute) {
@@ -40,13 +43,30 @@ export class AppdetailComponent implements OnInit {
     this.applicationSubscription = this.applicationStream.subscribe(
       (app: ApplicationBean) => {
         this.application = app;
-        if (this.application.deployments == undefined) {
-          this.application.deployments = []
+
+        // Rule is
+        // First use properties.description
+        // Then manifest.description overrive this description
+        if (app.properties && app.properties.description) {
+          this.description = app.properties.description;
         }
-        if (this.application.badgeRatings == undefined){
-          this.application.badgeRatings = []
+        if (app.manifest && app.manifest.description) {
+          this.description = app.manifest.description;
         }
-        this._badgeRatingShields = []
+        if (app.properties && app.properties.readme) {
+          this.readme = app.properties.readme;
+        }
+
+        // When read field exist use it as plain text
+        // Or if it's an url call it to obtain data
+
+        if (this.application.deployments === undefined) {
+          this.application.deployments = [];
+        }
+        if (this.application.badgeRatings === undefined) {
+          this.application.badgeRatings = [];
+        }
+        this._badgeRatingShields = [];
         app.badgeRatings.forEach((bdgRating) => {
           this._badgeRatingShields.push(<BadgeShieldsIOBean>{
               id: bdgRating.badgeslug,
@@ -57,8 +77,8 @@ export class AppdetailComponent implements OnInit {
               color: bdgRating.level.color,
               description: bdgRating.level.description,
             }
-          )
-        })
+          );
+        });
       },
       error => {
         console.error(error);
