@@ -127,6 +127,7 @@ import { BadgesResolver } from './resolver/resolve-badges';
 import { DataBadgeService } from './services/data-badge.service';
 import { BadgesStoreService } from './stores/badges-store.service';
 import { HelpsStoreService } from './stores/help-store.service';
+import { ErrorsStoreService } from './stores/errors-store.service';
 
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
@@ -241,6 +242,7 @@ export function createTranslateLoader(http: HttpClient) {
       badges: BadgesStoreService.reducer,
       loaders: LoadersStoreService.reducer,
       helps: HelpsStoreService.reducer,
+      errors: ErrorsStoreService.reducer,
     }),
     /**
      * i18n
@@ -274,6 +276,7 @@ export function createTranslateLoader(http: HttpClient) {
     LoadersStoreService,
     GraphsStoreService,
     HelpsStoreService,
+    ErrorsStoreService,
     /**
      * services
      */

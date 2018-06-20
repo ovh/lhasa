@@ -23,5 +23,11 @@
     "EMAIL": "Email",
     "SAVE": "Save",
     "BADGES": "Badges",
-    "LEVELS": "Levels"
+    "LEVELS": "Levels",
+    "ERROR-APP-DETAILS": "Error while loading application details",
+    "ERROR-APPLICATIONS": "Error while loading applications",
+    "ERROR-DOMAINS": "Error while loading domains",
+    "ERROR-BADGES": "Error while loading badges",
+    "ERROR-GRAPHS": "Error while loading graphs",
+    "ERROR-ENVS": "Error while loading environements"
 }

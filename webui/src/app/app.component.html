@@ -17,5 +17,6 @@
 <p-sidebar [(visible)]="displayHelp" [baseZIndex]="10000" [style]="{width:'50%'}" position="right">
     <ngx-md [data]="helpContent"></ngx-md>
 </p-sidebar>
+<app-oui-message *ngFor="let err of errors" (select)="onMessageEvent($event)" type="error" stack="{{ err.stack }}" message="{{ err.code }}"></app-oui-message>
 
 <router-outlet></router-outlet>

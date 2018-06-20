@@ -7,6 +7,7 @@ import { Subject } from 'rxjs/Subject';
 import { ContentBean } from '../models/commons/content-bean';
 import { DataContentService } from '../services/data-content.service';
 import { LoadersStoreService } from './loader-store.service';
+import { ErrorsStoreService, NewErrorAction, ErrorBean } from './errors-store.service';
 
 // Help
 export class HelpBean {
@@ -55,7 +56,8 @@ export class HelpsStoreService {
   constructor(
     private _store: Store<HelpState>,
     private _content: DataContentService,
-    private loadersStoreService: LoadersStoreService
+    private loadersStoreService: LoadersStoreService,
+    private errorsStoreService: ErrorsStoreService,
   ) {
     this.getHelp = HelpsStoreService.create((state: HelpState) => state.help);
   }
@@ -82,7 +84,7 @@ export class HelpsStoreService {
        * add a new loader
        */
       case GetHelpAction.getType(): {
-        const n = <HelpBean> Object.assign({}, action.payload)
+        const n = <HelpBean>Object.assign({}, action.payload);
         action.subject.complete();
         return {
           help: n,
@@ -122,7 +124,16 @@ export class HelpsStoreService {
             token: key,
             content: data
           }, subject));
-      });
+      },
+      (error) => {
+        // When errors only print a default help value
+        this.dispatch(
+          new GetHelpAction(<HelpBean>{
+            token: key,
+            content: 'TBD ...'
+          }, subject));
+      }
+    );
   }
 
 }

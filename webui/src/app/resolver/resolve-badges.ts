@@ -9,13 +9,15 @@ import { DataBadgeService } from '../services/data-badge.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { LoadersStoreService } from '../stores/loader-store.service';
+import { NewErrorAction, ErrorBean, ErrorsStoreService } from '../stores/errors-store.service';
 
 @Injectable()
 export class BadgesResolver implements Resolve<BadgeBean[]> {
     constructor(
         private badgesStoreService: BadgesStoreService,
         private badgesService: DataBadgeService,
-        private loadersStoreService: LoadersStoreService
+        private loadersStoreService: LoadersStoreService,
+        private errorsStoreService: ErrorsStoreService,
     ) { }
 
     resolve(
@@ -49,6 +51,14 @@ export class BadgesResolver implements Resolve<BadgeBean[]> {
                         metadata: data.pageMetadata,
                     }, subject)
                 );
+            },
+            (error) => {
+                this.errorsStoreService.dispatch(new NewErrorAction(
+                    <ErrorBean>{
+                        code: 'ERROR-BADGES',
+                        stack: JSON.stringify(error, null, 2),
+                    }, subject
+                ));
             }
         );
         return subject;

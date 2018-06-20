@@ -13,6 +13,8 @@ import { Store } from '@ngrx/store';
 import { LoaderBean, LoadersStoreService } from './stores/loader-store.service';
 import { SidebarModule } from 'primeng/sidebar';
 import { ContentBean } from './models/commons/content-bean';
+import { ErrorBean, ErrorsStoreService, DropErrorAction, NewErrorAction } from './stores/errors-store.service';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +27,8 @@ export class AppComponent implements OnInit {
   /**
    * internal streams and store
    */
+  protected errorsStream: Store<ErrorBean[]>;
+  public errors: ErrorBean[] = [];
   protected loadersStream: Store<LoaderBean[]>;
   public loaders: LoaderBean[] = [];
   protected helpStream: Store<HelpBean>;
@@ -43,6 +47,7 @@ export class AppComponent implements OnInit {
     private applicationsService: DataApplicationService,
     private environmentsStoreService: EnvironmentsStoreService,
     private loaderstoreService: LoadersStoreService,
+    private errorsStoreService: ErrorsStoreService,
     private environmentService: DataEnvironmentService,
     private translate: TranslateService,
     private helpsStoreService: HelpsStoreService,
@@ -79,6 +84,8 @@ export class AppComponent implements OnInit {
 
     // Loaders
     this.loadersStream = this.loaderstoreService.loaders();
+    // Errors
+    this.errorsStream = this.errorsStoreService.errors();
 
     // help
     this.helpStream = this.helpsStoreService.help();
@@ -132,6 +139,20 @@ export class AppComponent implements OnInit {
     ];
   }
 
+  /**
+   * handle error
+   */
+  public onMessageEvent(event: any) {
+    if (event.data.type === 'close') {
+      event.data.sender.hide();
+      this.errorsStoreService.dispatch(new DropErrorAction(
+        {
+          code: event.data.message,
+        }, null
+      ));
+    }
+  }
+
   ngOnInit(): void {
     // loaders
     this.loadersStream.subscribe(
@@ -148,6 +169,12 @@ export class AppComponent implements OnInit {
         }
       }
     );
+    // errors
+    this.errorsStream.subscribe(
+      (errors: ErrorBean[]) => {
+        this.errors = errors;
+      }
+    );
     // read domains
     this.environmentService.GetAllFromContent('/', null).subscribe(
       (value: ContentListResponse<EnvironmentBean>) => {
@@ -160,6 +187,14 @@ export class AppComponent implements OnInit {
             environmentMap
           )
         );
+      },
+      (error) => {
+        this.errorsStoreService.dispatch(new NewErrorAction(
+          <ErrorBean>{
+            code: 'ERROR-ENVS',
+            stack: JSON.stringify(error, null, 2),
+          }, new BehaviorSubject<any>('select environements')
+        ));
       }
     );
   }

@@ -56,6 +56,7 @@ export class GraphBrowseComponent implements OnInit, AfterViewInit {
     this.deploymentStream.subscribe(
       (graph: GraphBean) => {
         this.deployments = graph;
+        if (graph.nodes && graph.edges) {
         // Compute data
         this.deploymentsVis.nodes = [];
         graph.nodes.forEach(node => {
@@ -75,6 +76,7 @@ export class GraphBrowseComponent implements OnInit, AfterViewInit {
             label: edge.type
           });
         });
+      }
         // Compute data
         this.deploymentsVisOptions = this.deployments.options;
       },

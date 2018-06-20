@@ -10,6 +10,7 @@ import { DataBadgeRatingsService } from '../services/data-badgeratings.service';
 import { LoadersStoreService } from '../stores/loader-store.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
+import { ErrorsStoreService, NewErrorAction, ErrorBean } from '../stores/errors-store.service';
 
 @Injectable()
 export class ApplicationResolver implements Resolve<ApplicationBean> {
@@ -18,14 +19,16 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
         private applicationsService: DataApplicationService,
         private deploymentService: DataDeploymentService,
         private badgeRatingService: DataBadgeRatingsService,
-        private loadersStoreService: LoadersStoreService
+        private loadersStoreService: LoadersStoreService,
+        private errorsStoreService: ErrorsStoreService,
     ) { }
 
     resolve(
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<any> | Promise<any> | any {
-        this.selectApplication(route.params.domain, route.params.name, route.params.version, new BehaviorSubject<any>('select an application'));
+        this.selectApplication(route.params.domain, 
+            route.params.name, route.params.version, new BehaviorSubject<any>('select an application'));
     }
 
     /**
@@ -44,8 +47,8 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
                     (deployments: ContentListResponse<DeploymentBean>) => {
                         this.badgeRatingService.GetBadgeRatings(`${domain}/${name}/versions/${version}/badges`).subscribe(
                             (badgeRatings: BadgeRatingBean[]) => {
-                                app.deployments = deployments.content
-                                app.badgeRatings = badgeRatings
+                                app.deployments = deployments.content;
+                                app.badgeRatings = badgeRatings;
                                 this.applicationsStoreService.dispatch(
                                     new SelectApplicationAction(
                                         app,
@@ -56,6 +59,14 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
                         );
                     }
                     );
+            },
+            (error) => {
+                this.errorsStoreService.dispatch(new NewErrorAction(
+                    <ErrorBean>{
+                        code: 'ERROR-APP-DETAILS',
+                        stack: JSON.stringify(error, null, 2),
+                    }, subject
+                ));
             }
             );
     }

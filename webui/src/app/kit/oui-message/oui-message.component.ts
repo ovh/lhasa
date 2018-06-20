@@ -16,12 +16,17 @@ import { DomHandler } from 'primeng/primeng';
 export class OuiMessageComponent implements OnInit {
 
   _message: String;
+  _stack: any;
+  _type: String;
+  _klass: String;
   public visible = true;
 
   @Output() select: EventEmitter<any> = new EventEmitter();
 
   constructor(
   ) {
+    this._type = 'info';
+    this.validate();
   }
 
   ngOnInit() {
@@ -29,6 +34,14 @@ export class OuiMessageComponent implements OnInit {
 
   @Input() get message(): String {
     return this._message;
+  }
+
+  @Input() get type(): String {
+    return this._type;
+  }
+
+  @Input() get stack(): any {
+    return this._stack;
   }
 
   /**
@@ -44,6 +57,24 @@ export class OuiMessageComponent implements OnInit {
   set message(val: String) {
     this._message = val;
   }
+  set type(val: String) {
+    this._type = val;
+    this.validate();
+  }
+  set stack(val: any) {
+    this._stack = val;
+  }
+
+  validate() {
+    switch(this._type) {
+      case 'info':
+        this._klass = 'oui-message oui-message_info';
+      break;
+      case 'error':
+        this._klass = 'oui-message oui-message_error';
+      break;
+    }
+  }
 
   /**
    * emit selection
@@ -53,6 +84,8 @@ export class OuiMessageComponent implements OnInit {
    */
   onSelect(event: any, type: string, page: string) {
     event.data = {
+      sender: this,
+      message: this.message,
       type: type,
     };
     this.select.emit(event);

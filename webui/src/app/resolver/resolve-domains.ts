@@ -10,13 +10,15 @@ import { DataDomainService } from '../services/data-domain.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { LoadersStoreService } from '../stores/loader-store.service';
+import { ErrorsStoreService, NewErrorAction, ErrorBean } from '../stores/errors-store.service';
 
 @Injectable()
 export class DomainsResolver implements Resolve<DomainBean[]> {
     constructor(
         private applicationsStoreService: ApplicationsStoreService,
         private domainsService: DataDomainService,
-        private loadersStoreService: LoadersStoreService
+        private loadersStoreService: LoadersStoreService,
+        private errorsStoreService: ErrorsStoreService,
     ) { }
 
     resolve(
@@ -50,6 +52,14 @@ export class DomainsResolver implements Resolve<DomainBean[]> {
                         metadata: data.pageMetadata,
                     }, subject)
                 );
+            },
+            (error) => {
+                this.errorsStoreService.dispatch(new NewErrorAction(
+                    <ErrorBean>{
+                        code: 'ERROR-DOMAINS',
+                        stack: JSON.stringify(error, null, 2),
+                    }, subject
+                ));
             }
         );
         return subject;

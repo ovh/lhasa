@@ -7,13 +7,15 @@ import { LoadersStoreService } from '../stores/loader-store.service';
 import { GraphBean } from '../models/graph/graph-bean';
 import { DataGraphService } from '../services/data-graph.service';
 import { GraphsStoreService, LoadGraphDeploymentAction } from '../stores/graphs-store.service';
+import { ErrorsStoreService, ErrorBean, NewErrorAction } from '../stores/errors-store.service';
 
 @Injectable()
 export class GraphsResolver implements Resolve<GraphBean> {
     constructor(
         private dataGraphService: DataGraphService,
         private graphsStoreService: GraphsStoreService,
-        private loadersStoreService: LoadersStoreService
+        private errorsStoreService: ErrorsStoreService,
+        private loadersStoreService: LoadersStoreService,
     ) { }
 
     resolve(
@@ -37,6 +39,14 @@ export class GraphsResolver implements Resolve<GraphBean> {
                 this.graphsStoreService.dispatch(
                     new LoadGraphDeploymentAction(data, subject)
                 );
+            },
+            (error) => {
+                this.errorsStoreService.dispatch(new NewErrorAction(
+                    <ErrorBean>{
+                        code: 'ERROR-GRAPHS',
+                        stack: JSON.stringify(error, null, 2),
+                    }, subject
+                ));
             }
         );
         return subject;
