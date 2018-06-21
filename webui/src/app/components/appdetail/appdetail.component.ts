@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-
+import { CardModule } from 'primeng/card';
+import { CodeHighlighterModule } from 'primeng/codehighlighter';
 import { ActivatedRoute } from '@angular/router';
 import { ApplicationBean, DeploymentBean, EnvironmentBean, BadgeRatingBean } from '../../models/commons/applications-bean';
 import { Store } from '@ngrx/store';
@@ -14,8 +15,8 @@ import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.compone
   selector: 'app-appdetail',
   templateUrl: './appdetail.component.html',
   styleUrls: ['./appdetail.component.css'],
-
 })
+
 @AutoUnsubscribe()
 export class AppdetailComponent implements OnInit {
 
@@ -26,6 +27,8 @@ export class AppdetailComponent implements OnInit {
   protected applicationSubscription: ISubscription;
   public application: ApplicationBean;
   private _badgeRatingShields: BadgeShieldsIOBean[];
+  public _selectedDeployment: DeploymentBean;
+  public _activeDeployments: DeploymentBean[];
 
   public description: string;
   public readme: string;
@@ -60,8 +63,17 @@ export class AppdetailComponent implements OnInit {
         // When read field exist use it as plain text
         // Or if it's an url call it to obtain data
 
-        if (this.application.deployments === undefined) {
-          this.application.deployments = [];
+        this._activeDeployments = []
+        this._selectedDeployment = null;
+        if (this.application.deployments !== undefined) {
+          this.application.deployments.forEach(value => {
+            if (!value.undeployedAt || value.undeployedAt === null) {
+              this._activeDeployments.push(value);
+              if (this._selectedDeployment === null) {
+                this._selectedDeployment = value
+              }
+            }
+          });
         }
         if (this.application.badgeRatings === undefined) {
           this.application.badgeRatings = [];
@@ -69,14 +81,14 @@ export class AppdetailComponent implements OnInit {
         this._badgeRatingShields = [];
         app.badgeRatings.forEach((bdgRating) => {
           this._badgeRatingShields.push(<BadgeShieldsIOBean>{
-              id: bdgRating.badgeslug,
-              value: bdgRating.value,
-              title: bdgRating.badgetitle,
-              comment: bdgRating.comment,
-              label: bdgRating.level.label,
-              color: bdgRating.level.color,
-              description: bdgRating.level.description,
-            }
+            id: bdgRating.badgeslug,
+            value: bdgRating.value,
+            title: bdgRating.badgetitle,
+            comment: bdgRating.comment,
+            label: bdgRating.level.label,
+            color: bdgRating.level.color,
+            description: bdgRating.level.description,
+          }
           );
         });
       },
@@ -86,5 +98,9 @@ export class AppdetailComponent implements OnInit {
       () => {
       }
     );
+  }
+
+  selectDeployment(deployment: DeploymentBean): void {
+    this._selectedDeployment = deployment;
   }
 }

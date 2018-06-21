@@ -1,6 +1,10 @@
 #!/bin/bash
 
 set -ex
+HOST=`echo $API_BASE_URL | awk -F/ '{print $3}'`
+BASEPATH=`echo $API_BASE_URL | grep / | cut -d/ -f4-`
+SCHEME=`echo $API_BASE_URL | awk -F: '{print $1}'`
+
 curl --request DELETE \
   --url $API_BASE_URL/v1/applications/
 
@@ -75,19 +79,81 @@ curl --request PUT \
 	}
 }'
 
+OPENAPI_SPEC='{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Travel API",
+    "description": "API that allows to book travels",
+    "termsOfService": "http://mycompany.com/travelapi/terms/",
+    "contact": {
+      "name": "Human Resources Team"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+	"host": "'"$HOST"'",
+  "basePath": "'"/$BASEPATH"'",
+  "schemes": [
+    "'"$SCHEME"'"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Returns the root of the API",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of subroutes.",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/Links"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Links": {
+      "type": "object",
+      "properties": {
+        "_links": {
+          "type": "array"
+        }
+      }
+    }
+  }
+}'
 curl --request POST \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/1.0.0/deploy/prodfr \
   --header 'content-type: application/json' \
-  --data '{
-	"properties":{}
-}'
+  --data "{
+		\"properties\":{
+			\"openapi\": $OPENAPI_SPEC
+		}
+	}"
 
 curl --request POST \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/1.0.0/deploy/produk \
   --header 'content-type: application/json' \
-  --data '{
-	"properties":{}
-}'
+  --data "{
+		\"properties\":{
+			\"openapi\": $OPENAPI_SPEC
+		}
+	}"
+
 
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/1.0.1 \
@@ -118,9 +184,11 @@ curl --request PUT \
 curl --request POST \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/1.0.1/deploy/prodde \
   --header 'content-type: application/json' \
-  --data '{
-	"properties":{}
-}'
+  --data "{
+		\"properties\":{
+			\"openapi\": $OPENAPI_SPEC
+		}
+	}"
 
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/2.0.0 \
@@ -151,9 +219,11 @@ curl --request PUT \
 curl --request POST \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/2.0.0/deploy/staging \
   --header 'content-type: application/json' \
-  --data '{
-	"properties":{}
-}'
+  --data "{
+		\"properties\":{
+			\"openapi\": $OPENAPI_SPEC
+		}
+	}"
 
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/billing/api/versions/1.0.0 \
@@ -180,14 +250,14 @@ curl --request PUT \
 }'
 
 curl --request PUT \
-  --url $API_BASE_URL/v1/applications/billing/devise-converter/versions/1.0.0 \
+  --url $API_BASE_URL/v1/applications/billing/currency-converter/versions/1.0.0 \
   --header 'content-type: application/json' \
   --data '{
 	"domain": "billing",
-	"name": "devise-converter",
+	"name": "currency-converter",
 	"version": "1.0.0",
 	"manifest": {
-		"description": "Convert devises using public rates"
+		"description": "Convert currencies using public rates"
 	}
 }'
 
@@ -200,7 +270,7 @@ curl --request PUT \
 	"version": "1.0.0",
   "tags": ["order"],
 	"manifest": {
-		"description": "Rule engine to advise fraud risk on a order"
+		"description": "Rules engine to advise fraud risk on a order"
 	}
 }'
 
@@ -329,7 +399,7 @@ curl --request PUT \
   --url $API_BASE_URL/v1/applications/billing/api/versions/1.0.0/badgeratings/readme \
   --header 'content-type: application/json' \
   --data '{
-		"value": "exists",
+		"level": "exists",
 		"comment": "340 lines"
 	}'
 

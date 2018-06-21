@@ -16,6 +16,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MarkdownModule } from 'ngx-md';
+import { OpenAPIUIComponent } from './components/openapi-ui/openapi-ui.component';
 /**
  * material2
  */
@@ -100,7 +101,6 @@ import { ConfigurationService } from './services/configuration.service';
 import { SecurityService } from './services/security.service';
 import { OuiProgressTrackerComponent } from './kit/oui-progress-tracker/oui-progress-tracker.component';
 import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.component';
-import { AppdetailsActiveDeploymentsPipe } from './pipes/pipes-appdetails.component';
 import { DataEnvironmentService } from './services/data-environment.service';
 import { EnvironmentsStoreService } from './stores/environments-store.service';
 import { GraphComponent } from './widget/graph/graph.component';
@@ -146,6 +146,7 @@ export function createTranslateLoader(http: HttpClient) {
     DashboardComponent,
     AppdetailComponent,
     BadgesComponent,
+    OpenAPIUIComponent,
     /**
      * UI Kit component
      */
@@ -156,7 +157,6 @@ export function createTranslateLoader(http: HttpClient) {
     OuiActionMenuComponent,
     ApplicationSortPipe,
     DomainSortPipe,
-    AppdetailsActiveDeploymentsPipe,
     EnvChipComponent,
   ],
   imports: [

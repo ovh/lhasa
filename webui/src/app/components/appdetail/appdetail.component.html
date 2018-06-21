@@ -1,93 +1,99 @@
 <div *ngIf="application" class="ui-g">
-  <h1 class="oui-header_1 oui-header_underline header">
-    {{ 'APPLICATION' | translate }}: {{ application.domain }}/{{ application.name }}
-    <span class="oui-chip">{{ application.version }}</span>
-    <button type="button" class="oui-button oui-button_link oui-button_secondary oui-button_icon-only oui-button_small-width"
-      routerLink="/applications/{{ application.domain }}/{{ application.name }}/versions/{{ application.version }}/edit">
-      <i class="oui-icon oui-icon-pen_line" aria-hidden="true"></i>
-    </button>
-  </h1>
-  <div class="ui-g-12 oui-font-semibold">
-    <div class="ui-g-8  ">
-      <h3 *ngIf="description">
-        {{ description }}
-      </h3>
-      <div>
-        <span *ngFor="let badgeRating of _badgeRatingShields">
-          <app-badge-shieldsio [badge]="badgeRating"></app-badge-shieldsio>
-        </span>
-      </div>
-      <h3 *ngIf="readme">
-        <a *ngIf="readme.startsWith('http')" href="{{ readme }}" target="_blank">readme</a>
-        <ngx-md *ngIf="!readme.startsWith('http')" >{{ readme }}</ngx-md>
-      </h3>
+
+  <div class="ui-g-12">
+    <h1 class="oui-header_1 oui-header_underline header">
+      {{ 'APPLICATION' | translate }}: {{ application.domain }}/{{ application.name }}
+      <span class="oui-chip">{{ application.version }}</span>
+      <button type="button" class="oui-button oui-button_link oui-button_secondary oui-button_icon-only oui-button_small-width"
+        routerLink="/applications/{{ application.domain }}/{{ application.name }}/versions/{{ application.version }}/edit">
+        <i class="oui-icon oui-icon-pen_line" aria-hidden="true"></i>
+      </button>
+    </h1>
+  </div>
+  <div class="ui-g-8">
+    <div>
+      <span *ngFor="let badgeRating of _badgeRatingShields">
+        <app-badge-shieldsio [badge]="badgeRating"></app-badge-shieldsio>
+      </span>
     </div>
+    <h3 *ngIf="description">
+      {{ description }}
+    </h3>
+    <h3 *ngIf="readme">
+      <a *ngIf="readme.startsWith('http')" href="{{ readme }}" target="_blank">readme</a>
+      <ngx-md *ngIf="!readme.startsWith('http')">{{ readme }}</ngx-md>
+    </h3>
+  </div>
 
-    <div class="oui-list ui-g-4" *ngIf="application.manifest">
-      <p-card>
+  <div class="oui-list ui-g-4" *ngIf="application.manifest">
+    <p-card>
+      <h5 class="oui-header_5">
+        <i class="oui-icon oui-icon-check_line" aria-hidden="true"></i>
+        Tags
+      </h5>
+      <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
+      <div *ngIf="application.manifest && application.manifest.repository">
+        <hr>
         <h5 class="oui-header_5">
-          <i class="oui-icon oui-icon-check_line" aria-hidden="true"></i>
-          Tags
+          <i class="oui-icon oui-icon-page_line" aria-hidden="true"></i>
+          {{ 'REPOSITORY' | translate }}
         </h5>
-        <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
-        <div *ngIf="application.manifest && application.manifest.repository">
-          <hr>
-          <h5 class="oui-header_5">
-            <i class="oui-icon oui-icon-page_line" aria-hidden="true"></i>
-            Repository
-          </h5>
-          <p class="oui-field__control oui-field__control_auto">
-            <a class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
-              {{ application.manifest.repository }}
-              <span class="oui-icon oui-icon-external_link"></span>
-            </a>
-          </p>
-        </div>
-        <div *ngIf="application.manifest.authors">
-          <hr>
+        <p class="oui-field__control oui-field__control_auto">
+          <a class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
+            {{ application.manifest.repository }}
+            <span class="oui-icon oui-icon-external_link"></span>
+          </a>
+        </p>
+      </div>
+      <div *ngIf="application.manifest.authors">
+        <hr>
 
-          <h5 class="oui-header_5">
-            <i class="oui-icon oui-icon-user_line" aria-hidden="true"></i>
-            Authors
-          </h5>
-          <ul class="oui-list__items">
-            <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
-              <span class="oui-list__header">
-                {{ person.name }}
-                <span *ngIf="person.role">({{ person.role }})</span>
-                <span *ngIf="person.email"> &lt;{{ person.email }}&gt;</span>
-              </span>
-            </li>
-          </ul>
+        <h5 class="oui-header_5">
+          <i class="oui-icon oui-icon-user_line" aria-hidden="true"></i>
+          {{ 'AUTHORS' | translate }}
+        </h5>
+        <ul class="oui-list__items">
+          <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
+            <span class="oui-list__header">
+              {{ person.name }}
+              <span *ngIf="person.role">({{ person.role }})</span>
+              <span *ngIf="person.email"> &lt;{{ person.email }}&gt;</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </p-card>
+  </div>
+
+  <div class="ui-g-12" *ngIf="_activeDeployments.length > 0">
+    <h5 class="oui-header_5">
+      <i class="oui-icon oui-icon-paperplane_line" aria-hidden="false"></i>
+      {{ 'ACTIVE_DEPLOYMENTS' | translate }}</h5>
+    <div class="deploymentscontainer">
+      <div class="deploymentmenu">
+        <div *ngFor="let deployment of _activeDeployments; let i = index" class="deploymenubutton">
+          <input type="radio" name="deployments" value="{{ deployment.id }}" id="{{ deployment.id }}" [attr.checked]="i === 0 ? '' : null"
+            (click)="selectDeployment(deployment)" (load)="selectDeployment(deployment)">
+          <label class="container" for="{{ deployment.id }}">
+            <app-env-chip slug="{{ deployment.properties._env_slug }}"></app-env-chip>
+            <i class="oui-icon oui-icon_circle oui-icon-chevron-right" aria-hidden="true"></i>
+            <span class="oui-chip">{{ deployment.properties._app_version }}</span>
+          </label>
         </div>
-        <div>
-          <hr>
-          <h5 class="oui-header_5">
-            <i class="oui-icon oui-icon-paperplane_line" aria-hidden="false"></i>
-            Deployments</h5>
-          <table class="oui-datagrid">
-            <!--
-          <thead class="oui-datagrid__headers">
-          <tr>
-            <th class="oui-datagrid__header">Environment</th>
-            <th class="oui-datagrid__header">Version</th>
-            <th class="oui-datagrid__header table-col-75">Availability</th>
-          </tr>
-          </thead> -->
-            <tbody>
-              <tr class="oui-datagrid__row" *ngFor="let deployment of application.deployments | activeDeployment">
-                <td class="oui-datagrid__cell">
-                  <app-env-chip slug="{{ deployment.properties._env_slug }}"></app-env-chip>
-                </td>
-                <td class="oui-datagrid__cell">{{ deployment.properties._app_version }}</td>
-                <td class="oui-datagrid__cell">
-                  <div class="oui-progress oui-progress_warning oui-progress_indeterminate" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </p-card>
+      </div>
+      <div *ngIf="_selectedDeployment" class="deploymentpanel">
+        <dl class="intro">
+          <dt>{{ 'INTERNAL_ID' | translate }}</dt>
+          <dd>{{ _selectedDeployment.id }}</dd>
+          <dt>{{ 'CREATED_AT' | translate }}</dt>
+          <dd>{{ _selectedDeployment._createdAt }}</dd>
+          <dt>{{ 'UPDATED_AT' | translate }}</dt>
+          <dd>{{ _selectedDeployment._updatedAt }}</dd>
+        </dl>
+        <p-card title="{{ 'OPENAPI_SPEC' | translate }}">
+          <app-openapi-ui [spec]="_selectedDeployment.properties['openapi']"></app-openapi-ui>
+        </p-card>
+      </div>
     </div>
   </div>
 </div>

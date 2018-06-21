@@ -1,3 +1,62 @@
-.table-col-75 {
+.spacer {
+  height: 10em;
+}
+
+.deploymenubutton input {
+  display: none;
+}
+
+input[type="radio"]+label {
+  display: block;
+  border-top: 0.1em solid lightgray;
+  border-bottom: 0.1em solid lightgray;
+  border-radius: 0.5em 0 0 0.5em;
+  padding: 1em;
+}
+
+input[type="radio"]:checked+label {
+  background-color: rgb(17, 40, 68);
+}
+
+.deploymentmenu{
+  padding: 0;
+  width: 25%;
+  float: left;
+}
+
+.deploymentpanel{
+  border-top: 0.1em solid lightgray;
+  border-bottom: 0.1em solid lightgray;
+  background-color: rgb(17, 40, 68);
+  padding: 2em;
   width: 75%;
+  float: left;
+  border-radius: 0 0.5em 0.5em 0;
+}
+
+
+.deploymentmenu .oui-icon-chevron-right {
+  float: right;
+}
+
+.deploymentmenu .oui-chip {
+  margin-right: 1em;
+  float: right;
+}
+
+.intro {
+  color: white;
+}
+
+.intro a {
+  color: white;
+}
+
+.intro dt {
+  font-weight: bolder;
+}
+
+.deploymentscontainer {
+  display: flex;
+  flex-wrap: nowrap;
 }
