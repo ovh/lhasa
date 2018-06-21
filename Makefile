@@ -27,6 +27,8 @@ $(API_BIN):
 
 api:
 	$(MAKE) -C api
+	cp scripts/appcatalog.sh dist
+	cp samples/mycompany.sh dist
 
 webui:
 	$(MAKE) -C webui
