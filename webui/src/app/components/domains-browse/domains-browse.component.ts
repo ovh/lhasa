@@ -21,7 +21,8 @@ import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.
 })
 export class DomainsBrowseComponent implements OnInit {
 
-  @ViewChild('pagination') pagination: OuiPaginationComponent;
+  @ViewChild('paginationtop') paginationtop: OuiPaginationComponent;
+  @ViewChild('paginationbottom') paginationbottom: OuiPaginationComponent;
 
   /**
    * internal streams and store
@@ -78,7 +79,8 @@ export class DomainsBrowseComponent implements OnInit {
     );
     // if page different from 0
     if (this.page !== 0) {
-      this.pagination.RefreshMetadata(this.metadata, 'select', this.page);
+      this.paginationtop.RefreshMetadata(this.metadata, 'select', this.page);
+      this.paginationbottom.RefreshMetadata(this.metadata, 'select', this.page);
     }
   }
 

@@ -1,7 +1,7 @@
-<app-oui-pagination [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
+<app-oui-pagination #paginationtop [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
 <h1 class="oui-header_1 oui-header_underline header">{{ 'DOMAINS' | translate }}</h1>
 <div class="ui-g-3 ui-md-3 pad-tile" *ngFor="let domain of domains">
     <p-card title="{{domain.name}}" subtitle="{{domain._app_count}} apps" routerLink="/applications" [queryParams]="{domain: domain.name, page: 0}">
     </p-card>
 </div>
-<app-oui-pagination [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
+<app-oui-pagination #paginationbottom [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
