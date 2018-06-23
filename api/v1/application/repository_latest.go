@@ -99,8 +99,22 @@ func (repo *RepositoryLatest) FindPageBy(pageable hateoas.Pageable, criterias ma
 func getWhereClause(criterias map[string]interface{}) string {
 	whereClause := ""
 	for key, value := range criterias {
+		if value == "" {
+			continue
+		}
 		// TODO SQL injection
-		whereClause = whereClause + fmt.Sprintf("AND \"av\".%q = '%s' ", key, value)
+		if key == "search" {
+			whereClause = whereClause + fmt.Sprintf(
+				`AND ( "av".name ILIKE '%%%s%%'
+					OR "av".domain ILIKE '%%%s%%'
+					OR "av".version ILIKE '%%%s%%'
+					OR cast("av".properties as TEXT) ILIKE '%%%s%%'
+					OR cast("av".manifest as TEXT) ILIKE '%%%s%%'
+					OR cast("av".tags as TEXT) ILIKE '%%%s%%'
+				) `, value, value, value, value, value, value)
+		} else {
+			whereClause = whereClause + fmt.Sprintf("AND \"av\".%q = '%s' ", key, value)
+		}
 	}
 	return whereClause
 }

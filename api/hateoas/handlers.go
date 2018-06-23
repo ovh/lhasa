@@ -144,10 +144,7 @@ func parsePathParams(c *gin.Context) map[string]interface{} {
 
 // parse param and query of request
 func parsePathParamsAndQuery(c *gin.Context) map[string]interface{} {
-	criteria := map[string]interface{}{}
-	for _, p := range c.Params {
-		criteria[p.Key] = p.Value
-	}
+	criteria := parsePathParams(c)
 	pageable := Pageable{}
 	c.ShouldBindQuery(&pageable)
 

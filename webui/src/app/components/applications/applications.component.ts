@@ -39,6 +39,7 @@ export class ApplicationsComponent implements OnInit {
 
   public domain = '';
   public param = { target: '' };
+  protected searchString = ''
 
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
@@ -86,7 +87,7 @@ export class ApplicationsComponent implements OnInit {
       (element: ApplicationPagesBean) => {
         this.applications = element.applications;
         this.applications.forEach((app) => {
-          app.description = 'No provided description. Please fill the `description` field of the manifest.';
+          app.description = 'No description provided. Please fill the `description` field of the manifest.';
           if (app.manifest && app.manifest.description) {
             app.description = (app.manifest.description.length > 200) ?
               (app.manifest.description.substr(0, 200) + '...') : (app.manifest.description);
@@ -147,7 +148,8 @@ export class ApplicationsComponent implements OnInit {
       // Refresh query params
       this.router.navigate([], { queryParams: { page: page } });
       this.applicationsResolver.selectApplications(metadata,
-        this.domain, new BehaviorSubject<any>('select another page on domains'));
+        this.domain, this.searchString,
+        new BehaviorSubject<any>('select another page on domains'));
       this.page = page;
     }
   }
@@ -167,10 +169,15 @@ export class ApplicationsComponent implements OnInit {
    */
   public refreshApplications() {
     // Reset nav
-    this.router.navigate([], { queryParams: { page: 0 } });
+    this.router.navigate([], { queryParams: { page: 0, search: this.searchString } });
     return this.applicationsResolver.selectApplications({
       number: 0,
       size: 100
-    }, '', new BehaviorSubject<any>('refresh all applications'));
+    }, '', this.searchString, new BehaviorSubject<any>('refresh all applications'));
+  }
+
+  public onFilterKeyPressed(event: any) {
+    this.searchString = event.target.value;
+    this.refreshApplications()
   }
 }

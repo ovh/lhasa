@@ -27,28 +27,32 @@ export class ApplicationsResolver implements Resolve<ApplicationPagesBean> {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<any> | Promise<any> | any {
-        let domain = '';
+        let domain = '', search = '';
         // If any domain on url use it
         if (route.queryParams.domain) {
             domain = '/' + route.queryParams.domain;
+        }
+        if (route.queryParams.search) {
+            search = route.queryParams.search;
         }
         // Select application
         return this.selectApplications({
             number: route.queryParams.page || 0,
             size: 100
-        }, domain, new BehaviorSubject<any>('select all applications'));
+        }, domain, search, new BehaviorSubject<any>('select all applications'));
     }
 
     /**
      * dispatch load domains
      * @param event
      */
-    public selectApplications(metadata: PageMetaData, domain: string, subject: Subject<any>): Subject<any> {
+    public selectApplications(metadata: PageMetaData, domain: string, searchString: string, subject: Subject<any>): Subject<any> {
         this.loadersStoreService.notify(subject);
         // load all domains
         const meta: {
             [key: string]: any | any[];
         } = {
+                q: `{"search":"${searchString}"}`,
                 size: metadata.size,
                 page: metadata.number
             };

@@ -7,3 +7,6 @@
   cursor: pointer;
 }
 
+.filter{
+  float: right;
+}
