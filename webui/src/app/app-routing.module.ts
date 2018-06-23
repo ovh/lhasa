@@ -21,7 +21,8 @@ import { BadgesResolver } from './resolver/resolve-badges';
 const routes: Routes = [
   {
     path: '',
-    component: DashboardComponent,
+    redirectTo: 'applications', 
+    pathMatch: 'full',
     canActivate: [ProfileGuard, RoutingGuard]
   },
   {
