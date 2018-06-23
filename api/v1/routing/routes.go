@@ -218,7 +218,7 @@ func Init(tm db.TransactionManager, group *fizz.RouterGroup, log *logrus.Logger)
 }
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository
-func getOperationOptions(baseName string, repository hateoas.Repository, options ...fizz.OperationOption) []fizz.OperationOption {
+func getOperationOptions(baseName string, repository hateoas.BaseRepository, options ...fizz.OperationOption) []fizz.OperationOption {
 	return append(options, fizz.ID(baseName+repository.GetType().Name()))
 }
 
