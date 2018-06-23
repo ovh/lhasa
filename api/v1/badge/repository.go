@@ -31,11 +31,6 @@ func (repo *Repository) GetType() reflect.Type {
 	return reflect.TypeOf(v1.Badge{})
 }
 
-// GetNewEntityInstance returns a new empty instance of the entity managed by this repository
-func (repo *Repository) GetNewEntityInstance() hateoas.Entity {
-	return &v1.Badge{}
-}
-
 // FindAll returns all entities of the repository type
 func (repo *Repository) FindAll() (interface{}, error) {
 	return repo.FindBy(map[string]interface{}{})

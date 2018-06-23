@@ -40,11 +40,6 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-// GetNewEntityInstance returns a new empty instance of the entity managed by this repository
-func (repo *Repository) GetNewEntityInstance() hateoas.Entity {
-	return &v1.Deployment{}
-}
-
 // FindAllPage returns a page of matching entities
 func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
 	return repo.FindPageBy(pageable, map[string]interface{}{})

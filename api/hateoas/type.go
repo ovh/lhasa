@@ -33,7 +33,6 @@ type Repository interface {
 	FindOneBy(map[string]interface{}) (Entity, error)
 	Save(Entity) error
 	Remove(interface{}) error
-	GetNewEntityInstance() Entity
 	GetType() reflect.Type
 }
 
