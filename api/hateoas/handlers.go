@@ -2,9 +2,7 @@ package hateoas
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"reflect"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -84,37 +82,6 @@ func HandlerRemoveAll(repository TruncatableRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) error {
 		return repository.Truncate()
 	}, http.StatusNoContent)
-}
-
-// HandlerUpsert replace or create a resource
-func HandlerUpsert(repository Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context) error {
-		resource := reflect.New(repository.GetType()).Elem().Interface().(Entity)
-		if err := c.Bind(resource); err != nil {
-			return err
-		}
-		oldres, err := FindByPath(c, repository)
-		if IsEntityDoesNotExistError(err) || err == ErrorGone {
-			if c.Request.Method == http.MethodPost {
-				c.Header("Location", fmt.Sprintf("%s/%s", c.Request.URL.Path, resource.GetID()))
-			}
-			if err := repository.Save(resource); err != nil {
-				return err
-			}
-			return ErrorCreated
-		}
-		if err != nil {
-			return err
-		}
-
-		if c.Request.Method == http.MethodPost {
-			return errors.AlreadyExistsf("entity '%s' already exists", resource.GetID())
-		}
-		if err := resource.SetID(oldres.GetID()); err != nil {
-			return err
-		}
-		return repository.Save(resource)
-	}, http.StatusOK)
 }
 
 // ErrorHook Convert repository errors in juju errors
