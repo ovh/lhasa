@@ -2,6 +2,7 @@ package application
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -216,14 +217,17 @@ func HandlerDeleteBadgeRatingForAppVersion(repository *Repository) gin.HandlerFu
 	}, http.StatusOK)
 }
 
-// HandlerRedirectLatest perform a 303 redirection to
+// HandlerRedirectLatest reply back the latest version of this application
 func HandlerRedirectLatest(appLatestRepo *RepositoryLatest) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, _ *v1.Application) error {
+	return tonic.Handler(func(c *gin.Context, _ *v1.Application) (*v1.Release, error) {
 		app, err := hateoas.FindByPath(c, appLatestRepo)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		c.Header("location", app.(*v1.Release).GetSelfURL(hateoas.BaseURL(c)))
-		return nil
-	}, http.StatusSeeOther)
+		if release, ok := app.(*v1.Release); ok {
+			release.ToResource(hateoas.BaseURL(c))
+			return release, nil
+		}
+		return nil, errors.New("internal type error")
+	}, http.StatusOK)
 }
