@@ -33,7 +33,11 @@
   "OPENAPI_SPEC": "OpenAPI Specification",
   "REPOSITORY": "Repository",
   "AUTHORS": "Authors",
+  "TAGS": "Tags",
+  "NO_TAGS_SPECIFIED": "No tags specified",
+  "NO_SOURCE_CODE_REPOSITORY_SPECIFIED": "No source code repository specified",
   "ACTIVE_DEPLOYMENTS": "Active Deployments",
+  "NO_OPENAPI_API_URL_SPECIFIED": "No OpenAPI URL specified",
   "INTERNAL_ID": "Internal ID",
   "CREATED_AT": "Created At",
   "UPDATED_AT": "Updated At"

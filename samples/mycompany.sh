@@ -148,11 +148,7 @@ curl --request POST \
 curl --request POST \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/1.0.0/deploy/produk \
   --header 'content-type: application/json' \
-  --data "{
-		\"properties\":{
-			\"openapi\": $OPENAPI_SPEC
-		}
-	}"
+  --data "{}"
 
 
 curl --request PUT \
@@ -184,11 +180,7 @@ curl --request PUT \
 curl --request POST \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/1.0.1/deploy/prodde \
   --header 'content-type: application/json' \
-  --data "{
-		\"properties\":{
-			\"openapi\": $OPENAPI_SPEC
-		}
-	}"
+  --data "{}"
 
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/human-resources/travel-api/versions/2.0.0 \

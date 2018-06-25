@@ -60,3 +60,7 @@ input[type="radio"]:checked+label {
   display: flex;
   flex-wrap: nowrap;
 }
+
+.font-extra-light{
+  color: #b3becc;
+}

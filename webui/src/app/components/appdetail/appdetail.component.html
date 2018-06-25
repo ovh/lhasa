@@ -1,5 +1,4 @@
 <div *ngIf="application" class="ui-g">
-
   <div class="ui-g-12">
     <h1 class="oui-header_1 oui-header_underline header">
       {{ 'APPLICATION' | translate }}: {{ application.domain }}/{{ application.name }}
@@ -29,20 +28,22 @@
     <p-card>
       <h5 class="oui-header_5">
         <i class="oui-icon oui-icon-check_line" aria-hidden="true"></i>
-        Tags
+        {{ 'TAGS' | translate }}
       </h5>
       <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
-      <div *ngIf="application.manifest && application.manifest.repository">
+      <span class="font-extra-light" *ngIf="!application.tags">{{ 'NO_TAGS_SPECIFIED' | translate }}</span>
+      <div>
         <hr>
         <h5 class="oui-header_5">
           <i class="oui-icon oui-icon-page_line" aria-hidden="true"></i>
           {{ 'REPOSITORY' | translate }}
         </h5>
         <p class="oui-field__control oui-field__control_auto">
-          <a class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
+          <a *ngIf="application.manifest && application.manifest.repository" class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
             {{ application.manifest.repository }}
             <span class="oui-icon oui-icon-external_link"></span>
           </a>
+          <span class="font-extra-light" *ngIf="!application.manifest || !application.manifest.repository">{{ 'NO_SOURCE_CODE_REPOSITORY_SPECIFIED' | translate }}</span>
         </p>
       </div>
       <div *ngIf="application.manifest.authors">
@@ -91,7 +92,8 @@
           <dd>{{ _selectedDeployment._updatedAt }}</dd>
         </dl>
         <p-card title="{{ 'OPENAPI_SPEC' | translate }}">
-          <app-openapi-ui [spec]="_selectedDeployment.properties['openapi']"></app-openapi-ui>
+          <app-openapi-ui *ngIf="_selectedDeployment.properties['openapi']" [spec]="_selectedDeployment.properties['openapi']"></app-openapi-ui>
+          <span class="font-extra-light" *ngIf="!_selectedDeployment.properties['openapi']">{{ 'NO_OPENAPI_API_URL_SPECIFIED' | translate }}</span>
         </p-card>
       </div>
     </div>
