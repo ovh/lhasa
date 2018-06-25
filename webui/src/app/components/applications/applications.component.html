@@ -7,7 +7,7 @@
 <div class="ui-g-12" *ngFor="let domain of domains | orderByDomains">
   <h2 class="oui-header_2 oui-header_underline header">{{ domain.name | uppercase }}</h2>
   <div class="ui-g-4 ui-md-4 pad-tile" *ngFor="let app of domain.applications | orderByApps">
-    <p-card title="{{ app.name }}" subtitle="{{ app.domain }}" routerLink="/applications/{{ app.domain }}/{{ app.name }}/versions/{{ app.version }}">
+    <p-card title="{{ app.name }}" subtitle="{{ app.domain }}" routerLink="/applications/{{ app.domain }}/{{ app.name }}">
       <p class="application-description">
         {{ app.description }}
       </p>

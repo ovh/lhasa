@@ -27,6 +27,14 @@ export class DashboardComponent implements OnInit {
         this.router.navigate([params.redirect], {
           queryParams: copy
         });
+      } else {
+        const copy: Params = {};
+        each(params, (value, key) => {
+          copy[key] = value;
+        });
+        this.router.navigate(['/applications'], {
+          queryParams: copy
+        });
       }
     });
   }

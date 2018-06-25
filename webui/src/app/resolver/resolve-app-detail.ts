@@ -28,16 +28,16 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
         state: RouterStateSnapshot
     ): Observable<any> | Promise<any> | any {
         this.selectApplication(route.params.domain, 
-            route.params.name, route.params.version, new BehaviorSubject<any>('select an application'));
+            route.params.name, new BehaviorSubject<any>('select latest application'));
     }
 
     /**
      * dispatch  SelectApplicationAction
      * @param event
      */
-    protected selectApplication(domain: string, name: string, version: string, subject: Subject<any>) {
+    protected selectApplication(domain: string, name: string, subject: Subject<any>) {
         this.loadersStoreService.notify(subject);
-        this.applicationsService.GetSingle(`${domain}/${name}/versions/${version}`)
+        this.applicationsService.GetSingle(`${domain}/${name}/latest`)
             .subscribe(
             (app: ApplicationBean) => {
                 this.deploymentService.GetAllFromContent(
@@ -45,7 +45,7 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
                     '%22%2C%20%22properties._app_name%22%3A%20%22' + name + '%22%7D',
                     { 'size': '20' }).subscribe(
                     (deployments: ContentListResponse<DeploymentBean>) => {
-                        this.badgeRatingService.GetBadgeRatings(`${domain}/${name}/versions/${version}/badges`).subscribe(
+                        this.badgeRatingService.GetBadgeRatings(`${domain}/${name}/versions/${app.version}/badges`).subscribe(
                             (badgeRatings: BadgeRatingBean[]) => {
                                 app.deployments = deployments.content;
                                 app.badgeRatings = badgeRatings;

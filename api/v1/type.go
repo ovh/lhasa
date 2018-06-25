@@ -87,9 +87,9 @@ type Application struct {
 // Release defines the model properties of an application version
 type Release struct {
 	ID           uint            `json:"-" gorm:"auto increment" binding:"-"`
-	Domain       string          `json:"domain" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"domain" description:"Application Domain"`
-	Name         string          `json:"name" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"name" description:"Application Name"`
-	Version      string          `json:"version" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"version" description:"Application Version"`
+	Domain       string          `json:"domain" validate:"required" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"domain" description:"Application Domain"`
+	Name         string          `json:"name" validate:"required" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"name" description:"Application Name"`
+	Version      string          `json:"version" validate:"required" gorm:"not null;type:varchar(255);unique_index:idx_applications_domain_name_version;default:''" path:"version" description:"Application Version"`
 	Properties   *postgres.Jsonb `json:"properties"`
 	Manifest     *postgres.Jsonb `json:"manifest"`
 	Tags         pq.StringArray  `json:"tags,omitempty" gorm:"type:varchar(255)[]"`
