@@ -15,6 +15,9 @@ import { SidebarModule } from 'primeng/sidebar';
 import { ContentBean } from './models/commons/content-bean';
 import { ErrorBean, ErrorsStoreService, DropErrorAction, NewErrorAction } from './stores/errors-store.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ConfigStoreService, ConfigBean } from './stores/config-store.service';
+
+import { each, find } from 'lodash';
 
 @Component({
   selector: 'app-root',
@@ -32,6 +35,7 @@ export class AppComponent implements OnInit {
   protected loadersStream: Store<LoaderBean[]>;
   public loaders: LoaderBean[] = [];
   protected helpStream: Store<HelpBean>;
+  protected configStream: Store<ConfigBean>;
 
   title = 'app';
 
@@ -40,6 +44,76 @@ export class AppComponent implements OnInit {
   public displaySidebar = false;
   public displayHelp = false;
   public helpContent: ContentBean;
+
+  private TOOLBAR = [
+    {
+      id: 'domains',
+      label: 'DOMAINS',
+      routerLink: '/domains'
+    },
+    {
+      id: 'applications',
+      label: 'APPLICATIONS',
+      routerLink: '/applications'
+    },
+    {
+      id: 'badges',
+      label: 'BADGES',
+      routerLink: '/badges'
+    },
+    {
+      id: 'maps',
+      label: 'MAPS',
+      routerLink: '/graph/deployments'
+    }
+  ];
+
+  private SIDEBAR = [
+    {
+      id: 'domains',
+      label: 'DOMAINS',
+      items: [
+        {
+          id: 'domains-all',
+          label: 'DOMAINS-ALL',
+          routerLink: '/domains'
+        }
+      ]
+    },
+    {
+      id: 'applications',
+      label: 'APPLICATIONS',
+      items: [
+        {
+          id: 'applications-all',
+          label: 'APPLICATIONS-ALL',
+          routerLink: '/applications'
+        }
+      ]
+    },
+    {
+      id: 'badges',
+      label: 'BADGES',
+      items: [
+        {
+          id: 'badges-all',
+          label: 'BADGES-ALL',
+          routerLink: '/badges'
+        }
+      ]
+    },
+    {
+      id: 'maps',
+      label: 'MAPS',
+      items: [
+        {
+          id: 'deployments-graph',
+          label: 'MAPS-ALL',
+          routerLink: '/graph/deployments'
+        }
+      ]
+    },
+  ];
 
   constructor(
     private router: Router,
@@ -51,6 +125,7 @@ export class AppComponent implements OnInit {
     private environmentService: DataEnvironmentService,
     private translate: TranslateService,
     private helpsStoreService: HelpsStoreService,
+    private configStoreService: ConfigStoreService,
   ) {
     // this language will be used as a fallback when a translation isn't found in the current language
     this.translate.setDefaultLang('en');
@@ -59,28 +134,7 @@ export class AppComponent implements OnInit {
     this.translate.use('en');
 
     // Simple menu model
-    this.items = [
-      {
-        id: 'domains',
-        label: 'DOMAINS',
-        routerLink: '/domains'
-      },
-      {
-        id: 'applications',
-        label: 'APPLICATIONS',
-        routerLink: '/applications'
-      },
-      {
-        id: 'badges',
-        label: 'BADGES',
-        routerLink: '/badges'
-      },
-      {
-        id: 'maps',
-        label: 'MAPS',
-        routerLink: '/graph/deployments'
-      }
-    ];
+    this.items = [];
 
     // Loaders
     this.loadersStream = this.loaderstoreService.loaders();
@@ -89,54 +143,13 @@ export class AppComponent implements OnInit {
 
     // help
     this.helpStream = this.helpsStoreService.help();
+    // config
+    this.configStream = this.configStoreService.help();
+    // Dispath configuration loading
+    this.configStoreService.request('configuration');
 
     // Simple menu model
-    this.sideItems = [
-      {
-        id: 'domains',
-        label: 'DOMAINS',
-        items: [
-          {
-            id: 'domains-all',
-            label: 'DOMAINS-ALL',
-            routerLink: '/domains'
-          }
-        ]
-      },
-      {
-        id: 'applications',
-        label: 'APPLICATIONS',
-        items: [
-          {
-            id: 'applications-all',
-            label: 'APPLICATIONS-ALL',
-            routerLink: '/applications'
-          }
-        ]
-      },
-      {
-        id: 'badges',
-        label: 'BADGES',
-        items: [
-          {
-            id: 'badges-all',
-            label: 'BADGES-ALL',
-            routerLink: '/badges'
-          }
-        ]
-      },
-      {
-        id: 'maps',
-        label: 'MAPS',
-        items: [
-          {
-            id: 'deployments-graph',
-            label: 'MAPS-ALL',
-            routerLink: '/graph/deployments'
-          }
-        ]
-      },
-    ];
+    this.sideItems = [];
   }
 
   /**
@@ -153,6 +166,23 @@ export class AppComponent implements OnInit {
     }
   }
 
+  private filterByID(keys: any, values: any) {
+    if (!keys) {
+      return values;
+    }
+
+    const filtered = [];
+    each(values, (item) => {
+      const found = find(keys, (f) => {
+        return f.id === item.id;
+      });
+      if (found) {
+        filtered.push(item);
+      }
+    });
+    return filtered;
+  }
+
   ngOnInit(): void {
     // loaders
     this.loadersStream.subscribe(
@@ -166,6 +196,15 @@ export class AppComponent implements OnInit {
         if (help.token) {
           this.displayHelp = true;
           this.helpContent = help.content;
+        }
+      }
+    );
+    // config
+    this.configStream.subscribe(
+      (data: ConfigBean) => {
+        if (data.config) {
+          this.items = this.filterByID(data.config.toolbar, this.TOOLBAR);
+          this.sideItems = this.filterByID(data.config.toolbar, this.SIDEBAR);
         }
       }
     );
