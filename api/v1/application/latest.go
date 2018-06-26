@@ -41,7 +41,7 @@ func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory
 				return err
 			}
 			if shouldUpdate(application.LatestRelease, version, log) {
-				application.LatestReleaseID = &version.ID
+				application.LatestRelease = version
 				return latestRepo.Save(application)
 			}
 			return nil

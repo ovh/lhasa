@@ -1,0 +1,46 @@
+name: Applications Endpoint TestSuite
+vars:
+  baseroute: '{{.APP_HOST}}/api/v1'
+  appsroute: '{{.baseroute}}/applications'
+testcases:
+- name: ApplicationLifecycle
+  steps:
+    - type: http
+      method: DELETE
+      url: '{{.APP_HOST}}/api/v1/applications'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 204
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/versions/0.0.10+cds.432"
+      body: '{"domain": "agora", "name":"api", "version":"0.0.10+cds.432", "manifest":{"description":"Sample app"}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/latest"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: PUT
+      url: "{{.appsroute}}/agora/api/versions/0.1.10+cds.101"
+      body: '{"domain": "agora", "name":"api", "version":"0.1.10+cds.101", "manifest":{"description":"Sample app"}}'
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 201
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/latest"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+    - type: http
+      method: GET
+      url: "{{.appsroute}}/agora/api/latest"
+      headers:
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.version ShouldEqual 0.1.10+cds.101
