@@ -4,12 +4,14 @@ COPY dist /app
 
 WORKDIR /app
 
-RUN ls -lrt /app
-RUN mkdir -p /etc/appcatalog
-RUN chown -R nobody:nogroup /app && chmod +x /app/mycompany.sh
-RUN chown -R nobody:nogroup /app && chmod +x /app/appcatalog.sh
-RUN chown -R nobody:nogroup /app && chmod +x /app/appcatalog-configuration
-RUN chown -R nobody:nogroup /app && chmod +x /app/appcatalog
+RUN chown -R nobody:nogroup /app \
+    && chmod +x /app/mycompany.sh \
+                /app/appcatalog.sh \
+                /app/appcatalog-configuration \
+                /app/appcatalog \
+    && apt-get update \
+    && apt-get install -y curl wget ca-certificates
+
 USER nobody
 
 EXPOSE 8081

@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"github.com/ovh/lhasa/api/config"
 	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/logger"
 	"github.com/ovh/lhasa/api/routing"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
@@ -47,10 +47,12 @@ var (
 	cmdMigrateUp   = cmdMigrate.Command(cmdCodeMigrateUp, "Runs migrations upward (default).").Default()
 	cmdMigrateDown = cmdMigrate.Command(cmdCodeMigrateDown, "Runs migrations downward.")
 
-	cmdStart            = application.Command(cmdCodeStart, "Starts application.").Default()
-	flagStartPort       = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
-	flagHateoasBasePath = cmdStart.Flag("hateoas-base-path", "Base path to use for Hateoas links").Envar("APPCATALOG_HATEOAS_BASE_PATH").Default("/api").String()
-	flagUIBasePath      = cmdStart.Flag("ui-base-path", "Base path to use for UI redirections").Envar("APPCATALOG_UI_BASE_PATH").Default("/ui").String()
+	cmdStart             = application.Command(cmdCodeStart, "Starts application.").Default()
+	flagStartPort        = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
+	flagHateoasBasePath  = cmdStart.Flag("hateoas-base-path", "Base path to use for Hateoas links").Envar("APPCATALOG_HATEOAS_BASE_PATH").Default("/api").String()
+	flagUIBasePath       = cmdStart.Flag("ui-base-path", "Base path to use for UI redirections").Envar("APPCATALOG_UI_BASE_PATH").Default("/").String()
+	flagServerUIBasePath = cmdStart.Flag("server-ui-base-path", "UI Base path as seen by the server").Envar("APPCATALOG_SERVER_UI_BASE_PATH").Default("/").String()
+	flagWebUIDir         = cmdStart.Flag("web-ui-dir", "Web UI Dir").Envar("LHASA_WEB_UI_DIR").Default("./webui").String()
 )
 
 func main() {
@@ -82,7 +84,7 @@ func main() {
 		if *flagAutoMigrations {
 			runMigrationsUp(tm.DB().DB(), log)
 		}
-		router := routers.NewRouter(tm, version, *flagHateoasBasePath, *flagUIBasePath, *flagDebug, log)
+		router := routers.NewRouter(tm, version, *flagHateoasBasePath, *flagUIBasePath, *flagServerUIBasePath, *flagWebUIDir, *flagDebug, log)
 		srv := &http.Server{
 			Addr:    fmt.Sprintf(":%d", *flagStartPort),
 			Handler: router,

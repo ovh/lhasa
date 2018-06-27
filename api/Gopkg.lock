@@ -14,12 +14,6 @@
   version = "v1.5"
 
 [[projects]]
-  name = "github.com/alecthomas/gometalinter"
-  packages = ["_linters/src/honnef.co/go/tools/version"]
-  revision = "46cc1ea3778b247666c2949669a3333c532fa9c6"
-  version = "v2.0.5"
-
-[[projects]]
   branch = "master"
   name = "github.com/alecthomas/template"
   packages = [
@@ -78,12 +72,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/gin-contrib/gzip"
-  packages = ["."]
-  revision = "4fbfcc6122759afed2efbc762c4c41164a403951"
-
-[[projects]]
-  branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
@@ -91,7 +79,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/gin-gonic/contrib"
-  packages = ["static"]
+  packages = [
+    "gzip",
+    "static"
+  ]
   revision = "6ea35d32286ce194572a0dc2a3398aac0091228d"
 
 [[projects]]
@@ -474,6 +465,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5f7223d9d6e2301c70048dd885365b37ea387888e7ecf8f3532709ec75f93c44"
+  inputs-digest = "adc783119b569d0c0442d51b3485a7d2bfdc020e863260fb14049ac01c639fe6"
   solver-name = "gps-cdcl"
   solver-version = 1

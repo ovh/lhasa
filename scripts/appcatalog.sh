@@ -10,7 +10,7 @@ set -ex
     ret=1
     while [ $ret -ne 0 ]
     do
-        curl -s $API_BASE_URL/api/unsecured/version >/dev/null
+        curl -s $API_BASE_URL/unsecured/version >/dev/null
         ret=$?
         echo $ret
         sleep 1

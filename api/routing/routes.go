@@ -1,64 +1,39 @@
 package routers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
-	"path"
 	"reflect"
 	"strings"
 
-	"github.com/gin-contrib/gzip"
+	"github.com/gin-gonic/contrib/gzip"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
-	"github.com/sirupsen/logrus"
-	"github.com/wI2L/fizz"
-	"github.com/wI2L/fizz/openapi"
 	"github.com/ovh/lhasa/api/db"
 	ext "github.com/ovh/lhasa/api/ext/binding"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
 	v1 "github.com/ovh/lhasa/api/v1/routing"
+	"github.com/sirupsen/logrus"
+	"github.com/wI2L/fizz"
+	"github.com/wI2L/fizz/openapi"
 )
 
-const uiLocalPath = "./webui"
-
-// find existing resource on base webui (for security issue)
-func findResource(dir string, name string) (string, string, bool) {
-	var existing = strings.Replace(dir+"/"+name, "//", "", -1)
-	if _, err := os.Stat(existing); err == nil {
-		return "", existing, false
-	}
-	if dir == "/" {
-		return "", name, true
-	}
-	return path.Dir(dir), name, true
-}
-
-// redirect unknown routes to angular
 func uiRedirectHandler(uiBasePath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		dir, name, notfound := findResource(uiLocalPath+path.Dir(c.Request.URL.Path), path.Base(c.Request.URL.Path))
-		for notfound && dir != "." {
-			dir, name, notfound = findResource(dir, name)
-			if !notfound {
-				c.File(dir + name)
-				return
-			}
-		}
-		if strings.HasPrefix(c.Request.URL.Path, "/ui") {
-			c.Redirect(301, fmt.Sprintf("%s/?redirect=%s", uiBasePath, strings.TrimPrefix(c.Request.URL.Path, "/ui")))
+		if strings.HasPrefix(c.Request.RequestURI, "/api/") {
+			c.AbortWithStatusJSON(404, gin.H{"error": "API route not found"})
 			return
 		}
-		c.File(uiLocalPath + "/index.html")
+		c.HTML(http.StatusOK, "index.html", gin.H{"UIBasePath": uiBasePath})
 	}
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
+func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath string, ServerUIBasePath, webUIDir string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
 	router := fizz.New()
 	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
 
@@ -66,9 +41,6 @@ func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath st
 	configureGin(log, debugMode)
 
 	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))
-
-	// redirect root routes to angular assets
-	router.Use(gzip.Gzip(gzip.DefaultCompression), static.Serve("/ui", static.LocalFile("./webui", true)))
 
 	// Set specific hook
 	tonic.SetBindHook(ext.BindHook)
@@ -111,8 +83,16 @@ func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath st
 	unsecured.GET("/openapi.json", nil, router.OpenAPI(infos, "json"))
 	unsecured.GET("/openapi.yaml", nil, router.OpenAPI(infos, "yaml"))
 
+	if _, err := os.Stat(webUIDir + "/index.html"); os.IsNotExist(err) {
+		log.Warn("index.html not found. Starting in API only mode. No static content will be served.")
+		return router
+	}
+	// serve static content from angular
+	router.Use(static.Serve(ServerUIBasePath, static.LocalFile(webUIDir, false)))
+
 	// redirect unknown routes to angular
-	router.Engine().NoRoute(uiRedirectHandler(uiBasePath))
+	router.Engine().LoadHTMLFiles(webUIDir + "/index.html")
+	router.Engine().NoRoute(gzip.Gzip(gzip.DefaultCompression), uiRedirectHandler(uiBasePath))
 	return router
 }
 

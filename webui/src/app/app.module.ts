@@ -12,7 +12,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ApplicationsComponent } from './components/applications/applications.component';
 import { AppEditComponent } from './components/appedit/appedit.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MarkdownModule } from 'ngx-md';
@@ -95,7 +94,7 @@ import { DataApplicationService } from './services/data-application-version.serv
 import { DataDeploymentService } from './services/data-deployment.service';
 import { DataBadgeRatingsService } from './services/data-badgeratings.service';
 import { StoreModule } from '@ngrx/store';
-import { APP_BASE_HREF, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfigurationService } from './services/configuration.service';
 import { SecurityService } from './services/security.service';
@@ -130,9 +129,13 @@ import { HelpsStoreService } from './stores/help-store.service';
 import { ConfigStoreService } from './stores/config-store.service';
 import { ErrorsStoreService } from './stores/errors-store.service';
 
+export function getBaseUrl() {
+  return document.getElementsByTagName('base')[0].href;
+}
+
 // Cf. https://github.com/ngx-translate/core
 export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, environment.baseHref + '/assets/i18n/', '.json');
+  return new TranslateHttpLoader(http, getBaseUrl() + '/assets/i18n/', '.json');
 }
 
 @NgModule({
@@ -144,7 +147,6 @@ export function createTranslateLoader(http: HttpClient) {
     GraphComponent,
     BadgeWidgetComponent,
     AppEditComponent,
-    DashboardComponent,
     AppdetailComponent,
     BadgesComponent,
     OpenAPIUIComponent,
@@ -258,12 +260,6 @@ export function createTranslateLoader(http: HttpClient) {
     })
   ],
   providers: [
-    /**
-     * Base Href
-     */
-    {
-      provide: APP_BASE_HREF, useValue: environment.baseHref
-    },
     /**
      * guards
      */

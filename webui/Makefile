@@ -1,7 +1,5 @@
-UI_BASE_HREF = /ui
-
-all: ui-kit dep
-	ng build --output-path=../dist/webui --prod --aot --environment prod --base-href ${UI_BASE_HREF} --deploy-url ${UI_BASE_HREF}
+all: ui-kit
+	ng build --output-path=../dist/webui --prod --aot --environment prod --base-href '{{ .UIBasePath }}' --deploy-url ${UI_BASE_HREF}
 
 dev: ui-kit dep
 	ng build --output-path=../dist/webui

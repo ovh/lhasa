@@ -20,8 +20,7 @@ func StartTestHTTPServer() *httptest.Server {
 	mocket.Catcher.Logging = true
 	dbHandle, _ := gorm.Open(mocket.DRIVER_NAME, "any_string")
 	tm := db.NewTransactionManager(dbHandle, log)
-
-	router := routers.NewRouter(tm, "1.0.0", "/api", "/ui", true, log)
+	router := routers.NewRouter(tm, "1.0.0", "/api", "/ui", "/", "./", true, log)
 	server := httptest.NewServer(router)
 	return server
 }
