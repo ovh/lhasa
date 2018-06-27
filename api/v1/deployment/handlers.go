@@ -96,12 +96,8 @@ func HandlerFindDeployment(appRepo *application.Repository, envRepo *environment
 // HandlerListActiveDeployments list active deployments for a given application version
 func HandlerListActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
-		app, err := appRepo.FindOneByDomainNameVersion(request.Domain, request.Name, request.Version)
-		if err != nil {
-			return nil, err
-		}
-		criteria := map[string]interface{}{"application_id": app.ID}
-		deps, err := depRepo.FindActivesBy(criteria)
+		criteria := map[string]interface{}{}
+		deps, err := depRepo.FindActivesBy(request.Domain, request.Name, criteria)
 		if err != nil {
 			return nil, err
 		}

@@ -40,14 +40,13 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
         this.applicationsService.GetSingle(`${domain}/${name}/latest`)
             .subscribe(
             (app: ApplicationBean) => {
-                this.deploymentService.GetAllFromContent(
-                    '/?q=%7B%22properties._app_domain%22%3A%20%22' + domain +
-                    '%22%2C%20%22properties._app_name%22%3A%20%22' + name + '%22%7D',
-                    { 'size': '20' }).subscribe(
-                    (deployments: ContentListResponse<DeploymentBean>) => {
+                // application service should answer apps, but here we have deployments
+                this.applicationsService.GetSingleAny(`${domain}/${name}/deployments`)
+                .subscribe(
+                    (deployments: DeploymentBean[]) => {
                         this.badgeRatingService.GetBadgeRatings(`${domain}/${name}/versions/${app.version}/badges`).subscribe(
                             (badgeRatings: BadgeRatingBean[]) => {
-                                app.deployments = deployments.content;
+                                app.deployments = deployments;
                                 app.badgeRatings = badgeRatings;
                                 this.applicationsStoreService.dispatch(
                                     new SelectApplicationAction(

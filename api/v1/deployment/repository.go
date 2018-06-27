@@ -23,6 +23,9 @@ const (
 		"AND \"undeployed_at\" IS NULL"
 )
 
+// RepositoryFactory defines a repository constructor
+type RepositoryFactory func(*gorm.DB) *Repository
+
 // Repository is a repository manager for applications
 type Repository struct {
 	db *gorm.DB
@@ -144,11 +147,13 @@ func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, er
 	return deps, err
 }
 
-// FindActivesBy fetch a collection of deployments matching each criteria
-func (repo *Repository) FindActivesBy(criteria map[string]interface{}) ([]*v1.Deployment, error) {
+// FindActivesBy fetch a collection of deployments matching each criteria on a given domain and name apps
+func (repo *Repository) FindActivesBy(domain string, name string, criterias map[string]interface{}) ([]*v1.Deployment, error) {
 	var deps []*v1.Deployment
-
-	err := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).Where("undeployed_at IS NULL").Find(&deps, criteria).Error
+	err := repo.db.Preload("Environment").Preload("Application").Table("deployments").
+		Joins("JOIN releases on releases.id = deployments.application_id").
+		Model(v1.Deployment{}).Where("undeployed_at IS NULL AND releases.domain = ? AND releases.name = ?", domain, name).
+		Find(&deps, criterias).Error
 	return deps, err
 }
 
