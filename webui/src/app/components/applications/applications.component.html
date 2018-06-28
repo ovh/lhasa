@@ -1,6 +1,6 @@
 <app-oui-pagination #paginationtop [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
 <div class="oui-input-group oui-input-group_m filter">
-    <input (keyup)="onFilterKeyPressed($event)" class="oui-input" placeholder="🔍">
+  <input (keyup)="onFilterKeyPressed($event)" class="oui-input" placeholder="🔍" [(ngModel)]="searchString">
 </div>
 <h1 class="oui-header_1 oui-header_underline header">{{ 'APPLICATIONS' | translate }}</h1>
 <app-oui-message #message *ngIf="domain.length > 0" (select)="onMessageEvent($event)" message="{{ 'FILERED_BY_DOMAIN' | translate:param }}"></app-oui-message>
@@ -13,5 +13,8 @@
       </p>
     </p-card>
   </div>
+</div>
+<div class="ui-g-12" *ngIf="domains.length == 0">
+  {{ "YOUR_SEARCH_QUERY_RETURNED_0_RESULTS" | translate }}
 </div>
 <app-oui-pagination #paginationbottom [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>

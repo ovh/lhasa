@@ -34,6 +34,7 @@
   "REPOSITORY": "Repository",
   "AUTHORS": "Authors",
   "TAGS": "Tags",
+  "YOUR_SEARCH_QUERY_RETURNED_0_RESULTS": "Your search query returned 0 results",
   "NO_TAGS_SPECIFIED": "No tags specified",
   "NO_SOURCE_CODE_REPOSITORY_SPECIFIED": "No source code repository specified",
   "ACTIVE_DEPLOYMENTS": "Active Deployments",
