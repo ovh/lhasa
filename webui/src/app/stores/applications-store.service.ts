@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/store';
 
 import { ActionWithPayloadAndPromise } from './action-with-payload';
-import { ApplicationBean, ApplicationPagesBean, DeploymentBean, DomainBean, DomainPagesBean, BadgeRatingBean } from '../models/commons/applications-bean';
+import { ApplicationBean, ApplicationPagesBean,
+  DeploymentBean, DomainBean, DomainPagesBean, BadgeRatingBean } from '../models/commons/applications-bean';
 import { Subject } from 'rxjs/Subject';
 
 /**
@@ -125,12 +126,19 @@ export class ApplicationsStoreService {
           domains.push({name: k, applications: v});
         });
 
+        const firstApp = pages.applications[0];
+        if (!firstApp) {
+          console.warn('No active application can be selected');
+        }
+
         action.subject.complete();
         return {
           domainPages: state.domainPages,
           domains: domains,
           applications: pages,
-          active: pages.applications[0],
+          // Undefined must be check in all client
+          // of this stream
+          active: firstApp,
         };
       }
 
@@ -157,7 +165,7 @@ export class ApplicationsStoreService {
        */
       case SelectApplicationAction.getType(): {
         action = action as SelectApplicationAction;
-        var active = Object.assign({}, action.payload);
+        const active = Object.assign({}, action.payload);
 
         /**
          * notify domains change
