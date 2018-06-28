@@ -46,14 +46,14 @@ func HandlerFindByPage(repository PageableRepository) gin.HandlerFunc {
 }
 
 // HandlerFindBy returns all resources matching path params
-func HandlerFindBy(repository Repository) gin.HandlerFunc {
+func HandlerFindBy(repository ListableRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (interface{}, error) {
 		return repository.FindBy(parsePathParams(c))
 	}, http.StatusOK)
 }
 
 // HandlerFindOneBy returns the first resource matching path params
-func HandlerFindOneBy(repository Repository) gin.HandlerFunc {
+func HandlerFindOneBy(repository ListableRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (interface{}, error) {
 		result, err := FindByPath(c, repository)
 		if resource, ok := result.(Resourceable); ok {
@@ -67,7 +67,7 @@ func HandlerFindOneBy(repository Repository) gin.HandlerFunc {
 }
 
 // HandlerRemoveOneBy removes a given resource
-func HandlerRemoveOneBy(repository Repository) gin.HandlerFunc {
+func HandlerRemoveOneBy(repository SavableRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) error {
 		result, err := FindByPath(c, repository)
 		if err != nil {
@@ -118,7 +118,7 @@ func AddToBasePath(basePath string) gin.HandlerFunc {
 }
 
 // FindByPath find one entity in the given repository, using paths parameters as matching criteria
-func FindByPath(c *gin.Context, repository Repository) (Entity, error) {
+func FindByPath(c *gin.Context, repository ListableRepository) (Entity, error) {
 	params := parsePathParams(c)
 	if repo, ok := repository.(SoftDeletableRepository); ok {
 		result, err := repo.FindOneByUnscoped(params)

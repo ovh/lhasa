@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"github.com/juju/errors"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
 )
@@ -42,11 +41,6 @@ func NewRepositoryLatest(db *gorm.DB) *RepositoryLatest {
 	return &RepositoryLatest{
 		db: db,
 	}
-}
-
-// FindAllPage returns a page of matching entities
-func (repo *RepositoryLatest) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
-	return repo.FindPageBy(pageable, map[string]interface{}{})
 }
 
 // FindPageBy returns a page of matching entities
@@ -139,25 +133,6 @@ func (repo *RepositoryLatest) Save(application hateoas.Entity) error {
 		return repo.db.Create(app).Error
 	}
 	return repo.db.Unscoped().Save(app).Error
-}
-
-// Truncate empties the applications table for testing purposes
-func (repo *RepositoryLatest) Truncate() error {
-	return errors.NotSupportedf("operation not supported")
-}
-
-// Remove deletes the application whose GetID is given as a parameter
-func (repo *RepositoryLatest) Remove(app interface{}) error {
-	return errors.NotSupportedf("operation not supported")
-}
-
-// FindByID gives the details of a particular application
-func (repo *RepositoryLatest) FindByID(id interface{}) (hateoas.Entity, error) {
-	app := v1.Application{}
-	if err := repo.db.First(&app, id).Error; err != nil {
-		return nil, err
-	}
-	return &app, nil
 }
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
