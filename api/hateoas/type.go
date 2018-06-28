@@ -26,32 +26,37 @@ type SoftDeletableEntity interface {
 }
 
 // Repository defines a normal repository
-type Repository interface {
-	FindAll() (interface{}, error)
-	FindByID(interface{}) (Entity, error)
+type BaseRepository interface {
+	GetType() reflect.Type
+}
+
+type ListableRepository interface {
+	BaseRepository
 	FindBy(map[string]interface{}) (interface{}, error)
 	FindOneBy(map[string]interface{}) (Entity, error)
+}
+
+type SavableRepository interface {
+	ListableRepository
 	Save(Entity) error
 	Remove(interface{}) error
-	GetType() reflect.Type
 }
 
 // PageableRepository defines a repository that handles pagination
 type PageableRepository interface {
-	Repository
-	FindAllPage(Pageable) (Page, error)
+	BaseRepository
 	FindPageBy(Pageable, map[string]interface{}) (Page, error)
 }
 
 // TruncatableRepository defines a repository that handles truncation
 type TruncatableRepository interface {
-	Repository
+	BaseRepository
 	Truncate() error
 }
 
 // SoftDeletableRepository defines a repository that handles soft delete
 type SoftDeletableRepository interface {
-	Repository
+	BaseRepository
 	FindOneByUnscoped(criteria map[string]interface{}) (SoftDeletableEntity, error)
 }
 

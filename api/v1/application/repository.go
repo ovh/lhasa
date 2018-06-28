@@ -37,16 +37,6 @@ func (repo *Repository) GetType() reflect.Type {
 	return reflect.TypeOf(v1.Release{})
 }
 
-// FindAll returns all entities of the repository type
-func (repo *Repository) FindAll() (interface{}, error) {
-	return repo.FindBy(map[string]interface{}{})
-}
-
-// FindAllPage returns a page of matching entities
-func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
-	return repo.FindPageBy(pageable, map[string]interface{}{})
-}
-
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.ApplicationBasePath)
@@ -125,15 +115,6 @@ func (repo *Repository) Remove(app interface{}) error {
 	}
 
 	return repo.db.Delete(app).Error
-}
-
-// FindByID gives the details of a particular application
-func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
-	app := v1.Release{}
-	if err := repo.db.First(&app, id).Error; err != nil {
-		return nil, err
-	}
-	return &app, nil
 }
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
