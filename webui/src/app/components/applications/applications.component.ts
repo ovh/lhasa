@@ -37,9 +37,10 @@ export class ApplicationsComponent implements OnInit {
   @ViewChild('paginationbottom') paginationbottom: OuiPaginationComponent;
   @ViewChild('message') msg: OuiMessageComponent;
 
+
   public domain = '';
   public param = { target: '' };
-  protected searchString = ''
+  public searchString = ''
 
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
@@ -63,6 +64,7 @@ export class ApplicationsComponent implements OnInit {
         let changeDomain = false;
         // Defaults to 0 if no query param provided.
         this.page = +params['page'] || 0;
+        this.searchString = params['search'] || '';
         // verify if filter by domain
         if (!params['domain'] && this.domain !== '') {
           changeDomain = true;
