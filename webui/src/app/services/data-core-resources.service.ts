@@ -65,6 +65,15 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
   }
 
   /**
+   * get single resource with any reseult
+   */
+  public GetSingleAny = (id: string): Observable<any> => {
+    this.headers.set('AuthToken', this.configuration.getAuthToken());
+    return this.http.get<Observable<T>>(this.actionUrl + '/' + id, {headers: this.headers})
+      .catch(this.handleError);
+  }
+
+  /**
    * call api backend with a POST to execute task
    */
   public Task = (path: String, payload: any): Observable<T> => {

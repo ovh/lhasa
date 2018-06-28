@@ -98,7 +98,7 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.Summary("List active deployments for the latest release of this application"),
 		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
 			"Only a single deployment can be active at a time on a given environment."),
-	), deployment.HandlerListActiveDeployments(appLatestRepo, depRepo))
+	), deployment.HandlerListApplicationActiveDeployments(appLatestRepo, depRepo))
 	appRoutes.GET("/:domain/:name/versions/:version", getOperationOptions("FindOneBy", appRepo,
 		fizz.Summary("Find one Release"),
 		fizz.InputModel(v1.Release{}),
@@ -120,7 +120,7 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.Summary("List active deployments for this application version"),
 		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
 			"Only a single deployment can be active at a time on a given environment."),
-	), deployment.HandlerListActiveDeployments(appRepo, depRepo))
+	), deployment.HandlerListReleaseActiveDeployments(appRepo, depRepo))
 	appRoutes.GET("/:domain/:name/versions/:version/deployments/:slug", getOperationOptions("FindDeployment", appRepo,
 		fizz.Summary("Find active deployment for this application version, on this environment"),
 	), deployment.HandlerFindDeployment(appRepo, envRepo, depRepo))
@@ -208,9 +208,9 @@ func Init(tm db.TransactionManager, group *fizz.RouterGroup, log *logrus.Logger)
 	appLatestRepo := application.NewRepositoryLatest(tm.DB())
 	contRepo := content.NewRepository(tm.DB())
 	envRepo := environment.NewRepository(tm.DB())
-	depRepo := deployment.NewRepository(tm.DB())
 	badgeRepo := badge.NewRepository(tm.DB())
-	deployer := deployment.ApplicationDeployer(depRepo)
+	deployer := deployment.ApplicationDeployer(tm, deployment.NewRepository)
+	depRepo := deployment.NewRepository(tm.DB())
 	depend := deployment.Dependency(depRepo)
 	latestUpdater := application.NewLatestUpdater(tm, application.NewRepository, application.NewRepositoryLatest, log)
 
