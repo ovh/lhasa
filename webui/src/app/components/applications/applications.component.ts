@@ -39,7 +39,7 @@ export class ApplicationsComponent implements OnInit {
 
   public domain = '';
   public param = { target: '' };
-  public searchString = ''
+  public searchString = '';
 
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
