@@ -39,7 +39,7 @@ export class ApplicationsComponent implements OnInit {
 
   public domain = '';
   public param = { target: '' };
-  protected searchString = ''
+  protected searchString = '';
 
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
@@ -178,6 +178,6 @@ export class ApplicationsComponent implements OnInit {
 
   public onFilterKeyPressed(event: any) {
     this.searchString = event.target.value;
-    this.refreshApplications()
+    this.refreshApplications();
   }
 }

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Default value but can be overriden
+API_BASE_URL=${API_BASE_URL:-http:/localhost:8081/api}
+
 set -ex
 HOST=`echo $API_BASE_URL | awk -F/ '{print $3}'`
 BASEPATH=`echo $API_BASE_URL | grep / | cut -d/ -f4-`
@@ -302,6 +305,12 @@ curl --request PUT \
 	}
 }'
 
+curl --request POST \
+  --url $API_BASE_URL/v1/applications/web/ui/versions/1.0.0/deploy/staging \
+  --header 'content-type: application/json' \
+  --data "{
+		}
+	}"
 
 curl --request PUT \
   --url $API_BASE_URL/v1/badges/readme \
