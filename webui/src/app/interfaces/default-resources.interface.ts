@@ -9,6 +9,7 @@ export interface DefaultResource<T extends EntityBean> {
     GetAll(): Observable<T[]>;
     GetAllFromContent(filter: string, params: {[key: string]: any | any[]}): Observable<ContentListResponse<T>>;
     GetSingle(id: string): Observable<T>;
+    GetSingleAny(id: string): Observable<any>;
     Task(path: String, payload: any): Observable<any>;
     Add(itemToAdd: T): Observable<T>;
     Update(id: string, itemToUpdate: T): Observable<T>;
