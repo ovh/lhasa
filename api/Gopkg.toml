@@ -37,10 +37,6 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
   branch = "master"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/gin-contrib/gzip"
-
-[[constraint]]
   name = "github.com/fabienm/go-logrus-formatters"
   version = "~1.0.0"
 

@@ -3,7 +3,7 @@ TARGET_DIR = ./dist
 COMPOSE_BIN = $(TARGET_DIR)/docker-compose
 API_BIN = $(TARGET_DIR)/appcatalog
 VENOM_BIN = $(TARGET_DIR)/venom.$(ARCH)
-UI_BASE_HREF = /
+UI_BASE_HREF ?= /
 export UI_BASE_HREF
 
 all: api webui
