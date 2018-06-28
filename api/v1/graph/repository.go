@@ -32,7 +32,7 @@ func (repo *Repository) GetType() reflect.Type {
 }
 
 // FindAll fetch a collection of nodes matching each criteria
-// criterias are not used now
+// criteria are not used now
 func (repo *Repository) FindAll() (*graphapi.Graph, error) {
 	var entities []*v1.Deployment
 	err := repo.db.Preload("Application").Preload("Environment").Find(&entities).Error
@@ -48,7 +48,7 @@ func (repo *Repository) FindAll() (*graphapi.Graph, error) {
 }
 
 // FindAllActive fetch a collection of nodes matching each criteria
-// criterias are not used now
+// criteria are not used now
 func (repo *Repository) FindAllActive() (*graphapi.Graph, error) {
 	var entities []*v1.Deployment
 	err := repo.db.Where("undeployed_at is null").Preload("Application").Preload("Environment").Find(&entities).Error

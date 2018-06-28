@@ -117,7 +117,7 @@ func AddToBasePath(basePath string) gin.HandlerFunc {
 	}
 }
 
-// FindByPath find one entity in the given repository, using paths parameters as matching criterias
+// FindByPath find one entity in the given repository, using paths parameters as matching criteria
 func FindByPath(c *gin.Context, repository Repository) (Entity, error) {
 	params := parsePathParams(c)
 	if repo, ok := repository.(SoftDeletableRepository); ok {
@@ -159,7 +159,7 @@ func parsePathParamsAndQuery(c *gin.Context) map[string]interface{} {
 		if len(k) > 0 {
 			// only support simple fields, no check on jsonb expression
 			if !strings.Contains(k, ".") {
-				// Only support taking first occurence
+				// Only support taking first occurrence
 				str, check := v.(string)
 				if !check {
 					value, _ := json.Marshal(v)
@@ -167,7 +167,7 @@ func parsePathParamsAndQuery(c *gin.Context) map[string]interface{} {
 				}
 				criteria[unCamelCase(k)] = str
 			} else {
-				// Only support taking first occurence
+				// Only support taking first occurrence
 				criteria[k] = v.(string)
 			}
 		}

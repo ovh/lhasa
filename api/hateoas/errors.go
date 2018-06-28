@@ -87,10 +87,10 @@ func NewUnsupportedEntityError(expected, actual interface{}) error {
 }
 
 // NewEntityDoesNotExistError is a helper to create an EntityDoesNotExistError
-func NewEntityDoesNotExistError(entity interface{}, criterias map[string]interface{}) error {
+func NewEntityDoesNotExistError(entity interface{}, criteria map[string]interface{}) error {
 	return EntityDoesNotExistError{
 		EntityName: fmt.Sprintf("%T", entity),
-		Criteria:   criterias,
+		Criteria:   criteria,
 	}
 }
 

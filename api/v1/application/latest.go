@@ -3,10 +3,10 @@ package application
 import (
 	"github.com/coreos/go-semver/semver"
 	"github.com/jinzhu/gorm"
-	"github.com/sirupsen/logrus"
 	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
+	"github.com/sirupsen/logrus"
 )
 
 // LatestUpdater updates the application latest version to the given version
