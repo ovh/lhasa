@@ -50,6 +50,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[strin
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
 		Select("\"releases\".\"domain\" as \"name\", count(*) as app_count").
+		Where("\"releases\".\"deleted_at\" is null").
 		Group("\"releases\".\"domain\"").
 		Scan(&domains).Error; err != nil {
 		return page, err
