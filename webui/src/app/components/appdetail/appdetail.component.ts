@@ -45,6 +45,11 @@ export class AppdetailComponent implements OnInit {
   ngOnInit(): void {
     this.applicationSubscription = this.applicationStream.subscribe(
       (app: ApplicationBean) => {
+        // With full text search, active application can be undefined
+        // Just check if app is undefined
+        if (!app) {
+          return;
+        }
         this.application = app;
 
         // Rule is
@@ -63,14 +68,14 @@ export class AppdetailComponent implements OnInit {
         // When read field exist use it as plain text
         // Or if it's an url call it to obtain data
 
-        this._activeDeployments = []
+        this._activeDeployments = [];
         this._selectedDeployment = null;
         if (this.application.deployments !== undefined) {
           this.application.deployments.forEach(value => {
             if (!value.undeployedAt || value.undeployedAt === null) {
               this._activeDeployments.push(value);
               if (this._selectedDeployment === null) {
-                this._selectedDeployment = value
+                this._selectedDeployment = value;
               }
             }
           });
