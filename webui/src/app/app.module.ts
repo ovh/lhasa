@@ -128,6 +128,7 @@ import { BadgesStoreService } from './stores/badges-store.service';
 import { HelpsStoreService } from './stores/help-store.service';
 import { ConfigStoreService } from './stores/config-store.service';
 import { ErrorsStoreService } from './stores/errors-store.service';
+import { HelpWidgetComponent } from './widget/help-widget/help-widget.component';
 
 export function getBaseUrl() {
   return document.getElementsByTagName('base')[0].href;
@@ -161,6 +162,7 @@ export function createTranslateLoader(http: HttpClient) {
     ApplicationSortPipe,
     DomainSortPipe,
     EnvChipComponent,
+    HelpWidgetComponent,
   ],
   imports: [
     CommonModule,
