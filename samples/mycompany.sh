@@ -1,5 +1,7 @@
 #!/bin/bash
 
+API_BASE_URL=${API_BASE_URL:-http:/localhost:8081/api}
+
 set -ex
 HOST=`echo $API_BASE_URL | awk -F/ '{print $3}'`
 BASEPATH=`echo $API_BASE_URL | grep / | cut -d/ -f4-`
@@ -76,6 +78,9 @@ curl --request PUT \
 		],
 		"repository": "https://git.mycompany.com/HR/travel.git",
 		"description": "API to submit travel requests and declare expenses"
+	},
+	"properties": {
+		"readme": "Some read me for version 1.0.0"
 	}
 }'
 
@@ -205,6 +210,9 @@ curl --request PUT \
 		],
 		"repository": "https://git.mycompany.com/HR/travel.git",
 		"description": "API to submit travel requests and declare expenses"
+	},
+	"properties": {
+		"readme": "# Some readme elements for version 2.0.0\n\nwith some **notes**"
 	}
 }'
 
