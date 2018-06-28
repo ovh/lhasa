@@ -1,8 +1,6 @@
 package routing
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/wI2L/fizz"
 	"github.com/ovh/lhasa/api/db"
 	"github.com/ovh/lhasa/api/graphapi"
 	"github.com/ovh/lhasa/api/hateoas"
@@ -14,6 +12,8 @@ import (
 	"github.com/ovh/lhasa/api/v1/domain"
 	"github.com/ovh/lhasa/api/v1/environment"
 	"github.com/ovh/lhasa/api/v1/graph"
+	"github.com/sirupsen/logrus"
+	"github.com/wI2L/fizz"
 )
 
 // registerRoutes registers v1 API routes on a gin engine

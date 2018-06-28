@@ -52,10 +52,10 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 // FindOneBySlug fetch a collection of applications matching each criteria
 func (repo *Repository) FindOneBySlug(slug string) (*v1.Badge, error) {
 	badge := v1.Badge{}
-	criterias := map[string]interface{}{"slug": slug}
-	err := repo.db.First(&badge, criterias).Error
+	criteria := map[string]interface{}{"slug": slug}
+	err := repo.db.First(&badge, criteria).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &badge, hateoas.NewEntityDoesNotExistError(badge, criterias)
+		return &badge, hateoas.NewEntityDoesNotExistError(badge, criteria)
 	}
 	if err != nil {
 		return nil, err
@@ -64,28 +64,28 @@ func (repo *Repository) FindOneBySlug(slug string) (*v1.Badge, error) {
 }
 
 // FindBy fetch a collection of applications matching each criteria
-func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
+func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, error) {
 	var badges []*v1.Badge
-	err := repo.db.Where(criterias).Find(&badges).Error
+	err := repo.db.Where(criteria).Find(&badges).Error
 	return badges, err
 }
 
 // FindOneByUnscoped gives the details of a particular badge, even if soft deleted
-func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
+func (repo *Repository) FindOneByUnscoped(criteria map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
 	badge := v1.Badge{}
-	err := repo.db.Unscoped().Where(criterias).First(&badge).Error
+	err := repo.db.Unscoped().Where(criteria).First(&badge).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &badge, hateoas.NewEntityDoesNotExistError(badge, criterias)
+		return &badge, hateoas.NewEntityDoesNotExistError(badge, criteria)
 	}
 	return &badge, err
 }
 
 // FindOneBy fetch the first badge matching each criteria
-func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	badge := v1.Badge{}
-	err := repo.db.Where(criterias).First(&badge).Error
+	err := repo.db.Where(criteria).First(&badge).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &badge, hateoas.NewEntityDoesNotExistError(badge, criterias)
+		return &badge, hateoas.NewEntityDoesNotExistError(badge, criteria)
 	}
 	return &badge, err
 }
@@ -182,11 +182,11 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
+func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.BadgeBasePath)
 	var badges []*v1.Badge
 
-	if err := repo.db.Where(criterias).
+	if err := repo.db.Where(criteria).
 		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
@@ -196,7 +196,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page.Content = badges
 
 	count := 0
-	if err := repo.db.Model(&v1.Badge{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := repo.db.Model(&v1.Badge{}).Where(criteria).Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count

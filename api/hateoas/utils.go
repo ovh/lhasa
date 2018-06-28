@@ -17,8 +17,8 @@ func ToJSON(data interface{}) string {
 }
 
 // JSONBFilter filter jsonb
-func JSONBFilter(db *gorm.DB, criterias map[string]interface{}) *gorm.DB {
-	for k, v := range criterias {
+func JSONBFilter(db *gorm.DB, criteria map[string]interface{}) *gorm.DB {
+	for k, v := range criteria {
 		values := strings.Split(v.(string), ",")
 		switch len(values) {
 		case 1:
@@ -33,8 +33,8 @@ func JSONBFilter(db *gorm.DB, criterias map[string]interface{}) *gorm.DB {
 }
 
 // InlineFilter filter inline filters
-func InlineFilter(db *gorm.DB, criterias map[string]interface{}) *gorm.DB {
-	for k, v := range criterias {
+func InlineFilter(db *gorm.DB, criteria map[string]interface{}) *gorm.DB {
+	for k, v := range criteria {
 		values := strings.Split(v.(string), ",")
 		switch len(values) {
 		case 1:
@@ -49,12 +49,12 @@ func InlineFilter(db *gorm.DB, criterias map[string]interface{}) *gorm.DB {
 }
 
 // CheckFilter analyse filters
-func CheckFilter(criterias map[string]interface{}) (map[string]interface{}, map[string]interface{}, map[string]interface{}) {
+func CheckFilter(criteria map[string]interface{}) (map[string]interface{}, map[string]interface{}, map[string]interface{}) {
 	// Analyse critarias for extract inline, standard and JSONB ones
 	standardCriterias := make(map[string]interface{})
 	inlineCriterias := make(map[string]interface{})
 	jsonbCriterias := make(map[string]interface{})
-	for k, v := range criterias {
+	for k, v := range criteria {
 		if strings.Contains(k, ".") {
 			var values = strings.Split(k, ".")
 			key := values[0] + "->>'" + values[1] + "' in "

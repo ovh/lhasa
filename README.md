@@ -1,9 +1,13 @@
 # Lhasa
 
-Micro-services urban planning at scale.
+Urba planning for microservices.
 
-List and map applications of your micro service information system and how they interact. Track your business 
+List and map applications of your microservices information system and how they interact. Track your business 
 processes and domains, then gamify the continuous enhancement of your system.
+
+[![goreportcard](https://goreportcard.com/badge/github.com/ovh/lhasa)](https://goreportcard.com/report/github.com/ovh/lhasa)
+
+This project is at pre-alpha state and under active development.
 
 ## Features
 

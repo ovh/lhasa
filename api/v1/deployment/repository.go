@@ -4,9 +4,9 @@ import (
 	"reflect"
 
 	"github.com/jinzhu/gorm"
-	"github.com/satori/go.uuid"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
+	"github.com/satori/go.uuid"
 )
 
 const (
@@ -46,12 +46,12 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
+func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DeploymentBasePath)
 	var deployments []*v1.Deployment
 
 	// Analyse critarias for extract inline, standard and JSONB ones
-	standardCriterias, inlineCriterias, jsonbCriterias := hateoas.CheckFilter(criterias)
+	standardCriterias, inlineCriterias, jsonbCriterias := hateoas.CheckFilter(criteria)
 
 	// Apply request
 	db := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).
@@ -128,36 +128,36 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 }
 
 // FindOneByUnscoped gives the details of a particular deployment, even if soft deleted
-func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
+func (repo *Repository) FindOneByUnscoped(criteria map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
 	dep := &v1.Deployment{}
-	err := repo.db.Model(v1.Deployment{}).Unscoped().First(dep, criterias).Error
+	err := repo.db.Model(v1.Deployment{}).Unscoped().First(dep, criteria).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return dep, hateoas.NewEntityDoesNotExistError(dep, criterias)
+		return dep, hateoas.NewEntityDoesNotExistError(dep, criteria)
 	}
 	return dep, err
 }
 
 // FindBy fetch a collection of deployments matching each criteria
-func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
+func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, error) {
 	var deps []*v1.Deployment
-	err := repo.db.Model(v1.Deployment{}).Find(&deps, criterias).Error
+	err := repo.db.Model(v1.Deployment{}).Find(&deps, criteria).Error
 	return deps, err
 }
 
 // FindActivesBy fetch a collection of deployments matching each criteria
-func (repo *Repository) FindActivesBy(criterias map[string]interface{}) ([]*v1.Deployment, error) {
+func (repo *Repository) FindActivesBy(criteria map[string]interface{}) ([]*v1.Deployment, error) {
 	var deps []*v1.Deployment
 
-	err := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).Where("undeployed_at IS NULL").Find(&deps, criterias).Error
+	err := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).Where("undeployed_at IS NULL").Find(&deps, criteria).Error
 	return deps, err
 }
 
 // FindOneBy fetch the first deployment matching each criteria
-func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	dep := v1.Deployment{}
-	err := repo.db.Where(criterias).First(&dep).Error
+	err := repo.db.Where(criteria).First(&dep).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &dep, hateoas.NewEntityDoesNotExistError(dep, criterias)
+		return &dep, hateoas.NewEntityDoesNotExistError(dep, criteria)
 	}
 	return &dep, err
 }

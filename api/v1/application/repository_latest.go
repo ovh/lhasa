@@ -50,11 +50,11 @@ func (repo *RepositoryLatest) FindAllPage(pageable hateoas.Pageable) (hateoas.Pa
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *RepositoryLatest) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
+func (repo *RepositoryLatest) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.ApplicationBasePath)
 	var applications []*v1.Release
 
-	whereClause := getWhereClause(criterias)
+	whereClause := getWhereClause(criteria)
 	if err := repo.db.
 		Raw(fmt.Sprintf(querySelectLatestApplications,
 			whereClause,
@@ -96,9 +96,9 @@ func (repo *RepositoryLatest) FindPageBy(pageable hateoas.Pageable, criterias ma
 	return page, nil
 }
 
-func getWhereClause(criterias map[string]interface{}) string {
+func getWhereClause(criteria map[string]interface{}) string {
 	whereClause := ""
-	for key, value := range criterias {
+	for key, value := range criteria {
 		if value == "" {
 			continue
 		}
@@ -161,31 +161,31 @@ func (repo *RepositoryLatest) FindByID(id interface{}) (hateoas.Entity, error) {
 }
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
-func (repo *RepositoryLatest) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
+func (repo *RepositoryLatest) FindOneByUnscoped(criteria map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
 	app := v1.Release{}
 	err := repo.db.Raw(fmt.Sprintf(querySelectLatestApplicationsUnscoped,
-		getWhereClause(criterias), "1", 1, 0)).Scan(&app).Error
+		getWhereClause(criteria), "1", 1, 0)).Scan(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }
 
 // FindBy fetch a collection of applications matching each criteria
-func (repo *RepositoryLatest) FindBy(criterias map[string]interface{}) (interface{}, error) {
+func (repo *RepositoryLatest) FindBy(criteria map[string]interface{}) (interface{}, error) {
 	var apps []*v1.Application
-	err := repo.db.Where(criterias).Find(&apps).Error
+	err := repo.db.Where(criteria).Find(&apps).Error
 	return apps, err
 }
 
-// FindOneBy find by criterias
-func (repo *RepositoryLatest) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+// FindOneBy find by criteria
+func (repo *RepositoryLatest) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	app := v1.Release{}
 	err := repo.db.Raw(
-		fmt.Sprintf(querySelectLatestApplications, getWhereClause(criterias), "1", 1, 0)).
+		fmt.Sprintf(querySelectLatestApplications, getWhereClause(criteria), "1", 1, 0)).
 		Scan(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }
@@ -193,10 +193,10 @@ func (repo *RepositoryLatest) FindOneBy(criterias map[string]interface{}) (hateo
 // FindApplication finds a single application
 func (repo *RepositoryLatest) FindApplication(domain, name string) (*v1.Application, error) {
 	app := v1.Application{}
-	criterias := map[string]interface{}{"domain": domain, "name": name}
-	err := repo.db.Where(criterias).Preload("LatestRelease").First(&app).Error
+	criteria := map[string]interface{}{"domain": domain, "name": name}
+	err := repo.db.Where(criteria).Preload("LatestRelease").First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }
@@ -204,16 +204,16 @@ func (repo *RepositoryLatest) FindApplication(domain, name string) (*v1.Applicat
 // FindOneByDomainNameVersion fetch the first application matching each criteria
 func (repo *RepositoryLatest) FindOneByDomainNameVersion(domain, name, version string) (*v1.Release, error) {
 	app := v1.Release{}
-	criterias := map[string]interface{}{
+	criteria := map[string]interface{}{
 		"domain": domain,
 		"name":   name,
 	}
 	err := repo.db.Raw(
 		// Order by first column, limit 1, offset 0
-		fmt.Sprintf(querySelectLatestApplications, getWhereClause(criterias), "1", 1, 0)).
+		fmt.Sprintf(querySelectLatestApplications, getWhereClause(criteria), "1", 1, 0)).
 		Scan(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }

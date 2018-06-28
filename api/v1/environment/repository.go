@@ -50,10 +50,10 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 // FindOneBySlug fetch a collection of applications matching each criteria
 func (repo *Repository) FindOneBySlug(slug string) (*v1.Environment, error) {
 	env := v1.Environment{}
-	criterias := map[string]interface{}{"slug": slug}
-	err := repo.db.First(&env, criterias).Error
+	criteria := map[string]interface{}{"slug": slug}
+	err := repo.db.First(&env, criteria).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &env, hateoas.NewEntityDoesNotExistError(env, criterias)
+		return &env, hateoas.NewEntityDoesNotExistError(env, criteria)
 	}
 	if err != nil {
 		return nil, err
@@ -62,28 +62,28 @@ func (repo *Repository) FindOneBySlug(slug string) (*v1.Environment, error) {
 }
 
 // FindBy fetch a collection of applications matching each criteria
-func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
+func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, error) {
 	var envs []*v1.Environment
-	err := repo.db.Where(criterias).Find(&envs).Error
+	err := repo.db.Where(criteria).Find(&envs).Error
 	return envs, err
 }
 
 // FindOneByUnscoped gives the details of a particular environment, even if soft deleted
-func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
+func (repo *Repository) FindOneByUnscoped(criteria map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
 	env := v1.Environment{}
-	err := repo.db.Unscoped().Where(criterias).First(&env).Error
+	err := repo.db.Unscoped().Where(criteria).First(&env).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &env, hateoas.NewEntityDoesNotExistError(env, criterias)
+		return &env, hateoas.NewEntityDoesNotExistError(env, criteria)
 	}
 	return &env, err
 }
 
 // FindOneBy fetch the first application matching each criteria
-func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	env := v1.Environment{}
-	err := repo.db.Where(criterias).First(&env).Error
+	err := repo.db.Where(criteria).First(&env).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &env, hateoas.NewEntityDoesNotExistError(env, criterias)
+		return &env, hateoas.NewEntityDoesNotExistError(env, criteria)
 	}
 	return &env, err
 }
@@ -117,11 +117,11 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
+func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.EnvironmentBasePath)
 	var environments []*v1.Environment
 
-	if err := repo.db.Where(criterias).
+	if err := repo.db.Where(criteria).
 		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
@@ -131,7 +131,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page.Content = environments
 
 	count := 0
-	if err := repo.db.Model(&v1.Environment{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := repo.db.Model(&v1.Environment{}).Where(criteria).Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count

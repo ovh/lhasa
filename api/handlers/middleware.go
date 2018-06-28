@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/ovh/lhasa/api/hateoas"
+	"github.com/sirupsen/logrus"
 )
 
 var (

@@ -6,9 +6,9 @@ import (
 
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/lib/pq"
-	uuid "github.com/satori/go.uuid"
 	"github.com/ovh/lhasa/api/graphapi"
 	"github.com/ovh/lhasa/api/hateoas"
+	uuid "github.com/satori/go.uuid"
 )
 
 // ApplicationBasePath is the URL base path for this resource

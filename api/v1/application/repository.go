@@ -48,12 +48,12 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
+func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.ApplicationBasePath)
 	var applications []*v1.Release
 
 	if err := repo.db.
-		Where(criterias).
+		Where(criteria).
 		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
@@ -63,7 +63,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[stri
 	page.Content = applications
 
 	count := 0
-	if err := repo.db.Model(&v1.Release{}).Where(criterias).Count(&count).Error; err != nil {
+	if err := repo.db.Model(&v1.Release{}).Where(criteria).Count(&count).Error; err != nil {
 		return page, err
 	}
 	page.TotalElements = count
@@ -137,33 +137,33 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 }
 
 // FindOneByUnscoped gives the details of a particular application, even if soft deleted
-func (repo *Repository) FindOneByUnscoped(criterias map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
+func (repo *Repository) FindOneByUnscoped(criteria map[string]interface{}) (hateoas.SoftDeletableEntity, error) {
 	app := v1.Release{}
-	err := repo.db.Unscoped().Where(criterias).First(&app).Error
+	err := repo.db.Unscoped().Where(criteria).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }
 
 // FindBy fetch a collection of applications matching each criteria
-func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
+func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, error) {
 	var apps []*v1.Release
-	err := repo.db.Where(criterias).Find(&apps).Error
+	err := repo.db.Where(criteria).Find(&apps).Error
 	return apps, err
 }
 
 // FindOneByDomainNameVersion fetch the first application matching each criteria
 func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string) (*v1.Release, error) {
 	app := v1.Release{}
-	criterias := map[string]interface{}{
+	criteria := map[string]interface{}{
 		"domain":  domain,
 		"name":    name,
 		"version": version,
 	}
-	err := repo.db.First(&app, criterias).Error
+	err := repo.db.First(&app, criteria).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }
@@ -171,23 +171,23 @@ func (repo *Repository) FindOneByDomainNameVersion(domain, name, version string)
 // FindOneByDomainName fetch the first application matching each criteria
 func (repo *Repository) FindOneByDomainName(domain, name string) (*v1.Release, error) {
 	app := v1.Release{}
-	criterias := map[string]interface{}{
+	criteria := map[string]interface{}{
 		"domain": domain,
 		"name":   name,
 	}
-	err := repo.db.First(&app, criterias).Error
+	err := repo.db.First(&app, criteria).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }
 
-// FindOneBy find by criterias
-func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+// FindOneBy find by criteria
+func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	app := v1.Release{}
-	err := repo.db.Where(criterias).First(&app).Error
+	err := repo.db.Where(criteria).First(&app).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	return &app, err
 }

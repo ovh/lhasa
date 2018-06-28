@@ -41,11 +41,11 @@ func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, er
 }
 
 // FindPageBy returns a page of matching entities
-func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criterias map[string]interface{}) (hateoas.Page, error) {
+func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DomainBasePath)
 	var domains []*v1.Domain
 	if err := repo.db.Model(&v1.Release{}).
-		Where(criterias).
+		Where(criteria).
 		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
@@ -90,16 +90,16 @@ func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
 }
 
 // FindBy fetch a collection of domains matching each criteria
-func (repo *Repository) FindBy(criterias map[string]interface{}) (interface{}, error) {
+func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, error) {
 	return nil, errors.NotSupportedf("operation not supported")
 }
 
-// FindOneBy find by criterias
-func (repo *Repository) FindOneBy(criterias map[string]interface{}) (hateoas.Entity, error) {
+// FindOneBy find by criteria
+func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	var app v1.Release
-	err := repo.db.First(&app, criterias).Error
+	err := repo.db.First(&app, criteria).Error
 	if gorm.IsRecordNotFoundError(err) {
-		return &app, hateoas.NewEntityDoesNotExistError(app, criterias)
+		return &app, hateoas.NewEntityDoesNotExistError(app, criteria)
 	}
 	if err != nil {
 		return nil, err

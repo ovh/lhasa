@@ -52,10 +52,10 @@ type TruncatableRepository interface {
 // SoftDeletableRepository defines a repository that handles soft delete
 type SoftDeletableRepository interface {
 	Repository
-	FindOneByUnscoped(criterias map[string]interface{}) (SoftDeletableEntity, error)
+	FindOneByUnscoped(criteria map[string]interface{}) (SoftDeletableEntity, error)
 }
 
-// Pageable defines pagination criterias
+// Pageable defines pagination criteria
 type Pageable struct {
 	Page      int    `json:"page" form:"page"`
 	Size      int    `json:"size" form:"size"`
