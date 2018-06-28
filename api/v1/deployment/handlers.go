@@ -93,18 +93,26 @@ func HandlerFindDeployment(appRepo *application.Repository, envRepo *environment
 	}, http.StatusOK)
 }
 
-// HandlerListActiveDeployments list active deployments for a given application version
-func HandlerListActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
+// HandlerListApplicationActiveDeployments list active deployments for a given application
+func HandlerListApplicationActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
 		criteria := map[string]interface{}{}
-		var deps []*v1.Deployment
-		var err error
-		// Search can be done with a version
-		if len(request.Version) > 0 {
-			deps, err = depRepo.FindActivesByVersion(request.Domain, request.Name, request.Version, criteria)
-		} else {
-			deps, err = depRepo.FindActivesBy(request.Domain, request.Name, criteria)
+		deps, err := depRepo.FindActivesBy(request.Domain, request.Name, criteria)
+		if err != nil {
+			return nil, err
 		}
+		for _, dep := range deps {
+			dep.ToResource(hateoas.BaseURL(c))
+		}
+		return deps, nil
+	}, http.StatusOK)
+}
+
+// HandlerListReleaseActiveDeployments list active deployments for a given release (with version)
+func HandlerListReleaseActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
+		criteria := map[string]interface{}{}
+		deps, err := depRepo.FindActivesByVersion(request.Domain, request.Name, request.Version, criteria)
 		if err != nil {
 			return nil, err
 		}
