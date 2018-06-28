@@ -43,11 +43,6 @@ func NewRepository(db *gorm.DB) *Repository {
 	}
 }
 
-// FindAllPage returns a page of matching entities
-func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
-	return repo.FindPageBy(pageable, map[string]interface{}{})
-}
-
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DeploymentBasePath)
@@ -83,11 +78,6 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[strin
 	return page, nil
 }
 
-// FindAll returns all entities of the repository type
-func (repo *Repository) FindAll() (interface{}, error) {
-	return repo.FindBy(map[string]interface{}{})
-}
-
 // Save persists an deployment to the database
 func (repo *Repository) Save(deployment hateoas.Entity) error {
 	dep, err := repo.mustBeEntity(deployment)
@@ -119,15 +109,6 @@ func (repo *Repository) Remove(dep interface{}) error {
 	}
 
 	return repo.db.Delete(dep).Error
-}
-
-// FindByID gives the details of a particular deployment
-func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
-	dep := v1.Deployment{}
-	if err := repo.db.First(&dep, id).Error; err != nil {
-		return nil, err
-	}
-	return &dep, nil
 }
 
 // FindOneByUnscoped gives the details of a particular deployment, even if soft deleted

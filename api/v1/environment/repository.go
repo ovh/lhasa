@@ -29,24 +29,6 @@ func (repo *Repository) GetType() reflect.Type {
 	return reflect.TypeOf(v1.Environment{})
 }
 
-// FindAll returns all entities of the repository type
-func (repo *Repository) FindAll() (interface{}, error) {
-	return repo.FindBy(map[string]interface{}{})
-}
-
-// FindByID gives the details of a particular application
-func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
-	env := v1.Environment{}
-	err := repo.db.First(&env, id).Error
-	if gorm.IsRecordNotFoundError(err) {
-		return &env, hateoas.NewEntityDoesNotExistError(env, map[string]interface{}{"id": id})
-	}
-	if err != nil {
-		return nil, err
-	}
-	return &env, nil
-}
-
 // FindOneBySlug fetch a collection of applications matching each criteria
 func (repo *Repository) FindOneBySlug(slug string) (*v1.Environment, error) {
 	env := v1.Environment{}
@@ -109,11 +91,6 @@ func (repo *Repository) Remove(env interface{}) error {
 	}
 
 	return repo.db.Delete(env).Error
-}
-
-// FindAllPage returns a page of matching entities
-func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
-	return repo.FindPageBy(pageable, map[string]interface{}{})
 }
 
 // FindPageBy returns a page of matching entities

@@ -53,6 +53,7 @@ export class ApplicationsResolver implements Resolve<ApplicationPagesBean> {
             [key: string]: any | any[];
         } = {
                 q: `{"search":"${searchString}"}`,
+                sort: 'domain',
                 size: metadata.size,
                 page: metadata.number
             };

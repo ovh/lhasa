@@ -30,16 +30,6 @@ func (repo *Repository) GetType() reflect.Type {
 	return reflect.TypeOf(v1.Domain{})
 }
 
-// FindAll returns all entities of the repository type
-func (repo *Repository) FindAll() (interface{}, error) {
-	return repo.FindBy(map[string]interface{}{})
-}
-
-// FindAllPage returns a page of matching entities
-func (repo *Repository) FindAllPage(pageable hateoas.Pageable) (hateoas.Page, error) {
-	return repo.FindPageBy(pageable, map[string]interface{}{})
-}
-
 // FindPageBy returns a page of matching entities
 func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[string]interface{}) (hateoas.Page, error) {
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DomainBasePath)
@@ -50,6 +40,7 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[strin
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset()).
 		Select("\"releases\".\"domain\" as \"name\", count(*) as app_count").
+		Where("\"releases\".\"deleted_at\" is null").
 		Group("\"releases\".\"domain\"").
 		Scan(&domains).Error; err != nil {
 		return page, err
@@ -67,26 +58,6 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[strin
 	page.TotalElements = count
 
 	return page, nil
-}
-
-// Save persists an domain to the database
-func (repo *Repository) Save(_ hateoas.Entity) error {
-	return errors.NotSupportedf("operation not supported")
-}
-
-// Truncate empties the domains table for testing purposes
-func (repo *Repository) Truncate() error {
-	return errors.NotSupportedf("operation not supported")
-}
-
-// Remove deletes the domain whose GetID is given as a parameter
-func (repo *Repository) Remove(_ interface{}) error {
-	return errors.NotSupportedf("operation not supported")
-}
-
-// FindByID gives the details of a particular domain
-func (repo *Repository) FindByID(id interface{}) (hateoas.Entity, error) {
-	return nil, errors.NotSupportedf("operation not supported")
 }
 
 // FindBy fetch a collection of domains matching each criteria

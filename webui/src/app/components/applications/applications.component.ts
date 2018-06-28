@@ -37,7 +37,6 @@ export class ApplicationsComponent implements OnInit {
   @ViewChild('paginationbottom') paginationbottom: OuiPaginationComponent;
   @ViewChild('message') msg: OuiMessageComponent;
 
-
   public domain = '';
   public param = { target: '' };
   public searchString = ''
@@ -180,6 +179,6 @@ export class ApplicationsComponent implements OnInit {
 
   public onFilterKeyPressed(event: any) {
     this.searchString = event.target.value;
-    this.refreshApplications()
+    this.refreshApplications();
   }
 }
