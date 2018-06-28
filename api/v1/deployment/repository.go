@@ -157,6 +157,16 @@ func (repo *Repository) FindActivesBy(domain string, name string, criterias map[
 	return deps, err
 }
 
+// FindActivesByVersion fetch a collection of deployments matching each criteria on a given domain, name and version
+func (repo *Repository) FindActivesByVersion(domain string, name string, version string, criterias map[string]interface{}) ([]*v1.Deployment, error) {
+	var deps []*v1.Deployment
+	err := repo.db.Preload("Environment").Preload("Application").Table("deployments").
+		Joins("JOIN releases on releases.id = deployments.application_id").
+		Model(v1.Deployment{}).Where("undeployed_at IS NULL AND releases.domain = ? AND releases.name = ? AND releases.version = ?", domain, name, version).
+		Find(&deps, criterias).Error
+	return deps, err
+}
+
 // FindOneBy fetch the first deployment matching each criteria
 func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Entity, error) {
 	dep := v1.Deployment{}
