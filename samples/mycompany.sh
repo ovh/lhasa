@@ -18,6 +18,16 @@ curl --request DELETE \
   --url $API_BASE_URL/v1/environments/
 
 curl --request PUT \
+  --url $API_BASE_URL/v1/contents/help-what-is-an-app/en-GB \
+  --header 'content-type: text/plain' \
+  --data 'Fuzzy definition
+------
+
+An application is a piece of software that 
+can be deployed independently in the information system to offer an identified high level service
+'
+
+curl --request PUT \
   --url $API_BASE_URL/v1/environments/prodfr \
   --header 'content-type: application/json' \
   --data '{
