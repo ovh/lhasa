@@ -11,26 +11,26 @@ import (
 
 // HandlerCreate replace or create a resource
 func HandlerCreate(repository *Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, env *v1.Environment) error {
+	return tonic.Handler(func(c *gin.Context, env *v1.Environment) (*v1.Environment, error) {
 		oldres, err := repository.FindOneByUnscoped(map[string]interface{}{"slug": env.Slug})
 		oldenv := oldres.(*v1.Environment)
 		if hateoas.IsEntityDoesNotExistError(err) {
 			if err := repository.Save(env); err != nil {
-				return err
+				return nil, err
 			}
-			return hateoas.ErrorCreated
+			return nil, hateoas.ErrorCreated
 		}
 		if err != nil {
-			return err
+			return nil, err
 		}
 		env.ID = oldenv.ID
 		env.CreatedAt = oldenv.CreatedAt
 		if err := repository.Save(env); err != nil {
-			return err
+			return nil, err
 		}
 		if oldenv.DeletedAt != nil {
-			return hateoas.ErrorCreated
+			return env, hateoas.ErrorCreated
 		}
-		return nil
+		return env, nil
 	}, http.StatusOK)
 }
