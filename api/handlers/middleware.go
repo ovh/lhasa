@@ -12,6 +12,7 @@ import (
 var (
 	headerSource    = http.CanonicalHeaderKey("X-Ovh-Gateway-Source")
 	requestIDHeader = http.CanonicalHeaderKey("X-Request-Id")
+	remoteUser      = http.CanonicalHeaderKey("X-Remote-User")
 )
 
 // LoggingMiddleware logs before and after incoming gin requests
@@ -26,6 +27,7 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 			"path":         c.Request.URL.Path,
 			"source_token": c.Request.Header.Get(headerSource),
 			"request_id":   c.Request.Header.Get(requestIDHeader),
+			"remote_user":  c.Request.Header.Get(remoteUser),
 		}
 		log.WithFields(fields).Debug("incoming request")
 		startTime := time.Now()
