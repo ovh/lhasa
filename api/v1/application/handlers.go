@@ -32,29 +32,30 @@ type badgeRatingsRequest struct {
 
 // HandlerCreate replace or create a resource
 func HandlerCreate(repository *Repository, updater LatestUpdater) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, application *v1.Release) error {
+	return tonic.Handler(func(c *gin.Context, application *v1.Release) (*v1.Release, error) {
 		oldres, err := repository.FindOneByUnscoped(map[string]interface{}{"domain": application.Domain, "name": application.Name, "version": application.Version})
 		oldapp := oldres.(*v1.Release)
 		if hateoas.IsEntityDoesNotExistError(err) {
 			if err := updater(application); err != nil {
-				return err
+				return nil, err
 			}
-			return hateoas.ErrorCreated
+			return nil, hateoas.ErrorCreated
 		}
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		application.ID = oldapp.ID
 		application.CreatedAt = oldapp.CreatedAt
 
 		if err := updater(application); err != nil {
-			return err
+			return nil, err
 		}
 		if oldapp.DeletedAt != nil {
-			return hateoas.ErrorCreated
+			return nil, hateoas.ErrorCreated
 		}
-		return nil
+
+		return application, nil
 
 	}, http.StatusOK)
 }
@@ -136,28 +137,28 @@ func HandlerGetBadgeRatingsForAppVersion(repository *Repository) gin.HandlerFunc
 
 // HandlerSetBadgeRatingForAppVersion sets the badge values for a particular application version
 func HandlerSetBadgeRatingForAppVersion(repository *Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, request *badgeRatingsRequest) error {
+	return tonic.Handler(func(c *gin.Context, request *badgeRatingsRequest) (*badgeRating, error) {
 		// Retrieve the application version data
 		appv, err := repository.FindOneByDomainNameVersion(request.ApplicationDomain, request.ApplicationName, request.ApplicationVersion)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 		badgeRatings, err := retrieveBadgeRatings(appv)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		// Retrieve the badge data
 		badgeRepo := badge.NewRepository(repository.db)
 		bdg, err := badgeRepo.FindOneBySlug(request.BadgeSlug)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		_, err = badge.GetBadgeLevelByID(bdg, request.Level, false)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		found := false
 		for i, bdgRating := range badgeRatings {
@@ -180,10 +181,14 @@ func HandlerSetBadgeRatingForAppVersion(repository *Repository) gin.HandlerFunc 
 		}
 		badgeRatingsJSON, err := json.Marshal(badgeRatings)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		appv.BadgeRatings = &postgres.Jsonb{RawMessage: badgeRatingsJSON}
-		return repository.Save(appv)
+		return &badgeRating{
+			BadgeSlug: request.BadgeSlug,
+			Value:     request.Level,
+			Comment:   request.Comment,
+		}, repository.Save(appv)
 	}, http.StatusCreated)
 }
 
