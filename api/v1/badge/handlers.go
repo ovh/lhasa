@@ -11,30 +11,30 @@ import (
 
 // HandlerCreate replace or create a resource
 func HandlerCreate(repository *Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, bdg *v1.Badge) error {
+	return tonic.Handler(func(c *gin.Context, bdg *v1.Badge) (*v1.Badge, error) {
 		_, err := GetDefaultLevel(bdg)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		oldres, err := repository.FindOneByUnscoped(map[string]interface{}{"slug": bdg.Slug})
 		if hateoas.IsEntityDoesNotExistError(err) {
 			if err := repository.Save(bdg); err != nil {
-				return err
+				return nil, err
 			}
-			return hateoas.ErrorCreated
+			return nil, hateoas.ErrorCreated
 		}
 		if err != nil {
-			return err
+			return nil, err
 		}
 		oldbdg := oldres.(*v1.Badge)
 		bdg.ID = oldbdg.ID
 		bdg.CreatedAt = oldbdg.CreatedAt
 		if err := repository.Save(bdg); err != nil {
-			return err
+			return nil, err
 		}
 		if oldbdg.DeletedAt != nil {
-			return hateoas.ErrorCreated
+			return bdg, hateoas.ErrorCreated
 		}
-		return nil
+		return bdg, nil
 	}, http.StatusOK)
 }
