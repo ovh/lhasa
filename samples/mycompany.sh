@@ -28,6 +28,15 @@ can be deployed independently in the information system to offer an identified h
 '
 
 curl --request PUT \
+  --url $API_BASE_URL/v1/contents/help-what-is-a-repository/en-GB \
+  --header 'content-type: text/plain' \
+  --data 'Code repository
+------
+
+Code of application is stored in a __code repository__ (often git)
+'
+
+curl --request PUT \
   --url $API_BASE_URL/v1/environments/prodfr \
   --header 'content-type: application/json' \
   --data '{
