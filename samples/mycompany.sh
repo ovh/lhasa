@@ -28,6 +28,17 @@ can be deployed independently in the information system to offer an identified h
 '
 
 curl --request PUT \
+  --url $API_BASE_URL/v1/contents/help-what-is-a-contributor/en-GB \
+  --header 'content-type: text/plain' \
+  --data 'Authors
+------
+
+A contributor is someone who commit on code repository.
+
+A maintainer is someone who actively support this application.
+'
+
+curl --request PUT \
   --url $API_BASE_URL/v1/environments/prodfr \
   --header 'content-type: application/json' \
   --data '{
