@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -ex
+set -x
 
 ./appcatalog $* &
 
-[ "x${IMPORT_SAMPLE_DATA}" != "x" ] && {
+wait_for_apis () {
     export API_BASE_URL=http://localhost:8081/api
     # wait for api
     ret=1
@@ -12,10 +12,23 @@ set -ex
     do
         curl -s $API_BASE_URL/unsecured/version >/dev/null
         ret=$?
-        echo $ret
+        echo "Return:" $ret
         sleep 1
     done
-    ./mycompany.sh 2>/dev/null >/dev/null
+}
+
+# Activate IMPORT_SAMPLE_DATA env var to inject sample data
+[ "x${IMPORT_SAMPLE_DATA}" != "x" ] && {
+    wait_for_apis
+    ./mycompany.sh >/dev/null
+}
+
+# Any script called init-script.sh will be executed
+# Use it for your own integration
+[ -f ./init-script.sh ] && {
+    wait_for_apis
+    chmod 700 ./init-script.sh && ./init-script.sh
 }
 
 wait %1
+
