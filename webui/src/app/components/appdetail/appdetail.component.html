@@ -50,8 +50,8 @@
         <hr>
 
         <h5 class="oui-header_5">
-          <app-help-widget key="help-what-is-a-contributor"></app-help-widget><i class="oui-icon oui-icon-user_line" aria-hidden="true"></i>
-          {{ 'AUTHORS' | translate }}
+          <i class="oui-icon oui-icon-user_line" aria-hidden="true"></i>
+          {{ 'AUTHORS' | translate }}  <app-help-widget key="help-what-is-a-contributor"></app-help-widget>
         </h5>
         <ul class="oui-list__items">
           <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
