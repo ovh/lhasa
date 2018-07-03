@@ -10,6 +10,8 @@ import { element } from 'protractor';
 import { ISubscription } from 'rxjs/Subscription';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
+import {FieldsetModule} from 'primeng/fieldset';
+
 
 @Component({
   selector: 'app-appdetail',

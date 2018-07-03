@@ -16,12 +16,12 @@
       </span>
     </div>
     <h3 *ngIf="description">
-      {{ description }}
+      {{ (description.length>300)? (description | slice:0:300)+'...':(description) }}
     </h3>
-    <h3 *ngIf="readme">
+    <p-fieldset *ngIf="readme" legend="README.md" [toggleable]="true" [collapsed]="true">
       <a *ngIf="readme.startsWith('http')" href="{{ readme }}" target="_blank">readme</a>
       <ngx-md *ngIf="!readme.startsWith('http')">{{ readme }}</ngx-md>
-    </h3>
+    </p-fieldset>
   </div>
 
   <div class="oui-list ui-g-4" *ngIf="application.manifest">
@@ -36,7 +36,7 @@
         <hr>
         <h5 class="oui-header_5">
           <i class="oui-icon oui-icon-page_line" aria-hidden="true"></i>
-          {{ 'REPOSITORY' | translate }}
+          {{ 'REPOSITORY' | translate }}  <app-help-widget key="help-what-is-a-repository"></app-help-widget>
         </h5>
         <p class="oui-field__control oui-field__control_auto">
           <a *ngIf="application.manifest && application.manifest.repository" class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">

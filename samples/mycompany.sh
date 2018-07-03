@@ -39,6 +39,15 @@ A maintainer is someone who actively support this application.
 '
 
 curl --request PUT \
+  --url $API_BASE_URL/v1/contents/help-what-is-a-repository/en-GB \
+  --header 'content-type: text/plain' \
+  --data 'Code repository
+------
+
+Code of application is stored in a __code repository__ (often git)
+'
+
+curl --request PUT \
   --url $API_BASE_URL/v1/environments/prodfr \
   --header 'content-type: application/json' \
   --data '{
