@@ -34,7 +34,7 @@ $(PACKR):
 	go get -u github.com/gobuffalo/packr/packr
 
 install: $(GO_DEP) $(PACKR)
-	dep ensure
+	dep ensure -vendor-only
 	packr
 
 server: vet lint install
