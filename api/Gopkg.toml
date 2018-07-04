@@ -60,3 +60,8 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[override]]
   name = "github.com/valyala/fasthttp"
   branch = "master"
+
+[prune]
+  non-go = true
+  go-tests = true
+  unused-packages = true
