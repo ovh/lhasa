@@ -3,10 +3,6 @@
     <h1 class="oui-header_1 oui-header_underline header">
       {{ 'APPLICATION' | translate }}: {{ application.domain }}/{{ application.name }}
       <span class="oui-chip">{{ application.version }}</span>
-      <button type="button" class="oui-button oui-button_link oui-button_secondary oui-button_icon-only oui-button_small-width"
-        routerLink="/applications/{{ application.domain }}/{{ application.name }}/versions/{{ application.version }}/edit">
-        <i class="oui-icon oui-icon-pen_line" aria-hidden="true"></i>
-      </button>
     </h1>
   </div>
   <div class="ui-g-8">
