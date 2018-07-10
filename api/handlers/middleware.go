@@ -6,13 +6,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ovh/lhasa/api/hateoas"
+	"github.com/ovh/lhasa/api/security"
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	headerSource    = http.CanonicalHeaderKey("X-Ovh-Gateway-Source")
-	requestIDHeader = http.CanonicalHeaderKey("X-Request-Id")
-	remoteUser      = http.CanonicalHeaderKey("X-Remote-User")
+// KeyRoles is the gin context key where roles are stored
+const (
+	KeyRoles = "roles"
 )
 
 // LoggingMiddleware logs before and after incoming gin requests
@@ -25,9 +25,9 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 		fields := logrus.Fields{
 			"method":       c.Request.Method,
 			"path":         c.Request.URL.Path,
-			"source_token": c.Request.Header.Get(headerSource),
-			"request_id":   c.Request.Header.Get(requestIDHeader),
-			"remote_user":  c.Request.Header.Get(remoteUser),
+			"source_token": c.GetHeader(security.HeaderGatewaySource),
+			"request_id":   c.GetHeader(security.HeaderRequestID),
+			"remote_user":  c.GetHeader(security.HeaderRemoteUser),
 		}
 		log.WithFields(fields).Debug("incoming request")
 		startTime := time.Now()
@@ -45,5 +45,32 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 				log.WithFields(fields).Error(err)
 			}
 		}
+	}
+}
+
+// HasOneRoleOf returns a gin handler that checks the request against the given role
+func HasOneRoleOf(roles ...security.Role) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		rolesRaw, ok := c.Get(KeyRoles)
+		rolePolicy, castok := rolesRaw.(security.RolePolicy)
+		if !ok && !castok && rolePolicy != nil {
+			// Bypass roles check if the configuration has not been properly set
+			c.Next()
+			return
+		}
+
+		if rolePolicy.HasOneRoleOf(roles...) {
+			c.Next()
+			return
+		}
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized access"})
+	}
+}
+
+// AuthMiddleware returns a middleware that populate the Gin Context with security data
+func AuthMiddleware(policy security.Policy) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(KeyRoles, security.BuildRolePolicy(policy, c.Request))
+		c.Next()
 	}
 }

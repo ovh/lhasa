@@ -14,5 +14,10 @@
     },
     "manifest": {
         "name": ".sherpa.json"
+    },
+    "security": {
+        "ROLE_ADMIN": {
+            "X-Remote-User": "john.doe"
+        }
     }
 }

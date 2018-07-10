@@ -16,6 +16,7 @@ import (
 	ext "github.com/ovh/lhasa/api/ext/binding"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
+	"github.com/ovh/lhasa/api/security"
 	v1 "github.com/ovh/lhasa/api/v1/routing"
 	"github.com/sirupsen/logrus"
 	"github.com/wI2L/fizz"
@@ -33,7 +34,7 @@ func uiRedirectHandler(uiBasePath string) gin.HandlerFunc {
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath string, ServerUIBasePath, webUIDir string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
+func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath string, ServerUIBasePath, webUIDir string, debugMode bool, policy security.Policy, log *logrus.Logger) *fizz.Fizz {
 	router := fizz.New()
 	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
 
@@ -46,7 +47,7 @@ func NewRouter(tm db.TransactionManager, version, hateoasBaseBath, uiBasePath st
 	tonic.SetBindHook(ext.BindHook)
 	tonic.SetRenderHook(ext.RenderHook, "")
 
-	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath))
+	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath), handlers.AuthMiddleware(policy))
 	api.GET("/", []fizz.OperationOption{
 		fizz.Summary("Hateoas index of available resources"),
 		fizz.ID("IndexAPI"),
