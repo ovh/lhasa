@@ -10,67 +10,98 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// KeyRoles is the gin context key where roles are stored
+// Gin context keys
 const (
-	KeyRoles = "roles"
+	KeyRoles    = "roles"
+	KeyLogEntry = "logger"
 )
 
 // LoggingMiddleware logs before and after incoming gin requests
-func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
+func LoggingMiddleware(logHeaders []string, log *logrus.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if log == nil {
 			c.Next()
 			return
 		}
-		fields := logrus.Fields{
-			"method":       c.Request.Method,
-			"path":         c.Request.URL.Path,
-			"source_token": c.GetHeader(security.HeaderGatewaySource),
-			"request_id":   c.GetHeader(security.HeaderRequestID),
-			"remote_user":  c.GetHeader(security.HeaderRemoteUser),
+		entry := log.WithFields(logrus.Fields{
+			"method": c.Request.Method,
+			"path":   c.Request.URL.Path,
+		})
+		for _, h := range logHeaders {
+			header := http.CanonicalHeaderKey(h)
+			if header != "" {
+				entry = entry.WithField(header, c.GetHeader(header))
+			}
 		}
-		log.WithFields(fields).Debug("incoming request")
+		c.Set(KeyLogEntry, entry)
+
+		entry.Debug("incoming request")
 		startTime := time.Now()
-		c.Set("logfields", fields)
 
 		c.Next()
 
-		log.WithFields(fields).WithFields(logrus.Fields{
+		entry.WithFields(logrus.Fields{
 			"status":   c.Writer.Status(),
 			"duration": time.Since(startTime).Seconds(),
-		}).Info("done")
+		}).Debug("done")
 
 		for _, err := range c.Errors.Errors() {
 			if err != hateoas.ErrorCreated.Error() {
-				log.WithFields(fields).Error(err)
+				entry.Error(err)
 			}
 		}
 	}
 }
 
-// HasOneRoleOf returns a gin handler that checks the request against the given role
-func HasOneRoleOf(roles ...security.Role) gin.HandlerFunc {
+// HasOne returns a gin handler that checks the request against the given role
+func HasOne(roles ...security.Role) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rolesRaw, ok := c.Get(KeyRoles)
 		rolePolicy, castok := rolesRaw.(security.RolePolicy)
-		if !ok && !castok && rolePolicy != nil {
-			// Bypass roles check if the configuration has not been properly set
-			c.Next()
-			return
+		log := GetLogger(c)
+
+		if !ok || !castok {
+			if log != nil {
+				log.Warnf("unusable security policy, please check your configuration")
+				abortUnauthorized(c)
+				return
+			}
 		}
 
-		if rolePolicy.HasOneRoleOf(roles...) {
+		if rolePolicy.HasOne(roles...) {
 			c.Next()
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized access"})
+		if log != nil {
+			log.WithField("expectedRoles", roles).Info("unauthorized access")
+		}
+		abortUnauthorized(c)
 	}
 }
 
+func abortUnauthorized(c *gin.Context) {
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized access"})
+}
+
 // AuthMiddleware returns a middleware that populate the Gin Context with security data
-func AuthMiddleware(policy security.Policy) gin.HandlerFunc {
+func AuthMiddleware(policy security.CompiledPolicy) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set(KeyRoles, security.BuildRolePolicy(policy, c.Request))
+		roles := security.BuildRolePolicy(policy, c.Request)
+		c.Set(KeyRoles, roles)
+		log := GetLogger(c)
+		if log != nil {
+			log.WithField("roles", roles.ToSlice()).Debugf("user has roles")
+		}
 		c.Next()
 	}
+}
+
+// GetLogger returns the request logger from the gin context, nil if it does not exist
+func GetLogger(c *gin.Context) *logrus.Entry {
+	logRaw, found := c.Get(KeyLogEntry)
+	log, castok := logRaw.(*logrus.Entry)
+	if !found || !castok {
+		return nil
+	}
+	return log
 }

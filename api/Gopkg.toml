@@ -60,3 +60,7 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[override]]
   name = "github.com/valyala/fasthttp"
   branch = "master"
+
+[[constraint]]
+  name = "github.com/gobwas/glob"
+  version = "0.2.3"

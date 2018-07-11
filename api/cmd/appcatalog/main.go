@@ -69,22 +69,22 @@ func main() {
 		return
 	case cmdCodeMigrate:
 	case fmt.Sprintf("%s %s", cmdCodeMigrate, cmdCodeMigrateUp):
-		parseConf(log)
-		db := waitForDB(log)
+		c := parseConf(log)
+		db := waitForDB(c, log)
 		runMigrationsUp(db.DB(), log)
 		return
 	case fmt.Sprintf("%s %s", cmdCodeMigrate, cmdCodeMigrateDown):
-		parseConf(log)
-		db := waitForDB(log)
+		c := parseConf(log)
+		db := waitForDB(c, log)
 		runMigrationsDown(db.DB(), log)
 		return
 	case cmdCodeStart:
-		parseConf(log)
-		tm := db.NewTransactionManager(waitForDB(log), log)
+		c := parseConf(log)
+		tm := db.NewTransactionManager(waitForDB(c, log), log)
 		if *flagAutoMigrations {
 			runMigrationsUp(tm.DB().DB(), log)
 		}
-		router := routers.NewRouter(tm, version, *flagHateoasBasePath, *flagUIBasePath, *flagServerUIBasePath, *flagWebUIDir, *flagDebug, log)
+		router := routers.NewRouter(tm, c, version, *flagHateoasBasePath, *flagUIBasePath, *flagServerUIBasePath, *flagWebUIDir, *flagDebug, log)
 		srv := &http.Server{
 			Addr:    fmt.Sprintf(":%d", *flagStartPort),
 			Handler: router,
@@ -93,18 +93,20 @@ func main() {
 	}
 }
 
-func parseConf(log *logrus.Logger) {
-	if err := config.LoadFromFile(*flagConfigFile); err != nil {
+func parseConf(log *logrus.Logger) config.Lhasa {
+	c, err := config.LoadFromFile(*flagConfigFile)
+	if err != nil {
 		log.WithError(err).Fatalf("cannot read configuration file")
 	}
+	return c
 }
 
-func waitForDB(log *logrus.Logger) *gorm.DB {
-	dbHandle, err := config.NewDBHandle(*flagConfigFile, *flagDBAlias, *flagDebug, log)
+func waitForDB(c config.Lhasa, log *logrus.Logger) *gorm.DB {
+	dbHandle, err := db.NewDBHandle(c.DB, *flagDebug, log)
 	for err != nil {
 		log.WithError(err).Errorf("cannot get DB handle, retrying in %d seconds", dbRetryDuration)
 		time.Sleep(dbRetryDuration * time.Second)
-		dbHandle, err = config.NewDBHandle(*flagConfigFile, *flagDBAlias, *flagDebug, log)
+		dbHandle, err = db.NewDBHandle(c.DB, *flagDebug, log)
 	}
 	return dbHandle
 }

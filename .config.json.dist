@@ -12,12 +12,15 @@
         "password": "#sample#",
         "type": "postgresql"
     },
-    "manifest": {
-        "name": ".sherpa.json"
-    },
     "security": {
         "ROLE_ADMIN": {
             "X-Remote-User": "john.doe"
+        },
+        "ROLE_USER": {
+            "X-Remote-User": "*"
         }
     }
+    "log-headers": [
+        "X-Remote-User",
+    ]
 }

@@ -15,43 +15,52 @@ func TestBuildRolePolicy(t *testing.T) {
 	}{
 		{
 			policy: security.BuildRolePolicy(
-				security.Policy{
+				security.Compile(security.Policy{
 					"ROLE_ADMIN": {
 						"X-Remote-User": {"john.doe"},
 					},
-				},
+					"ROLE_USER": {
+						"X-Remote-User": {"*"},
+					},
+				}),
 				&http.Request{Header: map[string][]string{"X-Remote-User": {"john.doe"}}}),
 			roles: []security.Role{security.RoleAdmin, security.RoleUser},
 		},
 		{
 			policy: security.BuildRolePolicy(
-				security.Policy{
+				security.Compile(security.Policy{
 					"ROLE_ADMIN": {
 						"X-Remote-User": {"john.doe"},
 					},
-				},
+					"ROLE_USER": {
+						"X-Remote-User": {"*"},
+					},
+				}),
 				&http.Request{Header: map[string][]string{"X-Remote-User": {"foo.bar"}}}),
 			roles:   []security.Role{security.RoleUser},
 			noRoles: []security.Role{security.RoleAdmin},
 		},
 		{
 			policy: security.BuildRolePolicy(
-				security.Policy{
+				security.Compile(security.Policy{
 					"ROLE_ADMIN": {
 						"X-Ovh-Gateway-Source": {"foobar"},
 					},
-				},
+					"ROLE_USER": {
+						"X-Remote-User": {"*"},
+					},
+				}),
 				&http.Request{Header: map[string][]string{"X-Remote-User": {"foo.bar"}}}),
 			roles:   []security.Role{security.RoleUser},
 			noRoles: []security.Role{security.RoleAdmin},
 		},
 		{
 			policy: security.BuildRolePolicy(
-				security.Policy{
+				security.Compile(security.Policy{
 					"ROLE_ADMIN": {
 						"X-Ovh-Gateway-Source": {"foobar"},
 					},
-				},
+				}),
 				&http.Request{Header: map[string][]string{"X-Ovh-Gateway-Source": {"foobar"}}}),
 			roles:   []security.Role{security.RoleAdmin},
 			noRoles: []security.Role{security.RoleUser},
@@ -59,10 +68,10 @@ func TestBuildRolePolicy(t *testing.T) {
 	}
 
 	for i, run := range data {
-		if !run.policy.HasAllRoles(run.roles...) {
+		if !run.policy.HasAll(run.roles...) {
 			t.Errorf("Test %d - Expected %v - Found %v", i+1, run.roles, run.policy.ToSlice())
 		}
-		if run.policy.HasOneRoleOf(run.noRoles...) {
+		if run.policy.HasOne(run.noRoles...) {
 			t.Errorf("Test %d - Expected %v - Found %v", i+1, run.roles, run.policy.ToSlice())
 		}
 	}

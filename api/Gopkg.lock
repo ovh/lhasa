@@ -103,6 +103,21 @@
   version = "v1.10.11"
 
 [[projects]]
+  name = "github.com/gobwas/glob"
+  packages = [
+    ".",
+    "compiler",
+    "match",
+    "syntax",
+    "syntax/ast",
+    "syntax/lexer",
+    "util/runes",
+    "util/strings"
+  ]
+  revision = "5ccd90ef52e1e632236f7326478d4faa74f99438"
+  version = "v0.2.3"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/lint"
   packages = ["golint"]
@@ -465,6 +480,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "42cdb355dffc0255598ce1cdd816db43517353d794ac35659f80aab0697a1dad"
+  inputs-digest = "dbcd3db3780ee5523ebdb6dfb92c913ec3ca998061741ba97bb71674f1b1ccda"
   solver-name = "gps-cdcl"
   solver-version = 1
