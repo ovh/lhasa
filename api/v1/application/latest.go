@@ -65,5 +65,5 @@ func shouldUpdate(current, submitted *v1.Release, log *logrus.Entry) bool {
 	if err != nil {
 		return true
 	}
-	return currentSemver.LessThan(*submittedSemver)
+	return currentSemver.Compare(*submittedSemver) <= 0
 }
