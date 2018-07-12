@@ -21,25 +21,25 @@ type deploymentCreateRequest struct {
 
 // HandlerDeploy deploy this application version to the given environment and removes old deployments
 func HandlerDeploy(appRepo *application.Repository, envRepo *environment.Repository, deployer Deployer) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) error {
+	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (*v1.Deployment, error) {
 		dep := request.Deployment
 		app, err := appRepo.FindOneByDomainNameVersion(request.Domain, request.Name, request.Version)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		env, err := envRepo.FindOneBySlug(request.Slug)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if err := deployer(*app, *env, dep); err != nil {
-			return err
+			return nil, err
 		}
 		// If a resource has been created on the origin server, the response SHOULD be 201 (Created) and contain an
 		// entity which describes the status of the request and refers to the new resource, and a Location header.
 		// https://tools.ietf.org/html/rfc2616#page-54
 		c.Header("location", dep.GetSelfURL(hateoas.BaseURL(c)))
-		return nil
+		return dep, nil
 	}, http.StatusCreated)
 }
 
