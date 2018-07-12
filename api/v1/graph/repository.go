@@ -76,7 +76,7 @@ func (repo *Repository) internalMap(entity interface{}, mappers map[string]graph
 		graphEntity := v1.DeploymentGraph{
 			PublicID:     deployment.PublicID,
 			Application:  mappers["application"],
-			Environment:  mappers["environnement"],
+			Environment:  mappers["environment"],
 			Dependencies: deployment.Dependencies.RawMessage,
 			Properties:   deployment.Properties.RawMessage,
 			UndeployedAt: deployment.UndeployedAt,
@@ -103,22 +103,22 @@ func (repo *Repository) internalMap(entity interface{}, mappers map[string]graph
 		}
 		return "application", &graphEntity
 	}
-	environnement, isEnvironnement := entity.(*v1.Environment)
-	if isEnvironnement {
-		if environnement == nil {
+	environment, isenvironment := entity.(*v1.Environment)
+	if isenvironment {
+		if environment == nil {
 			graphEntity := v1.EnvironmentGraph{}
-			return "environnement", &graphEntity
+			return "environment", &graphEntity
 		}
 		uid, _ := uuid.NewV4()
 		graphEntity := v1.EnvironmentGraph{
 			PublicID:   uid.String(),
-			Slug:       environnement.Slug,
-			Name:       environnement.Name,
-			Properties: environnement.Properties.RawMessage,
-			CreatedAt:  environnement.CreatedAt,
-			UpdatedAt:  environnement.UpdatedAt,
+			Slug:       environment.Slug,
+			Name:       environment.Name,
+			Properties: environment.Properties.RawMessage,
+			CreatedAt:  environment.CreatedAt,
+			UpdatedAt:  environment.UpdatedAt,
 		}
-		return "environnement", &graphEntity
+		return "environment", &graphEntity
 	}
 	return "", nil
 }

@@ -8,6 +8,9 @@ export class VisNode {
     id: string;
     label: string;
     group: string;
+    environment: string;
+    domain: string;
+    application:string;
 }
 
 export class VisEdge {

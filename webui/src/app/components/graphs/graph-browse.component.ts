@@ -63,7 +63,10 @@ export class GraphBrowseComponent implements OnInit, AfterViewInit {
           this.deploymentsVis.nodes.push({
             id: node.id,
             label: node.name,
-            group: node.type
+            group: node.properties.environment.slug, 
+            environment: node.properties.environment.slug,
+            domain: node.properties.application.domain,
+            application: node.properties.application.name,
           });
         });
         // Compute data
