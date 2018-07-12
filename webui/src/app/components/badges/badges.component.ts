@@ -14,11 +14,23 @@ import { BadgesResolver } from '../../resolver/resolve-badges';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
+import { UIChart } from 'primeng/primeng';
 
 export class BadgeUIBean {
   title: string;
   type: string;
   levels: BadgeShieldsIOBean[];
+  piechartData: PieChartDataBean
+}
+
+export class PieChartDataBean {
+  labels: string[] = [];
+  datasets: PieChartDatasetBean[] = [];
+}
+
+export class PieChartDatasetBean {
+  data: number[] = [];
+  backgroundColor: string[] = [];
 }
 
 @Component({
@@ -45,6 +57,7 @@ export class BadgesComponent implements OnInit {
 
   public param = { target: 'badgess' };
   public page = 0;
+  public PieChartOptions;
 
   constructor(
     private router: Router,
@@ -60,6 +73,11 @@ export class BadgesComponent implements OnInit {
         this.page = +params['page'] || 0;
       });
 
+    this.PieChartOptions = {
+      legend: {
+        display: false
+      }
+    };
   }
 
   ngOnInit() {
@@ -67,12 +85,14 @@ export class BadgesComponent implements OnInit {
      * subscribe
      */
     this.badgesStream = this.badgesStoreService.badgePages();
-    
-    this.badgesStream.subscribe(  
+
+    this.badgesStream.subscribe(
       (elem: BadgePagesBean) => {
         this.badges = []
         elem.badges.forEach((bdg) => {
           var levels: BadgeShieldsIOBean[] = []
+          var piechartData = new(PieChartDataBean)
+          piechartData.datasets.push(new(PieChartDatasetBean))
           bdg.levels.forEach((lvl) => {
             levels.push(<BadgeShieldsIOBean>{
               id: lvl.id,
@@ -83,11 +103,15 @@ export class BadgesComponent implements OnInit {
               description: lvl.description,
               value: lvl.id,
             })
+            piechartData.labels.push(lvl.label);
+            piechartData.datasets[0].data.push(1);
+            piechartData.datasets[0].backgroundColor.push(lvl.color);
           })
           this.badges.push(<BadgeUIBean>{
             title: bdg.title,
             type: bdg.type,
             levels: levels,
+            piechartData: piechartData,
           });
         })
 
@@ -137,5 +161,5 @@ export class BadgesComponent implements OnInit {
       this.page = page;
     }
   }
-  
+
 }
