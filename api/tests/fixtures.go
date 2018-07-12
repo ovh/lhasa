@@ -4,7 +4,9 @@ import (
 	"net/http/httptest"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/ovh/lhasa/api/config"
 	"github.com/ovh/lhasa/api/db"
+	"github.com/ovh/lhasa/api/security"
 
 	"github.com/jinzhu/gorm"
 
@@ -20,7 +22,8 @@ func StartTestHTTPServer() *httptest.Server {
 	mocket.Catcher.Logging = true
 	dbHandle, _ := gorm.Open(mocket.DRIVER_NAME, "any_string")
 	tm := db.NewTransactionManager(dbHandle, log)
-	router := routers.NewRouter(tm, "1.0.0", "/api", "/ui", "/", "./", true, log)
+	c := config.Lhasa{Policy: security.Compile(security.Policy{"ROLE_ADMIN": {"X-Remote-User": {"*"}}})}
+	router := routers.NewRouter(tm, c, "1.0.0", "/api", "/ui", "/", "./", true, log)
 	server := httptest.NewServer(router)
 	return server
 }

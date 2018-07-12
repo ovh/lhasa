@@ -1,55 +1,43 @@
 package db
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
+	"time"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres" // This is required by GORM to enable postgresql support
+	"github.com/sirupsen/logrus"
 )
 
-// databaseInstance host and port
-type databaseInstance struct {
-	Port int    `json:"port"`
-	Host string `json:"host"`
-	Ssl  string `json:"sslmode"`
-}
+const (
+	maxOpenConns = 10
+	maxIdleConns = 3
+)
 
-// DatabaseCredentials credentials
-type DatabaseCredentials struct {
-	Readers  []databaseInstance `json:"readers"`
-	Writers  []databaseInstance `json:"writers"`
-	Database string             `json:"database"`
-	Password string             `json:"password"`
-	User     string             `json:"user"`
-	Type     string             `json:"type"`
-}
-
-// FromJSON unmarshall creds
-func FromJSON(creds string) (*DatabaseCredentials, error) {
-	dc := &DatabaseCredentials{}
-	err := json.Unmarshal([]byte(creds), &dc)
+// NewDBHandle provides the database handle to its callers
+func NewDBHandle(dc DatabaseCredentials, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
+	connStr, err := dc.GetRW()
 	if err != nil {
-		return nil, ErrUnmarshal
+		return nil, err
 	}
-	return dc, nil
+	return NewFromGormString(connStr, logMode, log)
 }
 
-// Type db type
-type Type string
-
-var (
-	// PostgreSQL connect string
-	PostgreSQL Type = "user=%s password=%s host=%s port=%d DB.name=%s sslmode=%s"
-
-	// PostgreSQLDefaultSslMode default ssl connect string
-	PostgreSQLDefaultSslMode = "require"
-
-	// ErrUnmarshal error
-	ErrUnmarshal = errors.New("Unmarshaling error")
-
-	// ErrNoInstanceFound instance not found
-	ErrNoInstanceFound = errors.New("No suitable db instance found")
-)
+// NewFromGormString creates a gorm db handler from a connection string
+func NewFromGormString(connStr string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
+	db, err := gorm.Open("postgres", connStr)
+	if err != nil {
+		return nil, err
+	}
+	db.DB().SetMaxIdleConns(maxIdleConns)
+	db.DB().SetMaxOpenConns(maxOpenConns)
+	db.LogMode(logMode)
+	db.SetLogger(gorm.Logger{LogWriter: dbLogWriter{log}})
+	return db, nil
+}
 
 // GetRW get a read/write database
 func (dc *DatabaseCredentials) GetRW() (string, error) {
@@ -61,7 +49,7 @@ func (dc *DatabaseCredentials) GetRO() (string, error) {
 	return dc.getConnStr(dc.Readers)
 }
 
-func (dc *DatabaseCredentials) getConnStr(instances []databaseInstance) (string, error) {
+func (dc *DatabaseCredentials) getConnStr(instances []DatabaseInstance) (string, error) {
 	dbType, err := dc.getType()
 	if err != nil {
 		return "", err
@@ -78,7 +66,7 @@ func (dc *DatabaseCredentials) getType() (Type, error) {
 	case "postgresql":
 		return PostgreSQL, nil
 	}
-	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
+	return "", fmt.Errorf("unsupported DB type '%s'", dc.Type)
 }
 
 func (dc *DatabaseCredentials) getSslDefaultMode(value string) (string, error) {
@@ -89,17 +77,19 @@ func (dc *DatabaseCredentials) getSslDefaultMode(value string) (string, error) {
 	case "postgresql":
 		return PostgreSQLDefaultSslMode, nil
 	}
-	return "", fmt.Errorf("Unknown DB type '%s'", dc.Type)
+	return "", fmt.Errorf("unsupported DB type '%s'", dc.Type)
 }
 
-func getRandom(instances []databaseInstance) (*databaseInstance, error) {
-	if len(instances) == 0 {
-		return nil, ErrNoInstanceFound
+func getRandom(instances []DatabaseInstance) (*DatabaseInstance, error) {
+	max := len(instances)
+	if max == 0 {
+		return nil, errors.New("no suitable db instance found")
 	}
-	return &instances[0], nil // TODO rnd
+	rand.Seed(time.Now().Unix())
+	return &instances[rand.Intn(max)], nil
 }
 
-func buildConnStr(fmtStr Type, dc *DatabaseCredentials, i *databaseInstance) string {
+func buildConnStr(fmtStr Type, dc *DatabaseCredentials, i *DatabaseInstance) string {
 	// build sslmode with default value according do bdd type
 	var sslmode, _ = dc.getSslDefaultMode(i.Ssl)
 	return fmt.Sprintf(string(fmtStr), dc.User, dc.Password, i.Host, i.Port, dc.Database, sslmode)
