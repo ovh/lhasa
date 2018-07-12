@@ -55,10 +55,10 @@
         </h5>
         <ul class="oui-list__items">
           <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
-            <span class="oui-list__header">
+            <span class="oui-list__header authorlist">
               {{ person.name }}
               <span *ngIf="person.role">({{ person.role }})</span>
-              <span *ngIf="person.email"> &lt;{{ person.email }}&gt;</span>
+              <span *ngIf="person.email"> &lt;<a href="mailto:{{ person.email }}">{{ person.email }}</a>&gt;</span>
             </span>
           </li>
         </ul>
@@ -78,7 +78,7 @@
           <label class="container" for="{{ deployment.id }}">
             <app-env-chip slug="{{ deployment.properties._env_slug }}"></app-env-chip>
             <i class="oui-icon oui-icon_circle oui-icon-chevron-right" aria-hidden="true"></i>
-            <span class="oui-chip">{{ deployment.properties._app_version }}</span>
+            <span class="oui-chip">{{ (deployment.properties._app_version.length>15)? (deployment.properties._app_version | slice:0:15)+'...':(deployment.properties._app_version) }}</span>
           </label>
         </div>
       </div>
