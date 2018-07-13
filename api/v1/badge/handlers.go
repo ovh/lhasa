@@ -38,3 +38,11 @@ func HandlerCreate(repository *Repository) gin.HandlerFunc {
 		return bdg, nil
 	}, http.StatusOK)
 }
+
+// HandlerStats computes and renders badge statistics
+func HandlerStats(repo *Repository) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, b *v1.Badge) (*v1.Badge, error) {
+
+		return nil, nil
+	}, http.StatusOK)
+}

@@ -218,3 +218,16 @@ func (badge *Badge) ToResource(baseURL string) {
 func (badge *Badge) GetSelfURL(baseURL string) string {
 	return fmt.Sprintf("%s%s/%s", baseURL, BadgeBasePath, badge.Slug)
 }
+
+// ToResource implements Resourceable
+func (br *BadgeRating) ToResource(baseURL string) {
+	br.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "badge", Href: br.Badge.GetSelfURL(baseURL)},
+		{Rel: "release", Href: br.Release.GetSelfURL(baseURL)},
+	}
+}
+
+// GetSelfURL implements Resourceable
+func (br *BadgeRating) GetSelfURL(baseURL string) string {
+	return ""
+}

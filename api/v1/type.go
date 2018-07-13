@@ -8,7 +8,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/ovh/lhasa/api/graphapi"
 	"github.com/ovh/lhasa/api/hateoas"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 // ApplicationBasePath is the URL base path for this resource
@@ -165,6 +165,18 @@ type Badge struct {
 	CreatedAt time.Time      `json:"_createdAt" binding:"-"`
 	UpdatedAt time.Time      `json:"_updatedAt" binding:"-"`
 	DeletedAt *time.Time     `json:"-" binding:"-"`
+	hateoas.Resource
+}
+
+// BadgeRating is a rating for a badge
+type BadgeRating struct {
+	BadgeID    string      `json:"badgeslug,omitempty" validate:"not null; not empty"`
+	Badge      *Badge      `json:"-"`
+	Release    *Release    `json:"-"`
+	BadgeTitle string      `json:"badgetitle,omitempty"`
+	Value      string      `json:"value" validate:"not null; not empty"`
+	Comment    string      `json:"comment"`
+	Level      *BadgeLevel `json:"level,omitempty"`
 	hateoas.Resource
 }
 
