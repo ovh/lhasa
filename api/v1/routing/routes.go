@@ -137,10 +137,10 @@ func registerRoutes(group *fizz.RouterGroup,
 	), application.HandlerGetBadgeRatingsForAppVersion(appRepo))
 	appRoutes.PUT("/:domain/:name/versions/:version/badgeratings/:badgeslug", getOperationOptions("SetBadgeRatingForAnApplicationVersion", appRepo,
 		fizz.Summary("Set badge value for an application version"),
-	), handlers.HasOne(security.RoleAdmin), application.HandlerSetBadgeRatingForRelease(appRepo, badgeRepo))
+	), handlers.HasOne(security.RoleAdmin, security.RoleBadgeCreator), application.HandlerSetBadgeRatingForRelease(appRepo, badgeRepo))
 	appRoutes.DELETE("/:domain/:name/versions/:version/badgeratings/:badgeslug", getOperationOptions("DeleteBadgeRatingForAnApplicationVersion", appRepo,
 		fizz.Summary("Delete badge value for an application version"),
-	), handlers.HasOne(security.RoleAdmin), application.HandlerDeleteBadgeRatingForRelease(appRepo))
+	), handlers.HasOne(security.RoleAdmin, security.RoleBadgeCreator), application.HandlerDeleteBadgeRatingForRelease(appRepo))
 
 	envRoutes := group.Group("/environments", "environments", "Environments resource management")
 	envRoutes.GET("/", getOperationOptions("FindByPage", envRepo,
@@ -195,7 +195,7 @@ func registerRoutes(group *fizz.RouterGroup,
 	), hateoas.HandlerFindOneBy(badgeRepo))
 	badgeRoutes.PUT("/:slug", getOperationOptions("Create", badgeRepo,
 		fizz.Summary("Create a Badge"),
-	), handlers.HasOne(security.RoleAdmin), badge.HandlerCreate(badgeRepo))
+	), handlers.HasOne(security.RoleAdmin, security.RoleBadgeCreator), badge.HandlerCreate(badgeRepo))
 	badgeRoutes.DELETE("/:slug", getOperationOptions("RemoveOneBy", badgeRepo,
 		fizz.Summary("Remove a Badge"),
 		fizz.InputModel(v1.Badge{}),

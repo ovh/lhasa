@@ -65,12 +65,15 @@ func TestBadgeRatingList(t *testing.T) {
 	mockSelectApplications(
 		[]map[string]interface{}{
 			{
-				"badge_ratings": []byte(`[
-				{
-					"badgeslug": "mybadge2",
-					"value": "good",
-					"comment": "tests passed"
-				}]`),
+				"name":    "myapp",
+				"domain":  "mydomain",
+				"version": "1.2.3",
+				"badge_ratings": []byte(`{
+					"mybadge2": {
+						"value": "good",
+						"comment": "tests passed"
+					}
+				}`),
 			},
 		},
 	)
@@ -81,7 +84,6 @@ func TestBadgeRatingList(t *testing.T) {
 		Status(http.StatusOK).
 		JSON().Array().Equal([]map[string]interface{}{
 		{
-			"badgeslug":  "mybadge1",
 			"badgetitle": "My Badge 1",
 			"value":      "unset",
 			"comment":    "",
@@ -92,9 +94,18 @@ func TestBadgeRatingList(t *testing.T) {
 				"description": "",
 				"isdefault":   true,
 			},
+			"_links": []interface{}{
+				map[string]string{
+					"href": "/api/v1/badges/mybadge1",
+					"rel":  "badge",
+				},
+				map[string]string{
+					"href": "/api/v1/applications/mydomain/myapp/versions/1.2.3",
+					"rel":  "release",
+				},
+			},
 		},
 		{
-			"badgeslug":  "mybadge2",
 			"badgetitle": "My Badge 2",
 			"value":      "good",
 			"comment":    "tests passed",
@@ -104,6 +115,16 @@ func TestBadgeRatingList(t *testing.T) {
 				"color":       "green",
 				"description": "",
 				"isdefault":   false,
+			},
+			"_links": []interface{}{
+				map[string]string{
+					"href": "/api/v1/badges/mybadge2",
+					"rel":  "badge",
+				},
+				map[string]string{
+					"href": "/api/v1/applications/mydomain/myapp/versions/1.2.3",
+					"rel":  "release",
+				},
 			},
 		},
 	})
@@ -152,13 +173,12 @@ func TestBadgeRatingSetSuccess(t *testing.T) {
 		[]map[string]interface{}{
 			{
 				"id": 1,
-				"badge_ratings": []byte(`[
-				{
-					"badgeslug": "mybadge2",
-					"value": "good",
-					"comment": "tests passed"
-					
-				}]`),
+				"badge_ratings": []byte(`{
+					"mybadge2": {
+						"value": "good",
+						"comment": "tests passed"
+					}
+				}`),
 			},
 		},
 	)
@@ -206,13 +226,12 @@ func TestBadgeRatingSetLevelNotFound(t *testing.T) {
 	mockSelectApplications(
 		[]map[string]interface{}{
 			{
-				"badge_ratings": []byte(`[
-				{
-					"badgeslug": "mybadge2",
-					"value": "good",
-					"comment": "tests passed"
-					
-				}]`),
+				"badge_ratings": []byte(`{
+					"mybadge2": {
+						"value": "good",
+						"comment": "tests passed"
+					}
+				}`),
 			},
 		},
 	)
@@ -243,13 +262,12 @@ func TestBadgeRatingSetBadgeNotFound(t *testing.T) {
 	mockSelectApplications(
 		[]map[string]interface{}{
 			{
-				"badge_ratings": []byte(`[
-				{
-					"badgeslug": "mybadge2",
-					"value": "good",
-					"comment": "tests passed"
-					
-				}]`),
+				"badge_ratings": []byte(`{
+					"mybadge2": {
+						"value": "good",
+						"comment": "tests passed"
+					}
+				}`),
 			},
 		},
 	)
@@ -337,18 +355,17 @@ func TestBadgeRatingDeleteSuccess(t *testing.T) {
 	mockSelectApplications(
 		[]map[string]interface{}{
 			{
-				"badge_ratings": []byte(`[
-				{
-					"badgeslug": "mybadge2",
-					"value": "thisisadeprecatedvalue",
-					"comment": ""
-					
-				}]`),
+				"badge_ratings": []byte(`{
+					"mybadge2": {
+						"value": "thisisadeprecatedvalue",
+						"comment": ""
+					}
+				}`),
 			},
 		},
 	)
 
-	m := mocket.Catcher.NewMock().WithQuery(`INSERT INTO "releases" ("properties","manifest","tags","created_at","updated_at","deleted_at","badge_ratings")`)
+	m := mocket.Catcher.NewMock().WithQuery(`INSERT INTO "releases"`)
 
 	e := httpexpect.New(t, server.URL)
 	e.DELETE("/api/v1/applications/mydomain/myapp/versions/1.0.0/badgeratings/mybadge2").

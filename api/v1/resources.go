@@ -211,7 +211,11 @@ func (badge *Badge) GetDeletedAt() *time.Time {
 
 // ToResource implements Resourceable
 func (badge *Badge) ToResource(baseURL string) {
-	badge.Resource.Links = []hateoas.ResourceLink{{Rel: "self", Href: badge.GetSelfURL(baseURL)}}
+	selfURL := badge.GetSelfURL(baseURL)
+	badge.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "self", Href: selfURL},
+		{Rel: "stats", Href: selfURL + "/stats"},
+	}
 }
 
 // GetSelfURL implements Resourceable

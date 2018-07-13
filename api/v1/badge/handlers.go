@@ -41,8 +41,10 @@ func HandlerCreate(repository *Repository) gin.HandlerFunc {
 
 // HandlerStats computes and renders badge statistics
 func HandlerStats(repo *Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context, b *v1.Badge) (*v1.Badge, error) {
-
-		return nil, nil
+	return tonic.Handler(func(c *gin.Context, b *v1.Badge) (map[string]int, error) {
+		if _, err := repo.FindOneBySlug(b.Slug); err != nil {
+			return nil, err
+		}
+		return repo.GatherStats(b.Slug)
 	}, http.StatusOK)
 }

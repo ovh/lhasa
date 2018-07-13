@@ -14,8 +14,9 @@ type RolePolicy map[Role]bool
 
 // Existing roles
 const (
-	RoleAdmin Role = "ROLE_ADMIN"
-	RoleUser       = "ROLE_USER"
+	RoleAdmin        Role = "ROLE_ADMIN"
+	RoleUser              = "ROLE_USER"
+	RoleBadgeCreator      = "ROLE_BADGE_CREATOR"
 )
 
 // User is a human user
