@@ -1,5 +1,6 @@
 .application-description {
-  height: 100px;
+  height: 5em;
+  overflow: scroll;
 }
 
 .pad-tile {
