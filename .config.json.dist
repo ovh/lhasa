@@ -14,10 +14,10 @@
     },
     "security": {
         "ROLE_ADMIN": {
-            "X-Remote-User": "john.doe"
+            "X-Remote-User": ["john.doe"]
         },
         "ROLE_USER": {
-            "X-Remote-User": "*"
+            "X-Remote-User": ["*"]
         }
     }
     "log-headers": [

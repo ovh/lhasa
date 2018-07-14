@@ -187,7 +187,7 @@ func (a *ApplicationVersionGraph) GetID() string {
 
 // GetName get all dependencies
 func (a *ApplicationVersionGraph) GetName() string {
-	return a.Domain + "/" + a.Name + " v" + a.Version
+	return a.Domain + "/" + a.Name
 }
 
 // GetType get entity type
@@ -204,7 +204,7 @@ func (a *ApplicationVersionGraph) GetEdges() []graphapi.ImplementEdge {
 type DeploymentGraph struct {
 	PublicID     string                 `json:"id" description:"Deployment public identifier"`
 	Application  graphapi.ImplementNode `json:"application"`
-	Environment  graphapi.ImplementNode `json:"environnement"`
+	Environment  graphapi.ImplementNode `json:"environment"`
 	Dependencies json.RawMessage        `json:"dependencies,omitempty" binding:"-"`
 	Properties   json.RawMessage        `json:"properties,omitempty"`
 	UndeployedAt *time.Time             `json:"undeployedAt,omitempty" binding:"-"`
@@ -219,7 +219,7 @@ func (d *DeploymentGraph) GetID() string {
 
 // GetName get all dependencies
 func (d *DeploymentGraph) GetName() string {
-	return d.Application.GetName() + " on (" + d.Environment.GetName() + ")"
+	return d.Application.GetName() + " [" + d.Environment.GetName() + "]"
 }
 
 // GetType get entity type
@@ -254,7 +254,7 @@ func (d *DeploymentGraph) GetEdges() []graphapi.ImplementEdge {
 
 // EnvironmentGraph is an application version instance on a given environment
 type EnvironmentGraph struct {
-	PublicID   string          `json:"id" description:"Environnement public identifier"`
+	PublicID   string          `json:"id" description:"environment public identifier"`
 	Slug       string          `json:"slug" description:"Environment identifier"`
 	Name       string          `json:"name"`
 	Properties json.RawMessage `json:"properties,omitempty"`
@@ -269,12 +269,12 @@ func (e *EnvironmentGraph) GetID() string {
 
 // GetName get all dependencies
 func (e *EnvironmentGraph) GetName() string {
-	return e.Slug + "/" + e.Name
+	return e.Slug
 }
 
 // GetType get entity type
 func (e *EnvironmentGraph) GetType() string {
-	return "environnement"
+	return "environment"
 }
 
 // GetEdges get all dependencies
