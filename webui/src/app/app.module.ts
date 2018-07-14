@@ -124,6 +124,7 @@ import { environment } from '../environments/environment';
 import { BadgesComponent } from './components/badges/badges.component';
 import { BadgesResolver } from './resolver/resolve-badges';
 import { DataBadgeService } from './services/data-badge.service';
+import { DataBadgeStatsService } from './services/data-badgestats.service';
 import { BadgesStoreService } from './stores/badges-store.service';
 import { HelpsStoreService } from './stores/help-store.service';
 import { ConfigStoreService } from './stores/config-store.service';
@@ -291,6 +292,7 @@ export function createTranslateLoader(http: HttpClient) {
     TranslateService,
     DataDomainService,
     DataBadgeService,
+    DataBadgeStatsService,
     DataGraphService,
     /**
      * resolvers

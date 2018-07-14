@@ -6,6 +6,7 @@ import { LoadBadgesAction, BadgesStoreService } from '../stores/badges-store.ser
 import { ContentListResponse, PageMetaData } from '../models/commons/entity-bean';
 import { DataDeploymentService } from '../services/data-deployment.service';
 import { DataBadgeService } from '../services/data-badge.service';
+import { DataBadgeStatsService } from '../services/data-badgestats.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import { LoadersStoreService } from '../stores/loader-store.service';
@@ -16,6 +17,7 @@ export class BadgesResolver implements Resolve<BadgeBean[]> {
     constructor(
         private badgesStoreService: BadgesStoreService,
         private badgesService: DataBadgeService,
+        private badgeStatsService: DataBadgeStatsService,
         private loadersStoreService: LoadersStoreService,
         private errorsStoreService: ErrorsStoreService,
     ) { }
@@ -45,12 +47,25 @@ export class BadgesResolver implements Resolve<BadgeBean[]> {
         };
         this.badgesService.GetAllFromContent('', meta).subscribe(
             (data: ContentListResponse<BadgeBean>) => {
-                this.badgesStoreService.dispatch(
-                    new LoadBadgesAction({
-                        badges: data.content,
-                        metadata: data.pageMetadata,
-                    }, subject)
-                );
+                //var stats = {}
+                var i = 0
+                data.content.forEach(badge => {
+                    this.badgeStatsService.GetBadgeStats(badge.slug).subscribe(
+                        (stats: Map<string, number>) => {
+                            console.log("stats", stats);
+                            badge._stats = stats
+                            if (i == 3) {
+                                this.badgesStoreService.dispatch(
+                                    new LoadBadgesAction({
+                                        badges: data.content,
+                                        metadata: data.pageMetadata,
+                                    }, subject)
+                                );
+                            }
+                            i += 1;
+                        })
+                });
+
             },
             (error) => {
                 this.errorsStoreService.dispatch(new NewErrorAction(

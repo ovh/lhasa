@@ -104,7 +104,11 @@ export class BadgesComponent implements OnInit {
               value: lvl.id,
             })
             piechartData.labels.push(lvl.label);
-            piechartData.datasets[0].data.push(1);
+            var val = bdg._stats[lvl.id];
+            if (val === undefined) {
+              val = 0;
+            }
+            piechartData.datasets[0].data.push( val);
             piechartData.datasets[0].backgroundColor.push(lvl.color);
           })
           this.badges.push(<BadgeUIBean>{
