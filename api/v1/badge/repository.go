@@ -11,7 +11,12 @@ import (
 )
 
 const (
-	defaultPageSize = 20
+	defaultPageSize  = 20
+	queryGatherStats = `SELECT "releases"."badge_ratings"->?->>'value' AS "v", count(1) AS "c"
+FROM "applications"
+JOIN "releases" on "applications"."latest_release_id" = "releases"."id" AND "releases"."badge_ratings" ? ?
+GROUP BY "v";
+`
 )
 
 // Repository is a repository manager for applications
@@ -70,6 +75,25 @@ func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Enti
 		return &badge, hateoas.NewEntityDoesNotExistError(badge, criteria)
 	}
 	return &badge, err
+}
+
+// GatherStats computes statistics for one badge
+func (repo *Repository) GatherStats(slug string) (map[string]int, error) {
+	rows, err := repo.db.Raw(queryGatherStats, slug, gorm.Expr("?"), slug).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	stats := map[string]int{}
+	for rows.Next() {
+		var value string
+		var count int
+		if err := rows.Scan(&value, &count); err != nil {
+			return nil, err
+		}
+		stats[value] = count
+	}
+	return stats, nil
 }
 
 // UnmarshalLevels extracts the levels JSONB field form the badge

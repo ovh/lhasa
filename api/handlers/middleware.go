@@ -73,7 +73,7 @@ func HasOne(roles ...security.Role) gin.HandlerFunc {
 			return
 		}
 		if log != nil {
-			log.WithField("expectedRoles", roles).Info("unauthorized access")
+			log.WithField("expectedRoles", roles).WithField("roles", rolePolicy.ToSlice()).Info("unauthorized access")
 		}
 		abortUnauthorized(c)
 	}

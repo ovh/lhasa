@@ -211,10 +211,27 @@ func (badge *Badge) GetDeletedAt() *time.Time {
 
 // ToResource implements Resourceable
 func (badge *Badge) ToResource(baseURL string) {
-	badge.Resource.Links = []hateoas.ResourceLink{{Rel: "self", Href: badge.GetSelfURL(baseURL)}}
+	selfURL := badge.GetSelfURL(baseURL)
+	badge.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "self", Href: selfURL},
+		{Rel: "stats", Href: selfURL + "/stats"},
+	}
 }
 
 // GetSelfURL implements Resourceable
 func (badge *Badge) GetSelfURL(baseURL string) string {
 	return fmt.Sprintf("%s%s/%s", baseURL, BadgeBasePath, badge.Slug)
+}
+
+// ToResource implements Resourceable
+func (br *BadgeRating) ToResource(baseURL string) {
+	br.Resource.Links = []hateoas.ResourceLink{
+		{Rel: "badge", Href: br.Badge.GetSelfURL(baseURL)},
+		{Rel: "release", Href: br.Release.GetSelfURL(baseURL)},
+	}
+}
+
+// GetSelfURL implements Resourceable
+func (br *BadgeRating) GetSelfURL(baseURL string) string {
+	return ""
 }

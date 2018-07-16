@@ -115,10 +115,16 @@ testcases:
       url: "{{.appsroute}}/mydomain/myappp/versions/1.0.0/badges"
       assertions:
       - result.statuscode ShouldEqual 200
-      - result.bodyjson.bodyjson0.badgeslug ShouldEqual readme
       - result.bodyjson.bodyjson0.badgetitle ShouldEqual README.md
       - result.bodyjson.bodyjson0.level.color ShouldEqual green
       - result.bodyjson.bodyjson0.comment ShouldEqual "340 lines"
       - result.bodyjson.bodyjson0.level.label ShouldEqual ✔
       - result.bodyjson.bodyjson0.value ShouldEqual exists
       - result.bodyjson.bodyjson0.level.description ShouldEqual desc5
+    - type: http
+      method: GET
+      url: "{{.badgesroute}}/readme/stats"
+      assertions:
+      - result.statuscode ShouldEqual 200
+      - result.bodyjson.exists ShouldEqual 1
+
