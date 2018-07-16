@@ -114,15 +114,15 @@ func GetDefaultLevel(bdg *v1.Badge) (*v1.BadgeLevel, error) {
 	}
 	var found v1.BadgeLevel
 	for _, lvl := range levels {
-		if lvl.IsDefault == true {
+		if lvl.IsDefault {
 			if found.ID != "" {
-				return nil, errors.BadRequestf("there are more than one levels with `isdefault=true`")
+				return nil, errors.New("there are more than one levels with `isdefault=true`")
 			}
 			found = lvl
 		}
 	}
-	if found.ID == "nil" {
-		return nil, errors.BadRequestf("there is no level with `isdefault=true`")
+	if found.ID == "" {
+		return nil, errors.New("there is no level with `isdefault=true`")
 	}
 	return &found, nil
 }

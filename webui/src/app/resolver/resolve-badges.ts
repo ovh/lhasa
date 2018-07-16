@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { BadgeBean, BadgePagesBean } from '../models/commons/badges-bean';
@@ -42,30 +42,27 @@ export class BadgesResolver implements Resolve<BadgeBean[]> {
         const meta: {
             [key: string]: any | any[];
         } = {
-            size: metadata.size,
-            page: metadata.number
-        };
+                size: metadata.size,
+                page: metadata.number
+            };
         this.badgesService.GetAllFromContent('', meta).subscribe(
             (data: ContentListResponse<BadgeBean>) => {
-                //var stats = {}
-                var i = 0
-                data.content.forEach(badge => {
-                    this.badgeStatsService.GetBadgeStats(badge.slug).subscribe(
-                        (stats: Map<string, number>) => {
-                            console.log("stats", stats);
-                            badge._stats = stats
-                            if (i == 3) {
-                                this.badgesStoreService.dispatch(
-                                    new LoadBadgesAction({
-                                        badges: data.content,
-                                        metadata: data.pageMetadata,
-                                    }, subject)
-                                );
-                            }
-                            i += 1;
-                        })
-                });
+                Observable
+                    .from(data.content)
+                    .map(badge => this.badgeStatsService.GetBadgeStats(badge.slug))
+                    .zipAll()
+                    .subscribe((stats: Array<Map<string, number>>) => {
+                        stats.forEach((stat, index) => {
+                            data.content[index]._stats = stat;
 
+                        });
+                        this.badgesStoreService.dispatch(
+                            new LoadBadgesAction({
+                                badges: data.content,
+                                metadata: data.pageMetadata,
+                            }, subject)
+                        );
+                    })
             },
             (error) => {
                 this.errorsStoreService.dispatch(new NewErrorAction(
