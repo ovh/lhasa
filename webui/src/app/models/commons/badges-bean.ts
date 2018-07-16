@@ -10,10 +10,12 @@ export class BadgeLevelBean {
 
 // Badge
 export class BadgeBean extends EntityBean {
+  slug: string;
   title: string;
   type: string;
   levels: BadgeLevelBean[];
   _links?: HrefLinks[];
+  _stats: Map<string, number>;
 }
 
 // Badge for page browse

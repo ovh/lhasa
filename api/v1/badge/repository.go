@@ -12,9 +12,9 @@ import (
 
 const (
 	defaultPageSize  = 20
-	queryGatherStats = `SELECT "releases"."badge_ratings"->?->>'value' AS "v", count(1) AS "c"
+	queryGatherStats = `SELECT COALESCE("releases"."badge_ratings"->?->>'value', ?) AS "v", count(1) AS "c"
 FROM "applications"
-JOIN "releases" on "applications"."latest_release_id" = "releases"."id" AND "releases"."badge_ratings" ? ?
+JOIN "releases" on "applications"."latest_release_id" = "releases"."id" 
 GROUP BY "v";
 `
 )
@@ -78,8 +78,8 @@ func (repo *Repository) FindOneBy(criteria map[string]interface{}) (hateoas.Enti
 }
 
 // GatherStats computes statistics for one badge
-func (repo *Repository) GatherStats(slug string) (map[string]int, error) {
-	rows, err := repo.db.Raw(queryGatherStats, slug, gorm.Expr("?"), slug).Rows()
+func (repo *Repository) GatherStats(slug string, defaultLevelID string) (map[string]int, error) {
+	rows, err := repo.db.Raw(queryGatherStats, slug, defaultLevelID).Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -112,21 +112,19 @@ func GetDefaultLevel(bdg *v1.Badge) (*v1.BadgeLevel, error) {
 	if err != nil {
 		return nil, err
 	}
-	var found *v1.BadgeLevel
+	var found v1.BadgeLevel
 	for _, lvl := range levels {
 		if lvl.IsDefault {
-			if found != nil {
-				// We have two default levels -> error
-				return nil, errors.BadRequestf("there are more than one levels with `isdefault=true`")
+			if found.ID != "" {
+				return nil, errors.New("there are more than one levels with `isdefault=true`")
 			}
-			found = &lvl
+			found = lvl
 		}
 	}
-	if found == nil {
-		// We have two default levels -> error
-		return nil, errors.BadRequestf("there is no level with `isdefault=true`")
+	if found.ID == "" {
+		return nil, errors.New("there is no level with `isdefault=true`")
 	}
-	return found, nil
+	return &found, nil
 }
 
 // GetBadgeLevelByID returns the level identified by id
