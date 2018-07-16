@@ -25,17 +25,19 @@ type SoftDeletableEntity interface {
 	GetDeletedAt() *time.Time
 }
 
-// Repository defines a normal repository
+// BaseRepository defines a normal repository
 type BaseRepository interface {
 	GetType() reflect.Type
 }
 
+// ListableRepository defines a repository where one can list entities
 type ListableRepository interface {
 	BaseRepository
 	FindBy(map[string]interface{}) (interface{}, error)
 	FindOneBy(map[string]interface{}) (Entity, error)
 }
 
+// SavableRepository defines a repository where one can persist or remove entities
 type SavableRepository interface {
 	ListableRepository
 	Save(Entity) error

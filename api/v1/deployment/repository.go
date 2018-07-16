@@ -48,26 +48,26 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[strin
 	page := hateoas.NewPage(pageable, defaultPageSize, v1.DeploymentBasePath)
 	var deployments []*v1.Deployment
 
-	// Analyse critarias for extract inline, standard and JSONB ones
-	standardCriterias, inlineCriterias, jsonbCriterias := hateoas.CheckFilter(criteria)
+	// Analyse critria for extract inline, standard and JSONB ones
+	standardCriteria, inlineCriteria, jsonbCriteria := hateoas.CheckFilter(criteria)
 
 	// Apply request
 	db := repo.db.Preload("Environment").Preload("Application").Model(v1.Deployment{}).
 		Order(page.Pageable.GetGormSortClause()).
 		Limit(page.Pageable.Size).
 		Offset(page.Pageable.GetOffset())
-	db = hateoas.JSONBFilter(db, jsonbCriterias)
-	db = hateoas.InlineFilter(db, inlineCriterias)
+	db = hateoas.JSONBFilter(db, jsonbCriteria)
+	db = hateoas.InlineFilter(db, inlineCriteria)
 
-	if err := db.Find(&deployments, standardCriterias).Error; err != nil {
+	if err := db.Find(&deployments, standardCriteria).Error; err != nil {
 		return page, err
 	}
 	page.Content = deployments
 
 	// Build counters
-	counter := repo.db.Model(v1.Deployment{}).Where(standardCriterias)
-	counter = hateoas.JSONBFilter(counter, jsonbCriterias)
-	counter = hateoas.InlineFilter(counter, inlineCriterias)
+	counter := repo.db.Model(v1.Deployment{}).Where(standardCriteria)
+	counter = hateoas.JSONBFilter(counter, jsonbCriteria)
+	counter = hateoas.InlineFilter(counter, inlineCriteria)
 
 	count := 0
 	if err := counter.Count(&count).Error; err != nil {
@@ -129,22 +129,22 @@ func (repo *Repository) FindBy(criteria map[string]interface{}) (interface{}, er
 }
 
 // FindActivesBy fetch a collection of deployments matching each criteria on a given domain and name apps
-func (repo *Repository) FindActivesBy(domain string, name string, criterias map[string]interface{}) ([]*v1.Deployment, error) {
+func (repo *Repository) FindActivesBy(domain string, name string, criteria map[string]interface{}) ([]*v1.Deployment, error) {
 	var deps []*v1.Deployment
 	err := repo.db.Preload("Environment").Preload("Application").Table("deployments").
 		Joins("JOIN releases on releases.id = deployments.application_id").
 		Model(v1.Deployment{}).Where("undeployed_at IS NULL AND releases.domain = ? AND releases.name = ?", domain, name).
-		Find(&deps, criterias).Error
+		Find(&deps, criteria).Error
 	return deps, err
 }
 
 // FindActivesByVersion fetch a collection of deployments matching each criteria on a given domain, name and version
-func (repo *Repository) FindActivesByVersion(domain string, name string, version string, criterias map[string]interface{}) ([]*v1.Deployment, error) {
+func (repo *Repository) FindActivesByVersion(domain string, name string, version string, criteria map[string]interface{}) ([]*v1.Deployment, error) {
 	var deps []*v1.Deployment
 	err := repo.db.Preload("Environment").Preload("Application").Table("deployments").
 		Joins("JOIN releases on releases.id = deployments.application_id").
 		Model(v1.Deployment{}).Where("undeployed_at IS NULL AND releases.domain = ? AND releases.name = ? AND releases.version = ?", domain, name, version).
-		Find(&deps, criterias).Error
+		Find(&deps, criteria).Error
 	return deps, err
 }
 
