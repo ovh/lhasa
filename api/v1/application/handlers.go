@@ -74,7 +74,7 @@ func HandlerGetBadgeRatingsForAppVersion(repository *Repository) gin.HandlerFunc
 		}
 
 		// Retrieve all the badges
-		var result []*v1.BadgeRating
+		result := make([]*v1.BadgeRating, 0)
 		badgeRepo := badge.NewRepository(repository.db)
 		badges, err := badgeRepo.FindBy(map[string]interface{}{})
 		if err != nil {
