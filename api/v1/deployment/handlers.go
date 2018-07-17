@@ -42,7 +42,6 @@ func HandlerDeploy(appRepo *application.Repository, envRepo *environment.Reposit
 		// https://tools.ietf.org/html/rfc2616#page-54
 		if created {
 			c.Header("location", dep.GetSelfURL(hateoas.BaseURL(c)))
-			return dep, hateoas.ErrorCreated
 		}
 		return dep, nil
 	}, http.StatusOK)
