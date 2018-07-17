@@ -42,5 +42,10 @@ func (tm *transactionManager) Transaction(callback func(db *gorm.DB) error) erro
 		tm.log.Warnf("transaction has been rollbacked")
 		return err
 	}
-	return tx.Commit().Error
+	tm.log.Debugf("committing transaction")
+	err := tx.Commit().Error
+	if err != nil {
+		tm.log.Debugf("transaction has ben committed")
+	}
+	return err
 }

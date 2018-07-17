@@ -84,6 +84,9 @@ func (repo *Repository) Save(deployment hateoas.Entity) error {
 	if err != nil {
 		return err
 	}
+	// don't save in cascade
+	dep.Application = nil
+	dep.Environment = nil
 
 	if dep.ID == 0 {
 		publicID, err := uuid.NewV4()
@@ -138,8 +141,8 @@ func (repo *Repository) FindActivesBy(domain string, name string, criteria map[s
 	return deps, err
 }
 
-// FindActivesByVersion fetch a collection of deployments matching each criteria on a given domain, name and version
-func (repo *Repository) FindActivesByVersion(domain string, name string, version string, criteria map[string]interface{}) ([]*v1.Deployment, error) {
+// FindActivesByRelease fetch a collection of deployments matching each criteria on a given domain, name and version
+func (repo *Repository) FindActivesByRelease(domain string, name string, version string, criteria map[string]interface{}) ([]*v1.Deployment, error) {
 	var deps []*v1.Deployment
 	err := repo.db.Preload("Environment").Preload("Application").Table("deployments").
 		Joins("JOIN releases on releases.id = deployments.application_id").

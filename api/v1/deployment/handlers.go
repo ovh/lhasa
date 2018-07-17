@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/loopfz/gadgeto/tonic"
+	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/application"
@@ -32,15 +33,19 @@ func HandlerDeploy(appRepo *application.Repository, envRepo *environment.Reposit
 			return nil, err
 		}
 
-		if err := deployer(*app, *env, dep); err != nil {
+		dep, created, err := deployer(*app, *env, dep, handlers.GetLogger(c))
+		if err != nil {
 			return nil, err
 		}
 		// If a resource has been created on the origin server, the response SHOULD be 201 (Created) and contain an
 		// entity which describes the status of the request and refers to the new resource, and a Location header.
 		// https://tools.ietf.org/html/rfc2616#page-54
-		c.Header("location", dep.GetSelfURL(hateoas.BaseURL(c)))
+		if created {
+			c.Header("location", dep.GetSelfURL(hateoas.BaseURL(c)))
+			return dep, hateoas.ErrorCreated
+		}
 		return dep, nil
-	}, http.StatusCreated)
+	}, http.StatusOK)
 }
 
 type dependCreateRequest struct {
@@ -112,7 +117,7 @@ func HandlerListApplicationActiveDeployments(appRepo application.FindOneByUnique
 func HandlerListReleaseActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
 		criteria := map[string]interface{}{}
-		deps, err := depRepo.FindActivesByVersion(request.Domain, request.Name, request.Version, criteria)
+		deps, err := depRepo.FindActivesByRelease(request.Domain, request.Name, request.Version, criteria)
 		if err != nil {
 			return nil, err
 		}
