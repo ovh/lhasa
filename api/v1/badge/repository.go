@@ -14,7 +14,8 @@ const (
 	defaultPageSize  = 20
 	queryGatherStats = `SELECT COALESCE("releases"."badge_ratings"->?->>'value', ?) AS "v", count(1) AS "c"
 FROM "applications"
-JOIN "releases" on "applications"."latest_release_id" = "releases"."id" 
+JOIN "releases" on "applications"."latest_release_id" = "releases"."id" AND "releases"."deleted_at" IS NULL
+WHERE "applications"."deleted_at" IS NULL
 GROUP BY "v";
 `
 )
