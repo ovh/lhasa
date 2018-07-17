@@ -34,7 +34,7 @@ export class DataBadgeStatsService{
    */
   public GetBadgeStats = (id: string): Observable<Map<string,number>> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.get(this.actionUrl+ '/' + id + '/stats' , {headers: this.headers})
+    return this.http.get(this.actionUrl + id + '/stats' , {headers: this.headers})
       .catch(this.handleError);
   }
 
