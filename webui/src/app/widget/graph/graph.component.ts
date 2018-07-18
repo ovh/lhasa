@@ -104,8 +104,8 @@ export class GraphComponent implements OnInit, AfterViewInit {
         if (data.edges.length > edgeCountLimit) {
             var msg = `This graph may take up-to 2 minutes to display due to its size and to some performance issues of the vis.js plugin. We're working to fix that.`
             if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-                data.edges = data.edges.slice(0, edgeCountLimit)
                 msg = `This graph is incomplete. It will only display the first ${edgeCountLimit} edges out of ${data.edges.length} due to a performance limitation of the vis.js plugin with Firefox. Please use Chromium for now if you want to display the whole graph. We're working to fix that.`
+                data.edges = data.edges.slice(0, edgeCountLimit)
             }
             this.msgs.push({
                 severity: 'warn',
