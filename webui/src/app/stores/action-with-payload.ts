@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 export class ActionWithPayload<T> implements Action {
   readonly type: string;

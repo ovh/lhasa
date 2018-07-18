@@ -7,10 +7,11 @@ import { Store } from '@ngrx/store';
 import { ApplicationsStoreService } from '../../stores/applications-store.service';
 import { EnvironmentsStoreService } from '../../stores/environments-store.service';
 import { element } from 'protractor';
-import { ISubscription } from 'rxjs/Subscription';
+import { SubscriptionLike as ISubscription } from 'rxjs';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
 import {FieldsetModule} from 'primeng/fieldset';
+import { Observable } from 'rxjs/internal/Observable';
 
 
 @Component({
@@ -25,7 +26,7 @@ export class AppdetailComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected applicationStream: Store<ApplicationBean>;
+  protected applicationStream: Observable<ApplicationBean>;
   protected applicationSubscription: ISubscription;
   public application: ApplicationBean;
   private _badgeRatingShields: BadgeShieldsIOBean[];

@@ -14,10 +14,11 @@ import { LoaderBean, LoadersStoreService } from './stores/loader-store.service';
 import { SidebarModule } from 'primeng/sidebar';
 import { ContentBean } from './models/commons/content-bean';
 import { ErrorBean, ErrorsStoreService, DropErrorAction, NewErrorAction } from './stores/errors-store.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { ConfigStoreService, ConfigBean } from './stores/config-store.service';
 
 import { each, find } from 'lodash';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-root',
@@ -30,12 +31,12 @@ export class AppComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected errorsStream: Store<ErrorBean[]>;
+  protected errorsStream: Observable<ErrorBean[]>;
   public errors: ErrorBean[] = [];
-  protected loadersStream: Store<LoaderBean[]>;
+  protected loadersStream: Observable<LoaderBean[]>;
   public loaders: LoaderBean[] = [];
-  protected helpStream: Store<HelpBean>;
-  protected configStream: Store<ConfigBean>;
+  protected helpStream: Observable<HelpBean>;
+  protected configStream: Observable<ConfigBean>;
 
   title = 'app';
 

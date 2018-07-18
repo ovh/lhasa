@@ -1,13 +1,13 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject ,  Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/store';
 
 import { ActionWithPayloadAndPromise } from './action-with-payload';
-import { Subject } from 'rxjs/Subject';
 import { ContentBean } from '../models/commons/content-bean';
 import { DataContentService } from '../services/data-content.service';
 import { LoadersStoreService } from './loader-store.service';
 import { ErrorsStoreService, NewErrorAction, ErrorBean } from './errors-store.service';
+import { Observable } from 'rxjs/internal/Observable';
 
 // Help
 export class HelpBean {
@@ -98,7 +98,7 @@ export class HelpsStoreService {
   /**
    * select this store service
    */
-  public help(): Store<HelpBean> {
+  public help(): Observable<HelpBean> {
     return this._store.select(this.getHelp);
   }
 

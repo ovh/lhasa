@@ -1,5 +1,5 @@
+import {throwError as observableThrowError,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { ConfigurationService } from './configuration.service';
 import { DefaultResource } from '../interfaces/default-resources.interface';
@@ -43,6 +43,6 @@ export class DataBadgeStatsService{
    * error handler
    */
   protected handleError(error: HttpErrorResponse) {
-    return Observable.throw(error || 'Server error');
+    return observableThrowError(error || 'Server error');
   }
 }

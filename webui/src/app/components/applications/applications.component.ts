@@ -7,12 +7,13 @@ import { ContentListResponse, PageMetaData } from '../../models/commons/entity-b
 
 import { DataDeploymentService } from '../../services/data-deployment.service';
 import { UiKitPaginate } from '../../models/kit/paginate';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { ApplicationsResolver } from '../../resolver/resolve-applications';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { OuiMessageComponent } from '../../kit/oui-message/oui-message.component';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-applications',
@@ -24,7 +25,7 @@ export class ApplicationsComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected applicationsStream: Store<ApplicationPagesBean>;
+  protected applicationsStream: Observable<ApplicationPagesBean>;
   public applications: ApplicationBean[];
   public metadata: UiKitPaginate = {
     totalElements: 0,

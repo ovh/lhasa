@@ -11,8 +11,9 @@ import { DataDeploymentService } from '../../services/data-deployment.service';
 import { UiKitPaginate } from '../../models/kit/paginate';
 import { ActivatedRoute } from '@angular/router';
 import { DomainsResolver } from '../../resolver/resolve-domains';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Component({
   selector: 'app-domains-browse',
@@ -27,7 +28,7 @@ export class DomainsBrowseComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected domainsStream: Store<DomainPagesBean>;
+  protected domainsStream: Observable<DomainPagesBean>;
   public domains: DomainBean[] = [];
   public metadata: UiKitPaginate = {
     totalElements: 0,

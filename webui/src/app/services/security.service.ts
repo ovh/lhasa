@@ -1,6 +1,8 @@
+
+import {catchError} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/map';
-import { Observable } from 'rxjs/Observable';
+
+import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { ConfigurationService } from '../services/configuration.service';
@@ -28,8 +30,8 @@ export class SecurityService extends DataCoreResource<EntityBean> implements Def
   /**
    * get connect resource
    */
-  public Connect = (): Observable<boolean> => {
-    return this.http.get(this.actionUrl + 'api/connect', {headers: this.headers})
-      .catch(this.handleError);
+  public Connect = (): Observable<Object> => {
+    return this.http.get(this.actionUrl + 'api/connect', {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 }

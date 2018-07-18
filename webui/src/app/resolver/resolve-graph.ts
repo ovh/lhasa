@@ -1,8 +1,6 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  BehaviorSubject ,  Subject } from 'rxjs';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
 import { LoadersStoreService } from '../stores/loader-store.service';
 import { GraphBean } from '../models/graph/graph-bean';
 import { DataGraphService } from '../services/data-graph.service';

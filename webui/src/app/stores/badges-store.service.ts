@@ -3,7 +3,8 @@ import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/st
 
 import { ActionWithPayloadAndPromise } from './action-with-payload';
 import {  BadgeBean, BadgePagesBean } from '../models/commons/badges-bean';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
+import { Observable } from 'rxjs/internal/Observable';
 
 /**
  * states
@@ -100,14 +101,14 @@ export class BadgesStoreService {
   /**
    * select this store service
    */
-  public badgePages(): Store<BadgePagesBean> {
+  public badgePages(): Observable<BadgePagesBean> {
     return this._store.select(this.getBadgePages);
   }
 
   /**
    * select this store service
    */
-  public badges(): Store<Array<BadgeBean>> {
+  public badges(): Observable<Array<BadgeBean>> {
     return this._store.select(this.getBadges);
   }
   

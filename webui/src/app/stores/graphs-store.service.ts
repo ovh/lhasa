@@ -3,8 +3,9 @@ import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/st
 
 import { ActionWithPayloadAndPromise } from './action-with-payload';
 import { ApplicationBean, ApplicationPagesBean, DeploymentBean, DomainBean, DomainPagesBean } from '../models/commons/applications-bean';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 import { GraphBean } from '../models/graph/graph-bean';
+import { Observable } from 'rxjs/internal/Observable';
 
 /**
  * states
@@ -90,7 +91,7 @@ export class GraphsStoreService {
   /**
    * select this store service
    */
-  public deployments(): Store<GraphBean> {
+  public deployments(): Observable<GraphBean> {
     return this._store.select(this.getDeploymentGraph);
   }
 
