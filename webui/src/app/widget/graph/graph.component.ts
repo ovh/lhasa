@@ -6,6 +6,8 @@ import { GraphVis } from '../../models/graph/graph-bean';
 import { DataContentService } from '../../services/data-content.service';
 import { ContentBean } from '../../models/commons/content-bean';
 import { environment } from '../../../environments/environment.prod';
+import { MessagesModule } from 'primeng/messages';
+import { Message } from 'primeng/api';
 
 @Component({
     selector: 'app-graph',
@@ -23,6 +25,8 @@ export class GraphComponent implements OnInit, AfterViewInit {
     protected _options: any;
     protected netOptions: any;
     protected network: any;
+    public msgs: Message[] = [];
+
 
     @ViewChild('graphvis') container: any;
     @ViewChild('graphvisconfig') config: any;
@@ -82,22 +86,38 @@ export class GraphComponent implements OnInit, AfterViewInit {
         this.network.setOptions(this.netOptions);
         this.display = true;
     }
-
     /**
      * update edge
      */
     public update() {
         const data = {
             nodes: this._graph.nodes,
-            edges: this._graph.edges
+            edges: this._graph.edges,
         };
 
         // HACK: This removes the edges that start and end at the same node (loop)
         // Vis.js does not  like clustering + edge loops :(
         data.edges = data.edges.filter(edge => edge.from !== edge.to);
 
+        // HACK: This limits the edge count on Fireox and displays a warning message
+        var edgeCountLimit = 100;
+        if (data.edges.length > edgeCountLimit) {
+            var msg = `This graph may take up-to 2 minutes to display due to its size and to some performance issues of the vis.js plugin. We're working to fix that.`
+            if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                data.edges = data.edges.slice(0, edgeCountLimit)
+                msg = `This graph is incomplete. It will only display the first ${edgeCountLimit} edges out of ${data.edges.length} due to a performance limitation of the vis.js plugin with Firefox. Please use Chromium for now if you want to display the whole graph. We're working to fix that.`
+            }
+            this.msgs.push({
+                severity: 'warn',
+                summary: 'Experimental feature',
+                detail: msg,
+            });
+        }
+
         this.contentService.GetSingle(this._options).subscribe(
-            (content: ContentBean) => {
+            async (content: ContentBean) => {
+                // Hack: This delay allows to let the time to display the warning message
+                await delay(500);
                 this.netOptions = {}
                 if (content) {
                     this.netOptions = JSON.parse(<any>content);
@@ -109,7 +129,7 @@ export class GraphComponent implements OnInit, AfterViewInit {
                         edges: {
                             arrows: {
                                 to: {
-                                  enabled: true,
+                                    enabled: true,
                                 }
                             }
                         },
@@ -124,7 +144,7 @@ export class GraphComponent implements OnInit, AfterViewInit {
                             },
                         },
                         physics: {
-                            maxVelocity: 3
+                            maxVelocity: 3,
                         }
                     }
                 }
@@ -132,18 +152,12 @@ export class GraphComponent implements OnInit, AfterViewInit {
                     // Cf. http://visjs.org/docs/network for documentation
                     this.network.setData(data.nodes, data.edges);
                 } else {
-                    var enviromnments = new Set()
-                    var domains = new Set()
-                    var domainsAndEnvs = new Set()
-                    var applications = new Set()
+                    var domains = new Set();
                     data.nodes.forEach(node => {
-                        enviromnments.add(node['environment']);
                         domains.add(node['domain'])
-                        applications.add(node['environment'] + '/' + node['domain'] + '/' + node['application'])
                     })
                     // create a network
                     this.network = new Network(this.container.nativeElement, data, this.netOptions);
-
                     [
                         'click',
                         'doubleClick',
@@ -171,6 +185,7 @@ export class GraphComponent implements OnInit, AfterViewInit {
                         });
                     });
                 }
+                var i = 1;
                 domains.forEach(domain => {
                     var clusterOptionsByData = {
                         joinCondition: function (childOptions) {
@@ -181,10 +196,12 @@ export class GraphComponent implements OnInit, AfterViewInit {
                             borderWidth: 3,
                             shape: 'dot',
                             label: domain,
-                            allowSingleNodeCluster: true
+                            allowSingleNodeCluster: false
                         }
                     };
                     this.network.cluster(clusterOptionsByData);
+                    console.log(`clustering domain ${domain} ${i}/${domains.size}`);
+                    i++;
                 })
                 const net = this.network;
                 this.network.on("selectNode", function (params) {
@@ -194,9 +211,13 @@ export class GraphComponent implements OnInit, AfterViewInit {
                         }
                     }
                 });
-                this.network.redraw();
                 this.network.setSize(this.container.nativeElement.width, "1000");
+                this.network.redraw();
             }
         )
     }
+}
+
+function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
