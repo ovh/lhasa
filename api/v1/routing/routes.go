@@ -206,7 +206,7 @@ func registerRoutes(group *fizz.RouterGroup,
 }
 
 // Init initialize the API v1 module
-func Init(tm db.TransactionManager, group *fizz.RouterGroup, log *logrus.Logger) {
+func Init(tm db.TransactionManager, group *fizz.RouterGroup, log logrus.FieldLogger) {
 	graphRepo := graph.NewRepository(tm.DB())
 	domRepo := domain.NewRepository(tm.DB())
 	appRepo := application.NewRepository(tm.DB())

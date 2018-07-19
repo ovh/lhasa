@@ -328,7 +328,7 @@ func TestBadgeRatingRequestMalformedJSON(t *testing.T) {
 		Status(http.StatusBadRequest).
 		JSON().
 		Object().
-		ValueEqual("error", "binding error: error parsing request body: invalid character 'T' looking for beginning of object key string")
+		ValueEqual("error", "binding error: error parsing request body")
 }
 
 func TestBadgeRatingDeleteSuccess(t *testing.T) {

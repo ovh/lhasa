@@ -13,7 +13,7 @@ import (
 type LatestUpdater func(*v1.Release) error
 
 // NewLatestUpdater instantiates a LatestUpdater
-func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory, latestRepoFactory RepositoryLatestFactory, log *logrus.Logger) LatestUpdater {
+func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory, latestRepoFactory RepositoryLatestFactory, log logrus.FieldLogger) LatestUpdater {
 	return func(version *v1.Release) error {
 		return tm.Transaction(func(db *gorm.DB) error {
 			appRepo := appRepoFactory(db)
@@ -29,7 +29,7 @@ func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory
 				return err
 			}
 			if hateoas.IsEntityDoesNotExistError(err) || application.LatestReleaseID == nil {
-				log.Debugf("application doesn't exist or doesn't have a latest so it will be created to the given version")
+				log.Debug("application doesn't exist or doesn't have a latest so it will be created to the given version")
 				application = &v1.Application{
 					ID:     application.ID,
 					Domain: version.Domain,
@@ -45,7 +45,7 @@ func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory
 				return latestRepo.Save(application)
 			}
 			return nil
-		})
+		}, log)
 	}
 }
 

@@ -14,7 +14,6 @@ import (
 	"github.com/loopfz/gadgeto/tonic/utils/jujerr"
 	"github.com/ovh/lhasa/api/config"
 	"github.com/ovh/lhasa/api/db"
-	ext "github.com/ovh/lhasa/api/ext/binding"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
 	v1 "github.com/ovh/lhasa/api/v1/routing"
@@ -34,18 +33,20 @@ func uiRedirectHandler(uiBasePath string) gin.HandlerFunc {
 }
 
 //NewRouter creates a new and configured gin router
-func NewRouter(tm db.TransactionManager, c config.Lhasa, version, hateoasBaseBath, uiBasePath string, ServerUIBasePath, webUIDir string, debugMode bool, log *logrus.Logger) *fizz.Fizz {
+func NewRouter(tm db.TransactionManager, c config.Lhasa, version, hateoasBaseBath, uiBasePath string, ServerUIBasePath, webUIDir string, debugMode bool, log logrus.FieldLogger) *fizz.Fizz {
+	ginMode := gin.ReleaseMode
+	if debugMode {
+		ginMode = gin.DebugMode
+	}
+	gin.SetMode(ginMode)
+
 	router := fizz.New()
 	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
-
-	router.Use(handlers.LoggingMiddleware(c.LogHeaders, log), gin.Recovery())
-	configureGin(log, debugMode)
+	router.Use(handlers.LoggingMiddleware(c.LogHeaders, log), handlers.RecoveryWithLogger(log))
 
 	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))
-
-	// Set specific hook
-	tonic.SetBindHook(ext.BindHook)
-	tonic.SetRenderHook(ext.RenderHook, "")
+	tonic.SetBindHook(handlers.BindHook)
+	tonic.SetRenderHook(handlers.RenderHook, "")
 
 	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath), handlers.AuthMiddleware(c.Policy))
 	api.GET("/", []fizz.OperationOption{
@@ -95,15 +96,4 @@ func NewRouter(tm db.TransactionManager, c config.Lhasa, version, hateoasBaseBat
 	router.Engine().LoadHTMLFiles(webUIDir + "/index.html")
 	router.Engine().NoRoute(gzip.Gzip(gzip.DefaultCompression), uiRedirectHandler(uiBasePath))
 	return router
-}
-
-func configureGin(log *logrus.Logger, debugMode bool) {
-	if log != nil {
-		gin.DefaultWriter = log.Writer()
-	}
-	ginMode := gin.ReleaseMode
-	if debugMode {
-		ginMode = gin.DebugMode
-	}
-	gin.SetMode(ginMode)
 }

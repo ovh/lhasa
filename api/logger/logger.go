@@ -8,7 +8,7 @@ import (
 )
 
 // NewLogger creates a configured logrus logger instance
-func NewLogger(isVerbose, isDebug, isQuiet, isJSON bool) *logrus.Logger {
+func NewLogger(isVerbose, isDebug, isQuiet, isJSON bool) logrus.FieldLogger {
 	log := logrus.New()
 	log.Level = logrus.WarnLevel
 	if isVerbose {
