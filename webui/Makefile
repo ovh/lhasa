@@ -1,3 +1,5 @@
+UI_BASE_HREF ?= /
+
 all: ui-kit
 	ng build --output-path=../dist/webui --prod --aot --configuration production --base-href '{{ .UIBasePath }}' --deploy-url ${UI_BASE_HREF}
 
