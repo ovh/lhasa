@@ -1,17 +1,15 @@
-package binding
+package handlers
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/juju/errors"
 	"github.com/loopfz/gadgeto/tonic"
-	"github.com/ovh/lhasa/api/v1"
 )
 
 var (
@@ -21,10 +19,40 @@ var (
 	whitelist = []string{"text/plain", "application/json"}
 )
 
+// MediaResource defines a media resource behaviour
+type MediaResource interface {
+	GetContentType() string
+	GetBytes() []byte
+	SetBytes([]byte)
+}
+
 type binaryBinding struct{}
 
+// Name returns "binary" as a name for this binding
 func (binaryBinding) Name() string {
 	return "binary"
+}
+
+// Bind perform this binary binding
+func (binaryBinding) Bind(req *http.Request, obj interface{}) error {
+	// Scan interface implementation
+	media, ok := obj.(MediaResource)
+	if !ok {
+		return nil
+	}
+	// Check white list
+	for _, value := range req.Header["Content-Type"] {
+		if !stringInSlice(value, whitelist) {
+			return fmt.Errorf("unsupported content-type %s", value)
+		}
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return err
+	}
+	media.SetBytes(buf)
+	return nil
 }
 
 func stringInSlice(a string, list []string) bool {
@@ -36,43 +64,18 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func (binaryBinding) Bind(req *http.Request, obj interface{}) error {
-	// Scan interface implementation
-	media, assert := (obj).(v1.MediaResource)
-	if assert {
-		// Check white list
-		for header, values := range req.Header {
-			if strings.ToLower(header) == "content-type" {
-				for _, value := range values {
-					if !stringInSlice(value, whitelist) {
-						return errors.New("content-type " + value + " is white listed")
-					}
-				}
-			}
-		}
-
-		buf, err := ioutil.ReadAll(req.Body)
-		if err != nil {
-			return err
-		}
-		media.SetBytes(buf)
-	}
-
-	return nil
-}
-
 // BindHook hook for lhasa, override default one
 func BindHook(c *gin.Context, i interface{}) error {
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, tonic.MaxBodyBytes)
 	if c.Request.ContentLength == 0 || c.Request.Method == http.MethodGet {
 		return nil
 	}
-	// If tag binary is on any field binding will override json binding
+	defaultBindError := errors.New("error parsing request body")
 	if err := c.ShouldBindWith(i, binary); err != nil && err != io.EOF {
-		return fmt.Errorf("error parsing request body: %s", err.Error())
+		return errors.Wrap(err, defaultBindError)
 	}
 	if err := c.ShouldBindWith(i, binding.JSON); err != nil && err != io.EOF {
-		return fmt.Errorf("error parsing request body: %s", err.Error())
+		return errors.Wrap(err, defaultBindError)
 	}
 	return nil
 }
@@ -80,8 +83,8 @@ func BindHook(c *gin.Context, i interface{}) error {
 // RenderHook hook for lhasa, override default one
 func RenderHook(c *gin.Context, status int, payload interface{}) {
 	// Scan interface implementation
-	media, assert := (payload).(v1.MediaResource)
-	if assert {
+	media, ok := payload.(MediaResource)
+	if ok {
 		c.Data(http.StatusOK, media.GetContentType(), media.GetBytes())
 		return
 	}

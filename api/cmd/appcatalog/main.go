@@ -80,7 +80,7 @@ func main() {
 		return
 	case cmdCodeStart:
 		c := parseConf(log)
-		tm := db.NewTransactionManager(waitForDB(c, log), log)
+		tm := db.NewTransactionManager(waitForDB(c, log))
 		if *flagAutoMigrations {
 			runMigrationsUp(tm.DB().DB(), log)
 		}
@@ -93,7 +93,7 @@ func main() {
 	}
 }
 
-func parseConf(log *logrus.Logger) config.Lhasa {
+func parseConf(log logrus.FieldLogger) config.Lhasa {
 	c, err := config.LoadFromFile(*flagConfigFile)
 	if err != nil {
 		log.WithError(err).Fatalf("cannot read configuration file")
@@ -101,7 +101,7 @@ func parseConf(log *logrus.Logger) config.Lhasa {
 	return c
 }
 
-func waitForDB(c config.Lhasa, log *logrus.Logger) *gorm.DB {
+func waitForDB(c config.Lhasa, log logrus.FieldLogger) *gorm.DB {
 	dbHandle, err := db.NewDBHandle(c.DB, *flagDebug, log)
 	for err != nil {
 		log.WithError(err).Errorf("cannot get DB handle, retrying in %d seconds", dbRetryDuration)
@@ -111,13 +111,13 @@ func waitForDB(c config.Lhasa, log *logrus.Logger) *gorm.DB {
 	return dbHandle
 }
 
-func runMigrationsUp(datasource *sql.DB, log *logrus.Logger) {
+func runMigrationsUp(datasource *sql.DB, log logrus.FieldLogger) {
 	if err := db.MigrateUp(datasource, log); err != nil {
 		log.WithError(err).Fatalf("cannot run migrations")
 	}
 }
 
-func runMigrationsDown(datasource *sql.DB, log *logrus.Logger) {
+func runMigrationsDown(datasource *sql.DB, log logrus.FieldLogger) {
 	if err := db.MigrateDown(datasource, log); err != nil {
 		log.WithError(err).Fatalf("cannot run migrations")
 	}

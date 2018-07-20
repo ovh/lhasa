@@ -7,11 +7,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 )
 
+func getLogger(log logrus.FieldLogger) gorm.Logger {
+	return gorm.Logger{LogWriter: dbLogWriter{log}}
+}
+
 type dbLogWriter struct {
-	log *logrus.Logger
+	log logrus.FieldLogger
 }
 
 // Println implements gorm's LogWriter interface

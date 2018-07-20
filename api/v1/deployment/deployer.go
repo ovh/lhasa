@@ -11,11 +11,11 @@ import (
 )
 
 // Deployer deploys an application version to the given environment and removes old deployments
-type Deployer func(application v1.Release, environment v1.Environment, deployment *v1.Deployment, log *logrus.Entry) (*v1.Deployment, bool, error)
+type Deployer func(application v1.Release, environment v1.Environment, deployment *v1.Deployment, log logrus.FieldLogger) (*v1.Deployment, bool, error)
 
 // ApplicationDeployer deploys an application version to the given environment and removes old deployments
 func ApplicationDeployer(tm db.TransactionManager, depFactory RepositoryFactory) Deployer {
-	return func(app v1.Release, env v1.Environment, dep *v1.Deployment, log *logrus.Entry) (*v1.Deployment, bool, error) {
+	return func(app v1.Release, env v1.Environment, dep *v1.Deployment, log logrus.FieldLogger) (*v1.Deployment, bool, error) {
 		c := false
 		created := &c
 		var d **v1.Deployment
@@ -52,7 +52,7 @@ func ApplicationDeployer(tm db.TransactionManager, depFactory RepositoryFactory)
 			created = &c
 			d = &dep
 			return depRepo.Save(dep)
-		})
+		}, log)
 		return *d, *created, err
 	}
 }

@@ -17,7 +17,7 @@ func init() {
 }
 
 // MigrateUp run sql-migrate migrations
-func MigrateUp(db *sql.DB, log *logrus.Logger) error {
+func MigrateUp(db *sql.DB, log logrus.FieldLogger) error {
 	count, err := migrate.Exec(db, "postgres", migrations, migrate.Up)
 	if err != nil {
 		return err
@@ -27,7 +27,7 @@ func MigrateUp(db *sql.DB, log *logrus.Logger) error {
 }
 
 // MigrateDown run sql-migrate migrations
-func MigrateDown(db *sql.DB, log *logrus.Logger) error {
+func MigrateDown(db *sql.DB, log logrus.FieldLogger) error {
 	count, err := migrate.Exec(db, "postgres", migrations, migrate.Down)
 	if err != nil {
 		return err

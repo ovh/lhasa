@@ -18,7 +18,7 @@ const (
 )
 
 // NewDBHandle provides the database handle to its callers
-func NewDBHandle(dc DatabaseCredentials, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
+func NewDBHandle(dc DatabaseCredentials, logMode bool, log logrus.FieldLogger) (*gorm.DB, error) {
 	connStr, err := dc.GetRW()
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func NewDBHandle(dc DatabaseCredentials, logMode bool, log *logrus.Logger) (*gor
 }
 
 // NewFromGormString creates a gorm db handler from a connection string
-func NewFromGormString(connStr string, logMode bool, log *logrus.Logger) (*gorm.DB, error) {
+func NewFromGormString(connStr string, logMode bool, log logrus.FieldLogger) (*gorm.DB, error) {
 	db, err := gorm.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func NewFromGormString(connStr string, logMode bool, log *logrus.Logger) (*gorm.
 	db.DB().SetMaxIdleConns(maxIdleConns)
 	db.DB().SetMaxOpenConns(maxOpenConns)
 	db.LogMode(logMode)
-	db.SetLogger(gorm.Logger{LogWriter: dbLogWriter{log}})
+	db.SetLogger(getLogger(log))
 	return db, nil
 }
 
