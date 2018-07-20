@@ -18,7 +18,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ConfigStoreService, ConfigBean } from './stores/config-store.service';
 
 import { each, find } from 'lodash';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',

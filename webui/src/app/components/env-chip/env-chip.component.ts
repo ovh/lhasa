@@ -4,7 +4,7 @@ import { EnvironmentBean } from '../../models/commons/applications-bean';
 import { Store } from '@ngrx/store';
 import { SubscriptionLike as ISubscription } from 'rxjs';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-env-chip',

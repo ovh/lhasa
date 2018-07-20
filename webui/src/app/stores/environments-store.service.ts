@@ -3,7 +3,7 @@ import { createFeatureSelector, createSelector, MemoizedSelector, Store } from '
 
 import { ActionWithPayload } from './action-with-payload';
 import { EnvironmentBean } from '../models/commons/applications-bean';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 /**
  * states

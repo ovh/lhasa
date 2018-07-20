@@ -4,7 +4,7 @@ import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/st
 import { ActionWithPayloadAndPromise } from './action-with-payload';
 import {  BadgeBean, BadgePagesBean } from '../models/commons/badges-bean';
 import { Subject } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 /**
  * states

@@ -12,7 +12,7 @@ import { GraphBean, NodeBean, GraphVis } from '../../models/graph/graph-bean';
 import { DataDeploymentService } from '../../services/data-deployment.service';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { GraphComponent } from '../../widget/graph/graph.component';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-graph-browse',

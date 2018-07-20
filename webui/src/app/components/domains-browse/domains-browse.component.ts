@@ -13,7 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DomainsResolver } from '../../resolver/resolve-domains';
 import { BehaviorSubject } from 'rxjs';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-domains-browse',

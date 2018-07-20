@@ -11,7 +11,7 @@ import { SubscriptionLike as ISubscription } from 'rxjs';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
 import {FieldsetModule} from 'primeng/fieldset';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 
 @Component({

@@ -15,7 +15,7 @@ import { BehaviorSubject } from 'rxjs';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
 import { UIChart } from 'primeng/primeng';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 export class BadgeUIBean {
   title: string;

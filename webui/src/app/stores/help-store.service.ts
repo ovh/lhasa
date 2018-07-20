@@ -7,7 +7,7 @@ import { ContentBean } from '../models/commons/content-bean';
 import { DataContentService } from '../services/data-content.service';
 import { LoadersStoreService } from './loader-store.service';
 import { ErrorsStoreService, NewErrorAction, ErrorBean } from './errors-store.service';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 // Help
 export class HelpBean {

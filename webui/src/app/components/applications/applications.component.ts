@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { OuiMessageComponent } from '../../kit/oui-message/oui-message.component';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-applications',

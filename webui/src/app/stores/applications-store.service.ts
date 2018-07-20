@@ -5,7 +5,7 @@ import { ActionWithPayloadAndPromise } from './action-with-payload';
 import { ApplicationBean, ApplicationPagesBean,
   DeploymentBean, DomainBean, DomainPagesBean, BadgeRatingBean } from '../models/commons/applications-bean';
 import { Subject } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 /**
  * states
