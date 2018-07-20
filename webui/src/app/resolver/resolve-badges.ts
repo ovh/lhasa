@@ -47,6 +47,14 @@ export class BadgesResolver implements Resolve<BadgeBean[]> {
             };
         this.badgesService.GetAllFromContent('', meta).subscribe(
             (data: ContentListResponse<BadgeBean>) => {
+                if (data.content.length == 0){
+                    this.badgesStoreService.dispatch(
+                        new LoadBadgesAction({
+                            badges: data.content,
+                            metadata: data.pageMetadata,
+                        }, subject)
+                    );
+                }
                 Observable
                     .from(data.content)
                     .map(badge => this.badgeStatsService.GetBadgeStats(badge.slug))
