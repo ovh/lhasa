@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gobwas/glob"
 	"github.com/ovh/lhasa/api/security"
 )
 
@@ -15,52 +16,52 @@ func TestBuildRolePolicy(t *testing.T) {
 	}{
 		{
 			policy: security.BuildRolePolicy(
-				security.Compile(security.Policy{
+				security.Policy{
 					"ROLE_ADMIN": {
 						"X-Remote-User": {"john.doe"},
 					},
 					"ROLE_USER": {
-						"X-Remote-User": {"*"},
+						"X-Remote-User": {glob.MustCompile("*")},
 					},
-				}),
+				},
 				&http.Request{Header: map[string][]string{"X-Remote-User": {"john.doe"}}}),
 			roles: []security.Role{security.RoleAdmin, security.RoleUser},
 		},
 		{
 			policy: security.BuildRolePolicy(
-				security.Compile(security.Policy{
+				security.Policy{
 					"ROLE_ADMIN": {
 						"X-Remote-User": {"john.doe"},
 					},
 					"ROLE_USER": {
-						"X-Remote-User": {"*"},
+						"X-Remote-User": {glob.MustCompile("*")},
 					},
-				}),
+				},
 				&http.Request{Header: map[string][]string{"X-Remote-User": {"foo.bar"}}}),
 			roles:   []security.Role{security.RoleUser},
 			noRoles: []security.Role{security.RoleAdmin},
 		},
 		{
 			policy: security.BuildRolePolicy(
-				security.Compile(security.Policy{
+				security.Policy{
 					"ROLE_ADMIN": {
 						"X-Ovh-Gateway-Source": {"foobar"},
 					},
 					"ROLE_USER": {
-						"X-Remote-User": {"*"},
+						"X-Remote-User": {glob.MustCompile("*")},
 					},
-				}),
+				},
 				&http.Request{Header: map[string][]string{"X-Remote-User": {"foo.bar"}}}),
 			roles:   []security.Role{security.RoleUser},
 			noRoles: []security.Role{security.RoleAdmin},
 		},
 		{
 			policy: security.BuildRolePolicy(
-				security.Compile(security.Policy{
+				security.Policy{
 					"ROLE_ADMIN": {
 						"X-Ovh-Gateway-Source": {"foobar"},
 					},
-				}),
+				},
 				&http.Request{Header: map[string][]string{"X-Ovh-Gateway-Source": {"foobar"}}}),
 			roles:   []security.Role{security.RoleAdmin},
 			noRoles: []security.Role{security.RoleUser},

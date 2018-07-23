@@ -36,28 +36,8 @@ func (policy RolePolicy) ToSlice() (roles []Role) {
 	return
 }
 
-// Compile a policy while compiling values as glob
-func Compile(policy Policy) CompiledPolicy {
-	p := CompiledPolicy{}
-	for role, headers := range policy {
-		p[role] = map[string][]interface{}{}
-		for header, patterns := range headers {
-			p[role][header] = []interface{}{}
-			for _, pattern := range patterns {
-				var v interface{} = pattern
-				g, err := glob.Compile(pattern)
-				if err == nil {
-					v = g
-				}
-				p[role][header] = append(p[role][header], v)
-			}
-		}
-	}
-	return p
-}
-
 // BuildRolePolicy returns a map of Role matching the given http request
-func BuildRolePolicy(policy CompiledPolicy, r *http.Request) RolePolicy {
+func BuildRolePolicy(policy Policy, r *http.Request) RolePolicy {
 	if r == nil {
 		return nil
 	}

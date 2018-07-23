@@ -7,8 +7,7 @@ import (
 
 // Lhasa is the main config format
 type Lhasa struct {
-	DB         db.DatabaseCredentials  `json:"appcatalog-db"`
-	Security   security.Policy         `json:"security"`
-	Policy     security.CompiledPolicy `json:"-"`
-	LogHeaders []string                `json:"log-headers"`
+	DB         db.DatabaseCredentials `json:"appcatalog-db"`
+	Policy     security.Policy        `json:"security"`
+	LogHeaders []string               `json:"log-headers"`
 }
