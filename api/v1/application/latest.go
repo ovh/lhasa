@@ -10,11 +10,11 @@ import (
 )
 
 // LatestUpdater updates the application latest version to the given version
-type LatestUpdater func(*v1.Release) error
+type LatestUpdater func(*v1.Release, logrus.FieldLogger) error
 
 // NewLatestUpdater instantiates a LatestUpdater
-func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory, latestRepoFactory RepositoryLatestFactory, log logrus.FieldLogger) LatestUpdater {
-	return func(version *v1.Release) error {
+func NewLatestUpdater(tm db.TransactionManager, appRepoFactory RepositoryFactory, latestRepoFactory RepositoryLatestFactory) LatestUpdater {
+	return func(version *v1.Release, log logrus.FieldLogger) error {
 		return tm.Transaction(func(db *gorm.DB) error {
 			appRepo := appRepoFactory(db)
 			latestRepo := latestRepoFactory(db)

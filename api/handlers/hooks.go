@@ -80,14 +80,18 @@ func BindHook(c *gin.Context, i interface{}) error {
 	return nil
 }
 
-// RenderHook hook for lhasa, override default one
-func RenderHook(c *gin.Context, status int, payload interface{}) {
-	// Scan interface implementation
-	media, ok := payload.(MediaResource)
-	if ok {
-		c.Data(http.StatusOK, media.GetContentType(), media.GetBytes())
-		return
+// RenderHookWrapper hook for lhasa, override default one
+func RenderHookWrapper(hook tonic.RenderHook) tonic.RenderHook {
+	return func(c *gin.Context, status int, payload interface{}) {
+		// Scan interface implementation
+		media, ok := payload.(MediaResource)
+		if ok {
+			c.Data(http.StatusOK, media.GetContentType(), media.GetBytes())
+			return
+		}
+		if hook == nil {
+			return
+		}
+		hook(c, status, payload)
 	}
-
-	tonic.DefaultRenderHook(c, status, payload)
 }

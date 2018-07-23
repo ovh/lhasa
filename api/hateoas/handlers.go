@@ -56,9 +56,6 @@ func HandlerFindBy(repository ListableRepository) gin.HandlerFunc {
 func HandlerFindOneBy(repository ListableRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (interface{}, error) {
 		result, err := FindByPath(c, repository)
-		if resource, ok := result.(Resourceable); ok {
-			resource.ToResource(BaseURL(c))
-		}
 		if err != nil {
 			return nil, err
 		}
