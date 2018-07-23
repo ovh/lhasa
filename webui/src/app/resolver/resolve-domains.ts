@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  BehaviorSubject ,  Subject } from 'rxjs';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { DomainBean, DomainPagesBean } from '../models/commons/applications-bean';
@@ -7,8 +7,6 @@ import { DataApplicationService } from '../services/data-application-version.ser
 import { ContentListResponse, PageMetaData } from '../models/commons/entity-bean';
 import { DataDeploymentService } from '../services/data-deployment.service';
 import { DataDomainService } from '../services/data-domain.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
 import { LoadersStoreService } from '../stores/loader-store.service';
 import { ErrorsStoreService, NewErrorAction, ErrorBean } from '../stores/errors-store.service';
 

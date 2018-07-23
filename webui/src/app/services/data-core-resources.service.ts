@@ -1,7 +1,5 @@
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/throw';
-import { Observable } from 'rxjs/Observable';
+import { catchError } from 'rxjs/operators';
+import {throwError as observableThrowError,  Observable } from 'rxjs';
 
 import { DefaultResource } from '../interfaces/default-resources.interface';
 import { ConfigurationService } from '../services/configuration.service';
@@ -39,10 +37,10 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
   /**
    * get all resources
    */
-  public GetAll = (): Observable<T[]> => {
+  public GetAll = (): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.get(this.actionUrl, {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.get(this.actionUrl, {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
@@ -51,17 +49,17 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
   public GetAllFromContent = (filter: string, params: { [p: string]: string }): Observable<ContentListResponse<T>> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
     return this.http.get<ContentListResponse<T>>(this.actionUrl + filter,
-      {headers: this.headers, params: new HttpParams({fromObject: params})})
-      .catch(this.handleError);
+      {headers: this.headers, params: new HttpParams({fromObject: params})}).pipe(
+      catchError(this.handleError));
   }
 
   /**
    * get single resource
    */
-  public GetSingle = (id: string): Observable<T> => {
+  public GetSingle = (id: string): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.get<Observable<T>>(this.actionUrl + '/' + id, {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.get<Observable<any>>(this.actionUrl + '/' + id, {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
@@ -69,50 +67,50 @@ export class DataCoreResource<T extends EntityBean> implements DefaultResource<T
    */
   public GetSingleAny = (id: string): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.get<Observable<T>>(this.actionUrl + '/' + id, {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.get<Observable<any>>(this.actionUrl + '/' + id, {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
    * call api backend with a POST to execute task
    */
-  public Task = (path: String, payload: any): Observable<T> => {
+  public Task = (path: String, payload: any): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.post(this.actionUrl + '/' + path, JSON.stringify(payload), {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.post(this.actionUrl + '/' + path, JSON.stringify(payload), {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
    * add a new resource
    */
-  public Add = (itemToAdd: T): Observable<T> => {
+  public Add = (itemToAdd: T): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.post(this.actionUrl, JSON.stringify(itemToAdd), {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.post(this.actionUrl, JSON.stringify(itemToAdd), {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
    * update this resource
    */
-  public Update = (id: string, itemToUpdate: T): Observable<T> => {
+  public Update = (id: string, itemToUpdate: T): Observable<any> => {
     this.headers.append('AuthToken', this.configuration.getAuthToken());
-    return this.http.put(this.actionUrl + '/' + id, JSON.stringify(itemToUpdate), {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.put(this.actionUrl + '/' + id, JSON.stringify(itemToUpdate), {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
    * delete this resource
    */
-  public Delete = (id: string): Observable<T> => {
+  public Delete = (id: string): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.delete(this.actionUrl + '/' + id, {headers: this.headers})
-      .catch(this.handleError);
+    return this.http.delete(this.actionUrl + '/' + id, {headers: this.headers}).pipe(
+      catchError(this.handleError));
   }
 
   /**
    * error handler
    */
   protected handleError(error: HttpErrorResponse) {
-    return Observable.throw(error || 'Server error');
+    return observableThrowError(error || 'Server error');
   }
 }

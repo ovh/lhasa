@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/store';
-
 import { ActionWithPayloadAndPromise } from './action-with-payload';
 import { ApplicationBean, ApplicationPagesBean, DeploymentBean, DomainBean, DomainPagesBean } from '../models/commons/applications-bean';
-import { Subject } from 'rxjs/Subject';
+import { Subject, Observable } from 'rxjs';
 import { GraphBean } from '../models/graph/graph-bean';
 
 import { remove } from 'lodash';
@@ -127,7 +126,7 @@ export class ErrorsStoreService {
   /**
    * select this store service
    */
-  public errors(): Store<ErrorBean[]> {
+  public errors(): Observable<ErrorBean[]> {
     return this._store.select(this.getErrors);
   }
 

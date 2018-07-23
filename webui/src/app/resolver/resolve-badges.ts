@@ -1,4 +1,6 @@
-import { Observable } from 'rxjs';
+import { BehaviorSubject,  Subject } from 'rxjs';
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/observable/from';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { BadgeBean, BadgePagesBean } from '../models/commons/badges-bean';
@@ -7,8 +9,6 @@ import { ContentListResponse, PageMetaData } from '../models/commons/entity-bean
 import { DataDeploymentService } from '../services/data-deployment.service';
 import { DataBadgeService } from '../services/data-badge.service';
 import { DataBadgeStatsService } from '../services/data-badgestats.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
 import { LoadersStoreService } from '../stores/loader-store.service';
 import { NewErrorAction, ErrorBean, ErrorsStoreService } from '../stores/errors-store.service';
 

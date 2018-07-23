@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable ,  SubscriptionLike as ISubscription } from 'rxjs';
 import { PersonBean } from './../../models/commons/applications-bean';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApplicationsStoreService } from '../../stores/applications-store.service';
@@ -8,7 +8,6 @@ import { DataApplicationService } from '../../services/data-application-version.
 
 import { cloneDeep, remove } from 'lodash';
 import { MatSnackBar } from '@angular/material';
-import { ISubscription } from 'rxjs/Subscription';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { UiKitStep } from '../../models/kit/progress-tracker';
 import { OuiProgressTrackerComponent } from '../../kit/oui-progress-tracker/oui-progress-tracker.component';
@@ -35,7 +34,7 @@ export class AppEditComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected applicationStream: Store<ApplicationBean>;
+  protected applicationStream: Observable<ApplicationBean>;
   public application: ApplicationBean;
 
   /**

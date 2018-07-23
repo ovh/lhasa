@@ -1,5 +1,5 @@
 import { EntityBean, PageMetaData, HrefLinks, AbstractPaginatedResource } from './entity-bean';
-import { Timestamp } from 'rxjs/operators/timestamp';
+import { Timestamp } from 'rxjs';
 
 export class BadgeLevelBean {
   id: string;

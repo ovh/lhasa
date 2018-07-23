@@ -14,7 +14,7 @@ import { ApplicationsComponent } from './components/applications/applications.co
 import { AppEditComponent } from './components/appedit/appedit.component';
 import { AppdetailComponent } from './components/appdetail/appdetail.component';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { MarkdownModule } from 'ngx-md';
+import { NgxMdModule } from 'ngx-md';
 import { OpenAPIUIComponent } from './components/openapi-ui/openapi-ui.component';
 /**
  * material2
@@ -237,7 +237,7 @@ export function createTranslateLoader(http: HttpClient) {
     // Local modules
     AppRoutingModule,
     ArchwizardModule,
-    MarkdownModule.forRoot(),
+    NgxMdModule.forRoot(),
     /**
      * store
      */

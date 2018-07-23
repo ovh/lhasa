@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, Store, Selector } from '@ngrx/store';
-
+import { Observable } from 'rxjs';
 import { ActionWithPayload, ActionWithPayloadAndPromise } from './action-with-payload';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject ,  Subject } from 'rxjs';
 import { remove } from 'lodash';
 
 // Loader
@@ -136,7 +135,7 @@ export class LoadersStoreService {
   /**
    * select this store service
    */
-  public loaders(): Store<LoaderBean[]> {
+  public loaders(): Observable<LoaderBean[]> {
     return this._store.select(this.getLoaders);
   }
 

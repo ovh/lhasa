@@ -4,7 +4,8 @@ import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/st
 import { ActionWithPayloadAndPromise } from './action-with-payload';
 import { ApplicationBean, ApplicationPagesBean,
   DeploymentBean, DomainBean, DomainPagesBean, BadgeRatingBean } from '../models/commons/applications-bean';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 /**
  * states
@@ -187,42 +188,42 @@ export class ApplicationsStoreService {
   /**
    * select this store service
    */
-  public domainPages(): Store<DomainPagesBean> {
+  public domainPages(): Observable<DomainPagesBean> {
     return this._store.select(this.getDomainPages);
   }
 
   /**
    * select this store service
    */
-  public domains(): Store<Array<DomainBean>> {
+  public domains(): Observable<Array<DomainBean>> {
     return this._store.select(this.getDomains);
   }
 
   /**
    * select this store service
    */
-  public applications(): Store<ApplicationPagesBean> {
+  public applications(): Observable<ApplicationPagesBean> {
     return this._store.select(this.getApplications);
   }
 
   /**
    * select this store service
    */
-  public active(): Store<ApplicationBean> {
+  public active(): Observable<ApplicationBean> {
     return this._store.select(this.getActive);
   }
 
   /**
    * select this store service
    */
-  public deployments(): Store<Array<DeploymentBean>> {
+  public deployments(): Observable<Array<DeploymentBean>> {
     return this._store.select(this.getDeployments);
   }
 
   /**
    * select this store service
    */
-  public badgeRatings(): Store<Array<BadgeRatingBean>> {
+  public badgeRatings(): Observable<Array<BadgeRatingBean>> {
     return this._store.select(this.getBadgeRatings);
   }
 

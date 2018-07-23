@@ -12,6 +12,7 @@ import { GraphBean, NodeBean, GraphVis } from '../../models/graph/graph-bean';
 import { DataDeploymentService } from '../../services/data-deployment.service';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { GraphComponent } from '../../widget/graph/graph.component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-graph-browse',
@@ -26,7 +27,7 @@ export class GraphBrowseComponent implements OnInit, AfterViewInit {
    */
   public display = false;
   public nodes: NodeBean[] = [];
-  protected deploymentStream: Store<GraphBean>;
+  protected deploymentStream: Observable<GraphBean>;
 
   public deployments: GraphBean = {
     nodes: [],

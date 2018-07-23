@@ -2,8 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { EnvironmentsStoreService } from '../../stores/environments-store.service';
 import { EnvironmentBean } from '../../models/commons/applications-bean';
 import { Store } from '@ngrx/store';
-import { ISubscription } from 'rxjs/Subscription';
+import { SubscriptionLike as ISubscription } from 'rxjs';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-env-chip',
@@ -17,7 +18,7 @@ export class EnvChipComponent implements OnInit {
 
   public blankImageURL = require('./blank.gif');
 
-  protected environmentStream: Store<Map<string, EnvironmentBean>>;
+  protected environmentStream: Observable<Map<string, EnvironmentBean>>;
   protected environmentSubscription: ISubscription;
 
   public environments: Map<string, EnvironmentBean>;

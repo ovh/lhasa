@@ -11,10 +11,11 @@ import { DataDeploymentService } from '../../services/data-deployment.service';
 import { UiKitPaginate } from '../../models/kit/paginate';
 import { ActivatedRoute } from '@angular/router';
 import { BadgesResolver } from '../../resolver/resolve-badges';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
 import { UIChart } from 'primeng/primeng';
+import { Observable } from 'rxjs';
 
 export class BadgeUIBean {
   title: string;
@@ -46,7 +47,7 @@ export class BadgesComponent implements OnInit {
   /**
    * internal streams and store
    */
-  protected badgesStream: Store<BadgePagesBean>;
+  protected badgesStream: Observable<BadgePagesBean>;
   public badges: BadgeUIBean[] = [];
   public metadata: UiKitPaginate = {
     totalElements: 0,

@@ -1,9 +1,8 @@
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { BehaviorSubject ,  Subject, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { createFeatureSelector, createSelector, Selector, Store } from '@ngrx/store';
 
 import { ActionWithPayloadAndPromise } from './action-with-payload';
-import { Subject } from 'rxjs/Subject';
 import { ContentBean } from '../models/commons/content-bean';
 import { DataContentService } from '../services/data-content.service';
 import { LoadersStoreService } from './loader-store.service';
@@ -97,7 +96,7 @@ export class ConfigStoreService {
   /**
    * select this store service
    */
-  public help(): Store<ConfigBean> {
+  public help(): Observable<ConfigBean> {
     return this._store.select(this.getConfig);
   }
 
