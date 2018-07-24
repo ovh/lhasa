@@ -43,9 +43,10 @@ func registerRoutes(group *fizz.RouterGroup,
 	))
 
 	graphRoutes := group.Group("/graphs", "graph", "Graphs node and edge management")
-	graphRoutes.GET("/", getGraphOperationOptions("FindAllActive", graphRepo,
+	graphRoutes.GET("/", []fizz.OperationOption{
+		fizz.ID("GraphAllActives"),
 		fizz.Summary("Find a page of node and all associated edge"),
-	), graphapi.HandlerFindAllActive(graphRepo))
+	}, graphapi.HandlerFindAllActive(graphRepo))
 
 	domRoutes := group.Group("/domains", "domains", "Domains resource management")
 	domRoutes.GET("/", getOperationOptions("FindByPage", domRepo,
@@ -101,7 +102,7 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.Summary("List active deployments for the latest release of this application"),
 		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
 			"Only a single deployment can be active at a time on a given environment."),
-	), deployment.HandlerListApplicationActiveDeployments(appLatestRepo, depRepo))
+	), deployment.HandlerListApplicationActiveDeployments(depRepo))
 	appRoutes.GET("/:domain/:name/versions/:version", getOperationOptions("FindOneBy", appRepo,
 		fizz.Summary("Find one Release"),
 		fizz.InputModel(v1.Release{}),
@@ -123,7 +124,7 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.Summary("List active deployments for this application version"),
 		fizz.Description("A deployment is *active* on an environment if it has not been marked as *undeployed*. "+
 			"Only a single deployment can be active at a time on a given environment."),
-	), deployment.HandlerListReleaseActiveDeployments(appRepo, depRepo))
+	), deployment.HandlerListReleaseActiveDeployments(depRepo))
 	appRoutes.GET("/:domain/:name/versions/:version/deployments/:slug", getOperationOptions("FindDeployment", appRepo,
 		fizz.Summary("Find active deployment for this application version, on this environment"),
 	), deployment.HandlerFindDeployment(appRepo, envRepo, depRepo))
@@ -181,6 +182,8 @@ func registerRoutes(group *fizz.RouterGroup,
 	depRoutes.POST("/:public_id/add_link/:target_public_id", getOperationOptions("AddLink", depRepo,
 		fizz.Summary("Create a dependency link between two deployments"),
 	), handlers.HasOne(security.RoleAdmin), deployment.HandlerDepend(depRepo, depend))
+	depRoutes.GET("/:public_id/graph", []fizz.OperationOption{fizz.Summary("Find one Deployment")},
+		graph.HandlerGraph(graphRepo, depRepo))
 
 	badgeRoutes := group.Group("/badges", "badges", "Badges resource management")
 	badgeRoutes.GET("/", getOperationOptions("FindByPage", badgeRepo,
@@ -224,10 +227,5 @@ func Init(tm db.TransactionManager, group *fizz.RouterGroup, log logrus.FieldLog
 
 // getOperationOptions returns an OperationOption list including generated ID for this repository
 func getOperationOptions(baseName string, repository hateoas.BaseRepository, options ...fizz.OperationOption) []fizz.OperationOption {
-	return append(options, fizz.ID(baseName+repository.GetType().Name()))
-}
-
-// getOperationOptions returns an OperationOption list including generated ID for this repository
-func getGraphOperationOptions(baseName string, repository graphapi.Repository, options ...fizz.OperationOption) []fizz.OperationOption {
 	return append(options, fizz.ID(baseName+repository.GetType().Name()))
 }

@@ -125,6 +125,7 @@ type Deployment struct {
 type DeploymentDependency struct {
 	TargetID string `json:"target"`
 	Type     string `json:"type"`
+	hateoas.Resource
 }
 
 // Environment is a target deployment environment

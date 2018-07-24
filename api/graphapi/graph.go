@@ -7,26 +7,11 @@ import (
 	"github.com/loopfz/gadgeto/tonic"
 )
 
-// HandlerFindAll returns a resource list
-func HandlerFindAll(repository Repository) gin.HandlerFunc {
-	return tonic.Handler(func(c *gin.Context) (*Graph, error) {
-
-		// params and query are user to filter resultset
-		graphResult, err := repository.FindAll()
-		if err != nil {
-			return nil, err
-		}
-
-		return graphResult, nil
-	}, http.StatusOK)
-}
-
 // HandlerFindAllActive returns a resource list
 func HandlerFindAllActive(repository Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (*Graph, error) {
-
 		// params and query are user to filter resultset
-		graphResult, err := repository.FindAllActive()
+		graphResult, err := repository.FindAllActive(nil)
 		if err != nil {
 			return nil, err
 		}
