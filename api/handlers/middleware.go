@@ -177,7 +177,7 @@ func abortUnauthorized(c *gin.Context) {
 }
 
 // AuthMiddleware returns a middleware that populate the Gin Context with security data
-func AuthMiddleware(policy security.CompiledPolicy) gin.HandlerFunc {
+func AuthMiddleware(policy security.Policy) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		roles := security.BuildRolePolicy(policy, c.Request)
 		c.Set(KeyRoles, roles)
