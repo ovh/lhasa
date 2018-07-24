@@ -9,31 +9,32 @@ import SwaggerUI from 'swagger-ui';
 })
 export class OpenAPIUIComponent implements AfterViewInit {
 
-  _spec: Object;
-  @ViewChild("openapi") targetdiv: ElementRef;
+  _url: Object;
+  @ViewChild('openapi') targetdiv: ElementRef;
 
   constructor(private el: ElementRef) {
   }
 
-  @Input() set spec(val: object) {
-    this._spec = val;
-    this.apply()
+  @Input() set url(val: string) {
+    this._url = val;
+    this.apply();
   }
 
   ngAfterViewInit() {
-    this.apply()
+    this.apply();
   }
 
   apply() {
-    if (!this._spec || !this.targetdiv) {
-      return
+    if (!this._url || !this.targetdiv) {
+      return;
     }
     // TODO: remove the following line if the import above is fixed
-    const SwaggerUI = require('swagger-ui')
+    const SwaggerUI = require('swagger-ui');
     const ui = SwaggerUI({
-      spec: this._spec,
+      url: this._url,
       domNode: this.targetdiv.nativeElement,
       deepLinking: true,
+      validatorUrl: null,
       presets: [
         SwaggerUI.presets.apis
       ],
