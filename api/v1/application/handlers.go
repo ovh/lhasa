@@ -2,12 +2,13 @@ package application
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/loopfz/gadgeto/tonic"
+	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
 	"github.com/ovh/lhasa/api/v1"
 	"github.com/ovh/lhasa/api/v1/badge"
@@ -28,7 +29,7 @@ func HandlerCreate(repository *Repository, updater LatestUpdater) gin.HandlerFun
 		oldres, err := repository.FindOneByUnscoped(map[string]interface{}{"domain": application.Domain, "name": application.Name, "version": application.Version})
 		oldapp := oldres.(*v1.Release)
 		if hateoas.IsEntityDoesNotExistError(err) {
-			if err := updater(application); err != nil {
+			if err := updater(application, handlers.GetLogger(c)); err != nil {
 				return nil, err
 			}
 			return nil, hateoas.ErrorCreated
@@ -40,7 +41,7 @@ func HandlerCreate(repository *Repository, updater LatestUpdater) gin.HandlerFun
 		application.ID = oldapp.ID
 		application.CreatedAt = oldapp.CreatedAt
 
-		if err := updater(application); err != nil {
+		if err := updater(application, handlers.GetLogger(c)); err != nil {
 			return nil, err
 		}
 		if oldapp.DeletedAt != nil {
@@ -91,7 +92,7 @@ func HandlerGetBadgeRatingsForAppVersion(repository *Repository) gin.HandlerFunc
 			if err != nil {
 				return nil, err
 			}
-			unsetRating := &v1.BadgeRating{
+			rating := &v1.BadgeRating{
 				Badge:      bdg,
 				BadgeTitle: bdg.Title,
 				Release:    appv,
@@ -99,36 +100,29 @@ func HandlerGetBadgeRatingsForAppVersion(repository *Repository) gin.HandlerFunc
 				Comment:    "",
 				Level:      &levels[0],
 			}
-			unsetRating.ToResource(hateoas.BaseURL(c))
-			b, found := badgeRatings[bdg.Slug]
-			if !found {
-				result = append(result, unsetRating)
-				continue
-			}
-
-			if level, found := searchLevel(levels, b); found {
-				rating := &v1.BadgeRating{
-					Badge:      bdg,
-					Release:    appv,
-					BadgeTitle: bdg.Title,
-					Value:      b.Value,
-					Comment:    b.Comment,
-					Level:      &level,
+			br, hasRating := badgeRatings[bdg.Slug]
+			if hasRating {
+				if level, found := searchLevel(levels, br); found {
+					rating = &v1.BadgeRating{
+						Badge:      bdg,
+						Release:    appv,
+						BadgeTitle: bdg.Title,
+						Value:      br.Value,
+						Comment:    br.Comment,
+						Level:      &level,
+					}
 				}
-				rating.ToResource(hateoas.BaseURL(c))
-				result = append(result, rating)
-				continue
 			}
-
-			result = append(result, unsetRating)
+			rating.ToResource(hateoas.BaseURL(c))
+			result = append(result, rating)
 		}
 		return result, nil
 	}, http.StatusOK)
 }
 
-func searchLevel(levels []v1.BadgeLevel, b v1.BadgeRating) (v1.BadgeLevel, bool) {
+func searchLevel(levels []v1.BadgeLevel, br v1.BadgeRating) (v1.BadgeLevel, bool) {
 	for _, badgeLevel := range levels {
-		if badgeLevel.ID == b.Value {
+		if badgeLevel.ID == br.Value {
 			return badgeLevel, true
 		}
 	}
@@ -170,11 +164,15 @@ func HandlerSetBadgeRatingForRelease(appRepo *Repository, badgeRepo *badge.Repos
 			return nil, err
 		}
 		appv.BadgeRatings = &postgres.Jsonb{RawMessage: badgeRatingsJSON}
-		return &v1.BadgeRating{
+		br := &v1.BadgeRating{
 			BadgeID: request.BadgeSlug,
+			Badge:   bdg,
+			Release: appv,
 			Value:   request.Level,
 			Comment: request.Comment,
-		}, appRepo.Save(appv)
+		}
+		br.ToResource(hateoas.BaseURL(c))
+		return br, appRepo.Save(appv)
 	}, http.StatusCreated)
 }
 
@@ -211,9 +209,8 @@ func HandlerRedirectLatest(appLatestRepo *RepositoryLatest) gin.HandlerFunc {
 			return nil, err
 		}
 		if release, ok := app.(*v1.Release); ok {
-			release.ToResource(hateoas.BaseURL(c))
 			return release, nil
 		}
-		return nil, errors.New("internal type error")
+		return nil, fmt.Errorf("returned entity %T is not a deployment", app)
 	}, http.StatusOK)
 }

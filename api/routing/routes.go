@@ -46,7 +46,7 @@ func NewRouter(tm db.TransactionManager, c config.Lhasa, version, hateoasBaseBat
 
 	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))
 	tonic.SetBindHook(handlers.BindHook)
-	tonic.SetRenderHook(handlers.RenderHook, "")
+	tonic.SetRenderHook(handlers.RenderHookWrapper(hateoas.RenderHookWrapper(tonic.DefaultRenderHook)), "")
 
 	api := router.Group("/api", "", "", hateoas.AddToBasePath(hateoasBaseBath), handlers.AuthMiddleware(c.Policy))
 	api.GET("/", []fizz.OperationOption{

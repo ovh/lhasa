@@ -37,7 +37,7 @@ func RecoveryWithLogger(log logrus.FieldLogger) gin.HandlerFunc {
 					stack := stack(3)
 					httprequest, _ := httputil.DumpRequest(c.Request, false)
 					log.WithField("error", err).
-						WithField("full_message", stack).
+						WithField("full_message", string(stack)).
 						WithField("request", string(httprequest)).
 						Error("panic recovered")
 				}

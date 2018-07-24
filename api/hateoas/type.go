@@ -166,8 +166,7 @@ func reflectValueToResource(value reflect.Value, baseURL string) {
 		}
 		return
 	}
-	resource, ok := value.Interface().(Resourceable)
-	if ok {
+	if resource, ok := value.Interface().(Resourceable); ok {
 		resource.ToResource(baseURL)
 	}
 }

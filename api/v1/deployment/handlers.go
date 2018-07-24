@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -89,12 +90,10 @@ func HandlerFindDeployment(appRepo *application.Repository, envRepo *environment
 		if err != nil {
 			return nil, err
 		}
-		dep := res.(*v1.Deployment)
-		dep.ToResource(hateoas.BaseURL(c))
-		if err != nil {
-			return nil, err
+		if dep, ok := res.(*v1.Deployment); ok {
+			return dep, nil
 		}
-		return dep, nil
+		return nil, fmt.Errorf("returned entity %T is not a deployment", res)
 	}, http.StatusOK)
 }
 
@@ -105,9 +104,6 @@ func HandlerListApplicationActiveDeployments(appRepo application.FindOneByUnique
 		deps, err := depRepo.FindActivesBy(request.Domain, request.Name, criteria)
 		if err != nil {
 			return nil, err
-		}
-		for _, dep := range deps {
-			dep.ToResource(hateoas.BaseURL(c))
 		}
 		return deps, nil
 	}, http.StatusOK)
@@ -120,9 +116,6 @@ func HandlerListReleaseActiveDeployments(appRepo application.FindOneByUniqueKey,
 		deps, err := depRepo.FindActivesByRelease(request.Domain, request.Name, request.Version, criteria)
 		if err != nil {
 			return nil, err
-		}
-		for _, dep := range deps {
-			dep.ToResource(hateoas.BaseURL(c))
 		}
 		return deps, nil
 	}, http.StatusOK)

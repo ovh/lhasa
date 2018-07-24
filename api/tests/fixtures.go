@@ -17,7 +17,7 @@ import (
 
 // StartTestHTTPServer starts a fake http server for testing purposes
 func StartTestHTTPServer() *httptest.Server {
-	log := logger.NewLogger(true, true, false, true)
+	log := logger.NewLogger(true, true, false, false)
 	mocket.Catcher.Register()
 	mocket.Catcher.Reset()
 	mocket.Catcher.Logging = true
