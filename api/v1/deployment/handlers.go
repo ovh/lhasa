@@ -98,7 +98,7 @@ func HandlerFindDeployment(appRepo *application.Repository, envRepo *environment
 }
 
 // HandlerListApplicationActiveDeployments list active deployments for a given application
-func HandlerListApplicationActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
+func HandlerListApplicationActiveDeployments(depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
 		criteria := map[string]interface{}{}
 		deps, err := depRepo.FindActivesBy(request.Domain, request.Name, criteria)
@@ -110,7 +110,7 @@ func HandlerListApplicationActiveDeployments(appRepo application.FindOneByUnique
 }
 
 // HandlerListReleaseActiveDeployments list active deployments for a given release (with version)
-func HandlerListReleaseActiveDeployments(appRepo application.FindOneByUniqueKey, depRepo *Repository) gin.HandlerFunc {
+func HandlerListReleaseActiveDeployments(depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (interface{}, error) {
 		criteria := map[string]interface{}{}
 		deps, err := depRepo.FindActivesByRelease(request.Domain, request.Name, request.Version, criteria)

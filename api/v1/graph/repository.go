@@ -11,7 +11,13 @@ import (
 )
 
 const (
-	defaultPageSize = 20
+	queryOutbound = `SELECT d2.* FROM "deployments" AS "d1"
+CROSS JOIN jsonb_array_elements("d1"."dependencies") as "items"
+JOIN "deployments" AS "d2" ON items->>'target' = "d2"."public_id"
+  AND "d2"."deleted_at" IS NULL
+  AND "d2"."undeployed_at" IS NULL
+WHERE "d1"."deleted_at" IS NULL
+  AND (("d1"."undeployed_at" IS NULL AND "d1"."public_id" = ?))`
 )
 
 // Repository is a repository manager
@@ -48,19 +54,64 @@ func (repo *Repository) FindAll() (*graphapi.Graph, error) {
 }
 
 // FindAllActive fetch a collection of nodes matching each criteria
-// criteria are not used now
-func (repo *Repository) FindAllActive() (*graphapi.Graph, error) {
+func (repo *Repository) FindAllActive(criteria map[string]interface{}) (*graphapi.Graph, error) {
 	var entities []*v1.Deployment
-	err := repo.db.Where("undeployed_at is null").Preload("Application").Preload("Environment").Find(&entities).Error
-	if err == nil {
-		interfaces := []interface{}{}
-		for _, entity := range entities {
-			interfaces = append(interfaces, entity)
-		}
-		graph, err := repo.transformToGraph(graphapi.Convert(repo, interfaces))
-		return graph, err
+	err := repo.db.Where(criteria).Where("\"undeployed_at\" is null").Preload("Application").Preload("Environment").Find(&entities).Error
+	if err != nil {
+		return nil, err
 	}
-	return nil, err
+	var interfaces []interface{}
+	for _, entity := range entities {
+		interfaces = append(interfaces, entity)
+	}
+	return repo.transformToGraph(graphapi.Convert(repo, interfaces))
+}
+
+// FindByDeployment find all inbound and outbound dependencies for a deployment
+func (repo *Repository) FindByDeployment(publicID string) (*graphapi.Graph, error) {
+	var entities []*v1.Deployment
+	var interfaces []interface{}
+	// load the deployment itself
+	err := repo.db.Where("\"undeployed_at\" IS NULL AND \"public_id\" = ?", publicID).Preload("Application").Preload("Environment").Find(&entities).Error
+	if err != nil {
+		return nil, err
+	}
+	for _, entity := range entities {
+		interfaces = append(interfaces, entity)
+	}
+	// load the inbound dependencies
+	err = repo.db.Where("\"undeployed_at\" IS NULL AND \"dependencies\" @> '[{\"target\": \"?\"}]'", gorm.Expr(publicID)).Preload("Application").Preload("Environment").Find(&entities).Error
+	if err != nil {
+		return nil, err
+	}
+	for _, entity := range entities {
+		interfaces = append(interfaces, entity)
+	}
+	// load the outbound dependencies
+	rows, err := repo.db.Preload("Application").Preload("Environment").Raw(queryOutbound, publicID).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		entity := &v1.Deployment{}
+		if err := repo.db.ScanRows(rows, entity); err != nil {
+			return nil, err
+		}
+		app := &v1.Release{}
+		if err := repo.db.Find(app, entity.ApplicationID).Error; err != nil {
+			return nil, err
+		}
+		env := &v1.Environment{}
+		if err := repo.db.Find(env, entity.EnvironmentID).Error; err != nil {
+			return nil, err
+		}
+		entity.Application = app
+		entity.Environment = env
+		interfaces = append(interfaces, entity)
+	}
+
+	return repo.transformToGraph(graphapi.Convert(repo, interfaces))
 }
 
 // Resolve resolve dependencies

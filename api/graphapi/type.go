@@ -28,7 +28,7 @@ type ImplementEdge interface {
 // Repository defines a normal repository
 type Repository interface {
 	FindAll() (*Graph, error)
-	FindAllActive() (*Graph, error)
+	FindAllActive(map[string]interface{}) (*Graph, error)
 	GetType() reflect.Type
 	// Map api entity to graph entity
 	Map(entity interface{}, others map[string]ImplementNode) ImplementNode

@@ -268,6 +268,11 @@ curl --request PUT \
 	}
 }'
 
+curl --request POST \
+  --url $API_BASE_URL/v1/applications/billing/api/versions/1.0.0/deploy/prodfr \
+  --header 'content-type: application/json' \
+  --data "{}"
+
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/billing/archiver/versions/1.0.0 \
   --header 'content-type: application/json' \
@@ -280,6 +285,11 @@ curl --request PUT \
 	}
 }'
 
+curl --request POST \
+  --url $API_BASE_URL/v1/applications/billing/archiver/versions/1.0.0/deploy/prodfr \
+  --header 'content-type: application/json' \
+  --data "{}"
+
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/billing/currency-converter/versions/1.0.0 \
   --header 'content-type: application/json' \
@@ -291,6 +301,11 @@ curl --request PUT \
 		"description": "Convert currencies using public rates"
 	}
 }'
+
+curl --request POST \
+  --url $API_BASE_URL/v1/applications/billing/currency-converter/versions/1.0.0/deploy/prodfr \
+  --header 'content-type: application/json' \
+  --data "{}"
 
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/billing/antifraud/versions/1.0.0 \
@@ -305,6 +320,11 @@ curl --request PUT \
 	}
 }'
 
+curl --request POST \
+  --url $API_BASE_URL/v1/applications/billing/antifraud/versions/1.0.0/deploy/prodfr \
+  --header 'content-type: application/json' \
+  --data "{}"
+
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/web/ecommerce-api/versions/1.0.0 \
   --header 'content-type: application/json' \
@@ -316,6 +336,11 @@ curl --request PUT \
 		"description": "Ecommerce api"
 	}
 }'
+
+curl --request POST \
+  --url $API_BASE_URL/v1/applications/web/ecommerce-api/versions/1.0.0/deploy/prodfr \
+  --header 'content-type: application/json' \
+  --data "{}"
 
 curl --request PUT \
   --url $API_BASE_URL/v1/applications/web/cms-api/versions/1.0.0 \
