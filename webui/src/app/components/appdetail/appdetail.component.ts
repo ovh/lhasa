@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { CodeHighlighterModule } from 'primeng/codehighlighter';
 import { ActivatedRoute } from '@angular/router';
-import { ApplicationBean, DeploymentBean, EnvironmentBean, BadgeRatingBean } from '../../models/commons/applications-bean';
+import { ApplicationBean, DeploymentBean, EnvironmentBean, BadgeRatingBean, DeploymentPropertiesBean } from '../../models/commons/applications-bean';
 import { Store } from '@ngrx/store';
 import { ApplicationsStoreService } from '../../stores/applications-store.service';
 import { EnvironmentsStoreService } from '../../stores/environments-store.service';
@@ -10,8 +10,10 @@ import { element } from 'protractor';
 import { SubscriptionLike as ISubscription } from 'rxjs';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
-import {FieldsetModule} from 'primeng/fieldset';
+import { FieldsetModule } from 'primeng/fieldset';
 import { Observable } from 'rxjs';
+import { strict } from 'assert';
+import { forEach } from '@angular/router/src/utils/collection';
 
 
 @Component({
@@ -35,6 +37,7 @@ export class AppdetailComponent implements OnInit {
 
   public description: string;
   public readme: string;
+  public links: Map<string, string>;
 
   constructor(
     private applicationsStoreService: ApplicationsStoreService,
@@ -67,18 +70,18 @@ export class AppdetailComponent implements OnInit {
         if (app.properties && app.properties.readme) {
           this.readme = app.properties.readme;
         }
-
-        // When read field exist use it as plain text
-        // Or if it's an url call it to obtain data
-
         this._activeDeployments = [];
         this._selectedDeployment = null;
         if (this.application.deployments !== undefined) {
-          this.application.deployments.forEach(value => {
-            if (!value.undeployedAt || value.undeployedAt === null) {
-              this._activeDeployments.push(value);
+          this.application.deployments.forEach(deployment => {
+            if (!deployment.undeployedAt || deployment.undeployedAt === null) {
+              this._activeDeployments.push(deployment);
               if (this._selectedDeployment === null) {
-                this._selectedDeployment = value;
+                this._selectedDeployment = deployment;
+                if (this._selectedDeployment.properties.links == null ) {
+                  this._selectedDeployment.properties.links = new Map<string, string>();
+                }
+                console.log(deployment);
               }
             }
           });
@@ -106,6 +109,25 @@ export class AppdetailComponent implements OnInit {
       () => {
       }
     );
+  }
+
+  getKeys(myMap: Map<string, string>): Array<Object> {
+    const res: Array<Object> = [];
+    for (const key of Object.keys(myMap).sort()) {
+      res.push({
+        'label': key,
+        'url': myMap[key],
+      });
+    }
+    return res;
+  }
+
+  shortLink(str: string, maxLen: number): string {
+    str = str.replace('https://', '').replace('http://', '').replace('mailto:', '');
+    if (str.length > maxLen) {
+      return str.substr(0, maxLen / 2) + '…' + str.substr(str.length - maxLen / 2, str.length);
+    }
+    return str;
   }
 
   selectDeployment(deployment: DeploymentBean): void {
