@@ -9,7 +9,7 @@ import SwaggerUI from 'swagger-ui';
 })
 export class OpenAPIUIComponent implements AfterViewInit {
 
-  _url: Object;
+  _url: string;
   @ViewChild('openapi') targetdiv: ElementRef;
 
   constructor(private el: ElementRef) {
@@ -28,13 +28,12 @@ export class OpenAPIUIComponent implements AfterViewInit {
     if (!this._url || !this.targetdiv) {
       return;
     }
-    // TODO: remove the following line if the import above is fixed
-    const SwaggerUI = require('swagger-ui');
-    const ui = SwaggerUI({
+    SwaggerUI({
       url: this._url,
       domNode: this.targetdiv.nativeElement,
-      deepLinking: true,
+      deepLinking: false,
       validatorUrl: null,
+      displayRequestDuration: true,
       presets: [
         SwaggerUI.presets.apis
       ],
