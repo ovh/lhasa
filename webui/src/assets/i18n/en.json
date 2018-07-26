@@ -32,7 +32,7 @@
   "ERROR-ENVS": "Error while loading environements",
   "OPENAPI_SPEC": "OpenAPI Specification",
   "REPOSITORY": "Repository",
-  "AUTHORS": "Authors",
+  "CONTACTS": "Contacts",
   "TAGS": "Tags",
   "YOUR_SEARCH_QUERY_RETURNED_0_RESULTS": "Your search query returned 0 results",
   "NO_TAGS_SPECIFIED": "No tags specified",
