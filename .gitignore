@@ -5,3 +5,5 @@ vault-file.json
 .config.json
 **/gin-bin
 **/test_results.xml
+.cds
+.sherpa.json

@@ -116,9 +116,18 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.Description("Use this route to create a new application version. The `manifest` field can contains "+
 			"any properties useful to track applications in your information system. It is recommended to track it as "+
 			"a file in your source-control repository."),
+		fizz.Header("Content-Type", "Must be application/merge-patch+json", "application/merge-patch+json"),
 		fizz.StatusDescription("Updated"),
 		fizz.Response("201", "Created", nil, nil),
 	), handlers.HasOne(security.RoleAdmin), application.HandlerCreate(appRepo, latestUpdater))
+	appRoutes.PATCH("/:domain/:name/versions/:version", getOperationOptions("Patch", appRepo,
+		fizz.Summary("Patch a Release"),
+		fizz.Description(`Use this route to patch a single release property.
+
+This is a JSON Merge Patch, as of defined by the [RFC7396](https://tools.ietf.org/html/rfc7396).
+
+Only the field "properties" can ben patched, all other fields are immutable.`),
+	), handlers.HasOne(security.RoleAdmin), application.HandlerPatch(appRepo))
 
 	appRoutes.GET("/:domain/:name/versions/:version/deployments", getOperationOptions("ListActiveDeploymentsVersion", appRepo,
 		fizz.Summary("List active deployments for this application version"),
