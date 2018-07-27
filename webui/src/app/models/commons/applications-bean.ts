@@ -13,7 +13,7 @@ export class ApplicationBean extends EntityBean {
   repo?: string;
   description?: string;
   manifest: ManifestBean;
-  properties: any;
+  properties: ReleasePropertiesBean;
   tags?: string[];
   deployments?: DeploymentBean[];
   badgeRatings?: BadgeRatingBean[];
@@ -30,11 +30,23 @@ export class ManifestBean {
   support?: TeamBean;
 }
 
+// ReleasePropertiesBean
+export class ReleasePropertiesBean {
+  description: string;
+  readme: string;
+  links: Map<string, string>;
+}
+
 // Deployment
 export class DeploymentBean extends EntityBean {
   id: string;
-  properties: Map<string, any>;
+  properties: DeploymentPropertiesBean = new DeploymentPropertiesBean();
   undeployedAt: Date;
+}
+
+// DeploymentPropertiesBean
+export class DeploymentPropertiesBean {
+  links: Map<string, string> = new Map([]);
 }
 
 // Environment

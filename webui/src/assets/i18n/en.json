@@ -33,6 +33,7 @@
   "OPENAPI_SPEC": "OpenAPI Specification",
   "REPOSITORY": "Repository",
   "CONTACTS": "Contacts",
+  "LINKS": "Links",
   "TAGS": "Tags",
   "YOUR_SEARCH_QUERY_RETURNED_0_RESULTS": "Your search query returned 0 results",
   "NO_TAGS_SPECIFIED": "No tags specified",

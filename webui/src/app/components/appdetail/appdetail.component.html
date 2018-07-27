@@ -1,68 +1,75 @@
 <div *ngIf="application" class="ui-g">
+  <h1 class="oui-header_1 oui-header_underline header">
+    {{ 'APPLICATION' | translate }}: {{ application.domain }}/{{ application.name }}
+    <span class="oui-chip">{{ application.version }}</span>
+  </h1>
   <div class="ui-g-12">
-    <h1 class="oui-header_1 oui-header_underline header">
-      {{ 'APPLICATION' | translate }}: {{ application.domain }}/{{ application.name }}
-      <span class="oui-chip">{{ application.version }}</span>
-    </h1>
-  </div>
-  <div class="ui-g-8">
-    <div>
-      <span *ngFor="let badgeRating of _badgeRatingShields">
-        <app-badge-shieldsio [badge]="badgeRating"></app-badge-shieldsio>&nbsp;
-      </span>
+    <div class="ui-g-8">
+      <div class="oui-box">
+        <div>
+          <span *ngFor="let badgeRating of _badgeRatingShields">
+            <app-badge-shieldsio [badge]="badgeRating"></app-badge-shieldsio>&nbsp;
+          </span>
+        </div>
+        <article *ngIf="description">
+          <ngx-md data="{{ description }}"></ngx-md>
+        </article>
+        <p-fieldset *ngIf="readme" legend="README.md" [toggleable]="true" [collapsed]="true">
+          <a *ngIf="readme.startsWith('http')" href="{{ readme }}" target="_blank">readme</a>
+          <article>
+            <ngx-md *ngIf="!readme.startsWith('http')">{{ readme }}</ngx-md>
+          </article>
+        </p-fieldset>
+      </div>
     </div>
-    <h3 *ngIf="description">
-      {{ (description.length>300)? (description | slice:0:300)+'...':(description) }}
-    </h3>
-    <p-fieldset *ngIf="readme" legend="README.md" [toggleable]="true" [collapsed]="true">
-      <a *ngIf="readme.startsWith('http')" href="{{ readme }}" target="_blank">readme</a>
-      <ngx-md *ngIf="!readme.startsWith('http')">{{ readme }}</ngx-md>
-    </p-fieldset>
+    <div class="oui-list ui-g-4" *ngIf="application.manifest">
+      <p-card>
+        <h5 class="oui-header_5">
+          <i class="oui-icon oui-icon-check_line" aria-hidden="true"></i>
+          {{ 'TAGS' | translate }}
+        </h5>
+        <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
+        <span class="font-extra-light" *ngIf="!application.tags">{{ 'NO_TAGS_SPECIFIED' | translate }}</span>
+        <div *ngIf="application.properties && application.properties.links">
+          <hr>
+          <h5 class="oui-header_5">
+            <i class="oui-icon oui-icon-external_link" aria-hidden="true"></i>
+            {{ 'LINKS' | translate }}
+          </h5>
+          <ul class="nobullets">
+            <li *ngFor="let link of getKeys(application.properties.links)">
+              <span class="link_label"> {{ link.label }}</span>
+              <span class="link_url">
+                <a class="oui-link oui-link_icon" href="{{ link.url }}" target="_blank">
+                  {{ shortLink(link.url, 40) }}
+                  <span class="oui-icon oui-icon-external_link"></span>
+                </a>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div *ngIf="application.manifest.authors">
+          <hr>
+          <h5 class="oui-header_5">
+            <i class="oui-icon oui-icon-user_line" aria-hidden="true"></i>
+            {{ 'CONTACTS' | translate }}
+          </h5>
+          <ul class="oui-list__items">
+            <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
+              <span class="oui-list__header authorlist">
+                {{ person.name }}
+                <span *ngIf="person.role">({{ person.role }})</span>
+                <span *ngIf="person.email"> &lt;
+                  <a class="oui-link" href="mailto:{{ person.email }}">{{ person.email }}</a>&gt;</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </p-card>
+    </div>
   </div>
 
-  <div class="oui-list ui-g-4" *ngIf="application.manifest">
-    <p-card>
-      <h5 class="oui-header_5">
-        <i class="oui-icon oui-icon-check_line" aria-hidden="true"></i>
-        {{ 'TAGS' | translate }}
-      </h5>
-      <span class="oui-chip" *ngFor="let tagname of application.tags">{{ tagname }}</span>
-      <span class="font-extra-light" *ngIf="!application.tags">{{ 'NO_TAGS_SPECIFIED' | translate }}</span>
-      <div>
-        <hr>
-        <h5 class="oui-header_5">
-          <i class="oui-icon oui-icon-page_line" aria-hidden="true"></i>
-          {{ 'REPOSITORY' | translate }}  <app-help-widget key="help-what-is-a-repository"></app-help-widget>
-        </h5>
-        <p class="oui-field__control oui-field__control_auto">
-          <a *ngIf="application.manifest && application.manifest.repository" class="oui-link oui-link_icon" href="{{ application.manifest.repository }}">
-            {{ application.manifest.repository }}
-            <span class="oui-icon oui-icon-external_link"></span>
-          </a>
-          <span class="font-extra-light" *ngIf="!application.manifest || !application.manifest.repository">{{ 'NO_SOURCE_CODE_REPOSITORY_SPECIFIED' | translate }}</span>
-        </p>
-      </div>
-      <div *ngIf="application.manifest.authors">
-        <hr>
-
-        <h5 class="oui-header_5">
-          <i class="oui-icon oui-icon-user_line" aria-hidden="true"></i>
-          {{ 'CONTACTS' | translate }}  <app-help-widget key="help-what-is-a-contributor"></app-help-widget>
-        </h5>
-        <ul class="oui-list__items">
-          <li *ngFor="let person of application.manifest.authors" class="oui-list__item oui-list__header">
-            <span class="oui-list__header authorlist">
-              {{ person.name }}
-              <span *ngIf="person.role">({{ person.role }})</span>
-              <span *ngIf="person.email"> &lt;<a href="mailto:{{ person.email }}">{{ person.email }}</a>&gt;</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-    </p-card>
-  </div>
-
-  <div class="ui-g-12" *ngIf="_activeDeployments.length > 0">
+  <div class="ui-g-12" *ngIf="_activeDeployments && _activeDeployments.length > 0">
     <h5 class="oui-header_5">
       <i class="oui-icon oui-icon-paperplane_line" aria-hidden="false"></i>
       {{ 'ACTIVE_DEPLOYMENTS' | translate }}</h5>
@@ -74,11 +81,34 @@
           <label class="container" for="{{ deployment.id }}">
             <app-env-chip slug="{{ deployment.properties._env_slug }}"></app-env-chip>
             <i class="oui-icon oui-icon_circle oui-icon-chevron-right" aria-hidden="true"></i>
-            <span class="oui-chip">{{ (deployment.properties._app_version.length>15)? (deployment.properties._app_version | slice:0:15)+'...':(deployment.properties._app_version) }}</span>
+            <span class="oui-chip">{{ (deployment.properties._app_version.length>15)? (deployment.properties._app_version | slice:0:15)+'...':(deployment.properties._app_version)
+              }}
+            </span>
           </label>
         </div>
       </div>
       <div *ngIf="_selectedDeployment" class="deploymentpanel">
+        <dl class="intro" *ngIf="_selectedDeployment.properties.links">
+          <dt>{{ 'LINKS' | translate }}</dt>
+          <dd>
+            <ul class="nobullets">
+              <li *ngFor="let link of getKeys(_selectedDeployment.properties.links)">
+                <span class="link_label"> {{ link.label }}</span>
+                <span class="link_url">
+                  <a class="oui-link oui-link_icon" href="{{ link.url }}" target="_blank">
+                    {{ shortLink(link.url, 80) }}
+                    <span class="oui-icon oui-icon-external_link"></span>
+                  </a>
+                </span>
+              </li>
+            </ul>
+          </dd>
+        </dl>
+        <p-card title="{{ 'OPENAPI_SPEC' | translate }}">
+          <app-openapi-ui *ngIf="_selectedDeployment.properties && _selectedDeployment.properties.links && _selectedDeployment.properties.links['openapi.spec']"
+            [url]="_selectedDeployment.properties.links['openapi.spec']"></app-openapi-ui>
+          <span class="font-extra-light" *ngIf="!_selectedDeployment.properties.links['openapi.spec']">{{ 'NO_OPENAPI_API_URL_SPECIFIED' | translate }}</span>
+        </p-card>
         <dl class="intro">
           <dt>{{ 'INTERNAL_ID' | translate }}</dt>
           <dd>{{ _selectedDeployment.id }}</dd>
@@ -87,10 +117,6 @@
           <dt>{{ 'UPDATED_AT' | translate }}</dt>
           <dd>{{ _selectedDeployment._updatedAt }}</dd>
         </dl>
-        <p-card title="{{ 'OPENAPI_SPEC' | translate }}">
-          <app-openapi-ui *ngIf="_selectedDeployment.properties['openapi']" [url]="_selectedDeployment.properties['openapi']"></app-openapi-ui>
-          <span class="font-extra-light" *ngIf="!_selectedDeployment.properties['openapi']">{{ 'NO_OPENAPI_API_URL_SPECIFIED' | translate }}</span>
-        </p-card>
       </div>
     </div>
   </div>

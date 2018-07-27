@@ -68,3 +68,33 @@ input[type="radio"]:checked+label {
 .authorlist{
   font-size: smaller;
 }
+
+.nobullets {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.link_label {
+  color: floralwhite;
+  background-color: #54627b;
+  border-radius: 15px 0px 0px 15px;
+  width: 10em;
+  display: inline-block;
+  padding-left: 0.5em;
+  font-size: smaller;
+  font-family: sans-serif;
+}
+.link_url {
+  background-color: aliceblue;
+  border-radius: 0px 15px 15px 0px;
+  display: inline-block;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-size: smaller;
+  font-family: sans-serif;
+}
+
+.link_url .oui-link {
+  color: dimgray;
+}
