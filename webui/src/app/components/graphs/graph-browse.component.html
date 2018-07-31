@@ -1,4 +1,4 @@
-<app-graph #deploymentsGraph *ngIf="deployments" (handler)="onEvent($event)" [graph]="deploymentsVis" [options]="'options-graph'" [style.height]="'100%'">
+<app-graph #deploymentsGraph *ngIf="deployments" (handler)="onEvent($event)" [graph]="deploymentsVis" [options]="'options-graph'" [height]="1000" [style.height]="'100%'">
 </app-graph>
 <p-dialog header="Payload" [(visible)]="display">
 <pre>{{pretty(nodes)}}</pre>

@@ -1,19 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { CardModule } from 'primeng/card';
-import { CodeHighlighterModule } from 'primeng/codehighlighter';
-import { ActivatedRoute } from '@angular/router';
-import { ApplicationBean, DeploymentBean, EnvironmentBean, BadgeRatingBean, DeploymentPropertiesBean } from '../../models/commons/applications-bean';
-import { Store } from '@ngrx/store';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ApplicationBean, DeploymentBean } from '../../models/commons/applications-bean';
 import { ApplicationsStoreService } from '../../stores/applications-store.service';
-import { EnvironmentsStoreService } from '../../stores/environments-store.service';
-import { element } from 'protractor';
-import { SubscriptionLike as ISubscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { BadgeShieldsIOBean } from '../../widget/badgewidget/badgewidget.component';
-import { FieldsetModule } from 'primeng/fieldset';
-import { Observable } from 'rxjs';
-import { strict } from 'assert';
-import { forEach } from '@angular/router/src/utils/collection';
+import { GraphComponent } from '../../widget/graph/graph.component';
+import { GraphsStoreService } from '../../stores/graphs-store.service';
+import { GraphBean, GraphVis, NodeBean } from '../../models/graph/graph-bean';
 
 
 @Component({
@@ -29,7 +22,6 @@ export class AppdetailComponent implements OnInit {
    * internal streams and store
    */
   protected applicationStream: Observable<ApplicationBean>;
-  protected applicationSubscription: ISubscription;
   public application: ApplicationBean;
   private _badgeRatingShields: BadgeShieldsIOBean[];
   public _selectedDeployment: DeploymentBean;
@@ -39,9 +31,11 @@ export class AppdetailComponent implements OnInit {
   public readme: string;
   public links: Map<string, string>;
 
+  @ViewChild('deploymentsGraph')
+  private graph: GraphComponent;
+
   constructor(
-    private applicationsStoreService: ApplicationsStoreService,
-    private route: ActivatedRoute) {
+    private applicationsStoreService: ApplicationsStoreService) {
     /**
      * subscribe
      */
@@ -49,7 +43,7 @@ export class AppdetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.applicationSubscription = this.applicationStream.subscribe(
+    this.applicationStream.subscribe(
       (app: ApplicationBean) => {
         // With full text search, active application can be undefined
         // Just check if app is undefined
@@ -92,14 +86,14 @@ export class AppdetailComponent implements OnInit {
         this._badgeRatingShields = [];
         app.badgeRatings.forEach((bdgRating) => {
           this._badgeRatingShields.push(<BadgeShieldsIOBean>{
-            id: bdgRating.badgeslug,
-            value: bdgRating.value,
-            title: bdgRating.badgetitle,
-            comment: bdgRating.comment,
-            label: bdgRating.level.label,
-            color: bdgRating.level.color,
-            description: bdgRating.level.description,
-          }
+              id: bdgRating.badgeslug,
+              value: bdgRating.value,
+              title: bdgRating.badgetitle,
+              comment: bdgRating.comment,
+              label: bdgRating.level.label,
+              color: bdgRating.level.color,
+              description: bdgRating.level.description,
+            }
           );
         });
       },
@@ -113,6 +107,9 @@ export class AppdetailComponent implements OnInit {
 
   getKeys(myMap: Map<string, string>): Array<Object> {
     const res: Array<Object> = [];
+    if (!myMap) {
+      return res;
+    }
     for (const key of Object.keys(myMap).sort()) {
       res.push({
         'label': key,
@@ -132,5 +129,7 @@ export class AppdetailComponent implements OnInit {
 
   selectDeployment(deployment: DeploymentBean): void {
     this._selectedDeployment = deployment;
+    this.graph.graph = deployment._graph;
+    this.graph.update();
   }
 }

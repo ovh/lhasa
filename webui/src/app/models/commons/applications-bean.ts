@@ -1,6 +1,7 @@
 import { EntityBean, PageMetaData, HrefLinks, AbstractPaginatedResource } from './entity-bean';
 import { Timestamp } from 'rxjs';
 import { BadgeLevelBean } from './badges-bean';
+import { GraphBean, GraphVis } from '../graph/graph-bean';
 
 
 // Application
@@ -42,6 +43,7 @@ export class DeploymentBean extends EntityBean {
   id: string;
   properties: DeploymentPropertiesBean = new DeploymentPropertiesBean();
   undeployedAt: Date;
+  _graph: GraphVis;
 }
 
 // DeploymentPropertiesBean

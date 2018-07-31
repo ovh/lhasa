@@ -1,6 +1,6 @@
-import {catchError} from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 
 import { DefaultResource, DefaultGraphResource } from '../interfaces/default-resources.interface';
 import { ConfigurationService } from '../services/configuration.service';
@@ -40,9 +40,16 @@ export class DataGraphResource<T> implements DefaultGraphResource<T> {
    */
   public Get = (params: any): Observable<any> => {
     this.headers.set('AuthToken', this.configuration.getAuthToken());
-    return this.http.get(this.actionUrl , {headers: this.headers}).pipe(
+    return this.http.get(this.actionUrl, {headers: this.headers}).pipe(
       catchError(this.handleError));
-  }
+  };
+
+  public GetDeployment = (id: string): Observable<any> => {
+    this.headers.set('AuthToken', this.configuration.getAuthToken());
+    return this.http.get(`${this.actionUrl}/${id}`, {headers: this.headers}).pipe(
+      catchError(this.handleError)
+    );
+  };
 
   /**
    * error handler

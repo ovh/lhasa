@@ -1,15 +1,8 @@
 import { GraphsStoreService } from './../../stores/graphs-store.service';
-import { DataGraphService } from './../../services/data-graph.service';
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { ApplicationsStoreService, LoadApplicationsAction, SelectApplicationAction } from '../../stores/applications-store.service';
-import { Store } from '@ngrx/store';
-import { ApplicationBean, DeploymentBean, DomainBean } from '../../models/commons/applications-bean';
-import { DataApplicationService } from '../../services/data-application-version.service';
-import { ContentListResponse } from '../../models/commons/entity-bean';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { find } from 'lodash';
 
-import { GraphBean, NodeBean, GraphVis } from '../../models/graph/graph-bean';
-import { DataDeploymentService } from '../../services/data-deployment.service';
+import { GraphBean, GraphVis, NodeBean } from '../../models/graph/graph-bean';
 import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
 import { GraphComponent } from '../../widget/graph/graph.component';
 import { Observable } from 'rxjs';
@@ -58,29 +51,29 @@ export class GraphBrowseComponent implements OnInit, AfterViewInit {
       (graph: GraphBean) => {
         this.deployments = graph;
         if (graph.nodes && graph.edges) {
-        // Compute data
-        this.deploymentsVis.nodes = [];
-        graph.nodes.forEach(node => {
-          this.deploymentsVis.nodes.push({
-            id: node.id,
-            label: node.name,
-            group: node.properties.environment.slug, 
-            environment: node.properties.environment.slug,
-            domain: node.properties.application.domain,
-            application: node.properties.application.name,
+          // Compute data
+          this.deploymentsVis.nodes = [];
+          graph.nodes.forEach(node => {
+            this.deploymentsVis.nodes.push({
+              id: node.id,
+              label: node.name,
+              group: node.properties.environment.slug,
+              environment: node.properties.environment.slug,
+              domain: node.properties.application.domain,
+              application: node.properties.application.name,
+            });
           });
-        });
-        // Compute data
-        this.deploymentsVis.edges = [];
-        graph.edges.forEach(edge => {
-          this.deploymentsVis.edges.push({
-            id: edge.id,
-            from: edge.from,
-            to: edge.to,
-            label: edge.type
+          // Compute data
+          this.deploymentsVis.edges = [];
+          graph.edges.forEach(edge => {
+            this.deploymentsVis.edges.push({
+              id: edge.id,
+              from: edge.from,
+              to: edge.to,
+              label: edge.type
+            });
           });
-        });
-      }
+        }
         // Compute data
         this.deploymentsVisOptions = this.deployments.options;
       },

@@ -1,6 +1,6 @@
 <p-messages [(value)]="msgs"></p-messages>
 <div #graphvis></div>
-<button (click)="configure()" >configure</button>
+<button (click)="configure()" *ngIf="_configurable" >configure</button>
 <p-dialog header="Configure" [(visible)]="display">
     <div #graphvisconfig></div>
 </p-dialog>
