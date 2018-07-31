@@ -41,6 +41,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/evanphx/json-patch"
+  packages = ["."]
+  revision = "afac545df32f2287a079e2dfb7ba2745a643747e"
+  version = "v3.0.0"
+
+[[projects]]
   name = "github.com/fabienm/go-logrus-formatters"
   packages = ["."]
   revision = "54b28d1fe0b946dea49c5244cf3f3b82d5ac8989"
@@ -480,6 +486,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5c1b53c24aa2f2656c9b452b5a123b437af078e2d172d086729d8b9fe21a12e1"
+  inputs-digest = "0042f28771f44f6fa1205ca1ff870d1bc49a710c221f869d14dde62bb6636d49"
   solver-name = "gps-cdcl"
   solver-version = 1

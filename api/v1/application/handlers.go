@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/evanphx/json-patch"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/juju/errors"
 	"github.com/loopfz/gadgeto/tonic"
 	"github.com/ovh/lhasa/api/handlers"
 	"github.com/ovh/lhasa/api/hateoas"
@@ -51,6 +53,47 @@ func HandlerCreate(repository *Repository, updater LatestUpdater) gin.HandlerFun
 		return application, nil
 
 	}, http.StatusOK)
+}
+
+// HandlerPatch patch release properties
+func HandlerPatch(repository *Repository) gin.HandlerFunc {
+	return tonic.Handler(func(c *gin.Context, request *v1.Release) error {
+		contentType := "application/merge-patch+json"
+		if c.ContentType() != contentType {
+			return errors.NotSupportedf("only application/merge-patch+json is supported, content-type %s", c.ContentType(), contentType)
+		}
+		entity, err := repository.FindOneBy(map[string]interface{}{"domain": request.Domain, "name": request.Name, "version": request.Version})
+		if err != nil {
+			return err
+		}
+		release, ok := entity.(*v1.Release)
+		if !ok {
+			return errors.New("invalid type")
+		}
+
+		if request.Properties == nil {
+			return nil
+		}
+
+		document, err := release.Properties.MarshalJSON()
+		if err != nil {
+			return err
+		}
+
+		patch, err := json.Marshal(request.Properties)
+		if err != nil {
+			return err
+		}
+
+		properties, err := jsonpatch.MergePatch(document, patch)
+		if err != nil {
+			return err
+		}
+
+		release.Properties.UnmarshalJSON(properties)
+
+		return repository.Save(release)
+	}, http.StatusNoContent)
 }
 
 func retrieveBadgeRatings(appv *v1.Release) (map[string]v1.BadgeRating, error) {

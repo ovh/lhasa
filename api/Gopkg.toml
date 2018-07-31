@@ -64,3 +64,7 @@ required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
 [[constraint]]
   name = "github.com/gobwas/glob"
   version = "0.2.3"
+
+[[constraint]]
+  name = "github.com/evanphx/json-patch"
+  version = "3.0.0"
