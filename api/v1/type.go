@@ -29,6 +29,8 @@ const ContentBasePath = "/content"
 // BadgeBasePath is the URL base path for this resource
 const BadgeBasePath = "/badges"
 
+const FreeSearch = "freesearch"
+
 // Content define a content resource
 type Content struct {
 	ID          uint       `json:"-" binding:"-" gorm:"auto increment"`

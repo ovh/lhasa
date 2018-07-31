@@ -97,32 +97,7 @@ func getWhereClause(criteria map[string]interface{}) string {
 		if value == "" {
 			continue
 		}
-		// TODO SQL injection
-		if key == "freesearch" {
-			whereClause = whereClause + fmt.Sprintf(
-				`AND ( "av".name ILIKE '%%%s%%'
-					OR "av".domain ILIKE '%%%s%%'
-					OR "av".version ILIKE '%%%s%%'
-					OR cast("av".properties as TEXT) ILIKE '%%%s%%'
-					OR cast("av".manifest as TEXT) ILIKE '%%%s%%'
-					OR cast("av".tags as TEXT) ILIKE '%%%s%%'
-				) `, value, value, value, value, value, value)
-		} else if strings.Contains(key, ".") {
-			keyParts := strings.Split(key, ".")
-			for i, p := range keyParts {
-				if i == 0 {
-					whereClause += fmt.Sprintf("AND \"av\".%q::json", p)
-				} else if i == len(keyParts)-1 {
-					whereClause += fmt.Sprintf("->>'%s'", p)
-				} else {
-					whereClause += fmt.Sprintf("->'%s'", p)
-				}
-			}
-			whereClause += fmt.Sprintf("= '%s'", value)
-
-		} else {
-			whereClause += fmt.Sprintf("AND \"av\".%q = '%s' ", key, value)
-		}
+		whereClause += getWhereClauseChunk(key, value.(string))
 	}
 	return whereClause
 }
@@ -134,6 +109,36 @@ func (repo *RepositoryLatest) getIndexedField(field string, application *v1.Rele
 		return application.Domain, nil
 	}
 	return "", hateoas.NewUnsupportedIndexError(field, "domain")
+}
+
+func getWhereClauseChunk(field string, value string) string {
+	// TODO FIX SQL injection issue
+	if field == v1.FreeSearch {
+		return fmt.Sprintf(
+			`AND ( "av".name ILIKE '%%%s%%'
+				OR "av".domain ILIKE '%%%s%%'
+				OR "av".version ILIKE '%%%s%%'
+				OR cast("av".properties as TEXT) ILIKE '%%%s%%'
+				OR cast("av".manifest as TEXT) ILIKE '%%%s%%'
+				OR cast("av".tags as TEXT) ILIKE '%%%s%%'
+			) `, value, value, value, value, value, value)
+	}
+	if !strings.Contains(field, ".") {
+		return fmt.Sprintf("AND \"av\".%q = '%s' ", field, value)
+	}
+	fieldParts := strings.Split(field, ".")
+	clause := ""
+	for i, p := range fieldParts {
+		switch i {
+		case 0:
+			clause = fmt.Sprintf("AND \"av\".%q::json", p)
+		case len(fieldParts) - 1:
+			clause += fmt.Sprintf("->>'%s'", p)
+		default:
+			clause += fmt.Sprintf("->'%s'", p)
+		}
+	}
+	return clause + fmt.Sprintf("= '%s'", value)
 }
 
 // Save persists an application to the database
