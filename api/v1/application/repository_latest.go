@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/ovh/lhasa/api/hateoas"
@@ -97,7 +98,7 @@ func getWhereClause(criteria map[string]interface{}) string {
 			continue
 		}
 		// TODO SQL injection
-		if key == "search" {
+		if key == "freesearch" {
 			whereClause = whereClause + fmt.Sprintf(
 				`AND ( "av".name ILIKE '%%%s%%'
 					OR "av".domain ILIKE '%%%s%%'
@@ -106,8 +107,21 @@ func getWhereClause(criteria map[string]interface{}) string {
 					OR cast("av".manifest as TEXT) ILIKE '%%%s%%'
 					OR cast("av".tags as TEXT) ILIKE '%%%s%%'
 				) `, value, value, value, value, value, value)
+		} else if strings.Contains(key, ".") {
+			keyParts := strings.Split(key, ".")
+			for i, p := range keyParts {
+				if i == 0 {
+					whereClause += fmt.Sprintf("AND \"av\".%q::json", p)
+				} else if i == len(keyParts)-1 {
+					whereClause += fmt.Sprintf("->>'%s'", p)
+				} else {
+					whereClause += fmt.Sprintf("->'%s'", p)
+				}
+			}
+			whereClause += fmt.Sprintf("= '%s'", value)
+
 		} else {
-			whereClause = whereClause + fmt.Sprintf("AND \"av\".%q = '%s' ", key, value)
+			whereClause += fmt.Sprintf("AND \"av\".%q = '%s' ", key, value)
 		}
 	}
 	return whereClause

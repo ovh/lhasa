@@ -234,7 +234,7 @@ testcases:
       - result.statuscode ShouldEqual 200
     - type: http
       method: GET
-      url: "{{.depsroute}}/?q=%7B%22properties.arsenal_id%22%3A%20%22app1-token,app2-token%22,%20%22_createdAt%20%3E%20%3F%22%3A%20%222016-04-17T12%3A54%3A04.601578Z%22%7D"
+      url: "{{.depsroute}}"
       headers:
       assertions:
       - result.bodyjson.content.content0 ShouldNotBeEmpty

@@ -1,6 +1,6 @@
 <app-oui-pagination #paginationtop [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
 <div class="oui-input-group oui-input-group_m filter">
-  <input (keyup)="onFilterKeyPressed($event)" class="oui-input" placeholder="🔍" [(ngModel)]="searchString">
+  <input (keyup)="keyUp.next($event)" class="oui-input" placeholder="🔍" [(ngModel)]="searchString">
 </div>
 <h1 class="oui-header_1 oui-header_underline header">{{ 'APPLICATIONS' | translate }} <span class="count">({{metadata.totalElements}})</span><app-help-widget key="help-what-is-an-app"></app-help-widget></h1>
 <app-oui-message #message *ngIf="domain.length > 0" (select)="onMessageEvent($event)" message="{{ 'FILERED_BY_DOMAIN' | translate:param }}"></app-oui-message>

@@ -18,10 +18,11 @@ import { UIChart } from 'primeng/primeng';
 import { Observable } from 'rxjs';
 
 export class BadgeUIBean {
+  slug: string;
   title: string;
   type: string;
   levels: BadgeShieldsIOBean[];
-  piechartData: PieChartDataBean
+  piechartData: PieChartDataBean;
 }
 
 export class PieChartDataBean {
@@ -30,8 +31,10 @@ export class PieChartDataBean {
 }
 
 export class PieChartDatasetBean {
+  label: string;
   data: number[] = [];
   backgroundColor: string[] = [];
+  levelID: string[] = [];
 }
 
 @Component({
@@ -75,10 +78,22 @@ export class BadgesComponent implements OnInit {
       });
 
     this.PieChartOptions = {
+      cutoutPercentage: 50,
       legend: {
         display: false
+      },
+      animation: {
+        animateScale: true,
       }
+
     };
+  }
+
+  onPieChartClick(event) {
+    const dataset = event.dataset[event.element._index]._chart.data.datasets[0];
+    const params = {};
+    params[`badge_ratings.${dataset.label}.value`] = dataset.levelID[event.element._index];
+    this.router.navigate(['/applications'],  { queryParams: params} );
   }
 
   ngOnInit() {
@@ -89,36 +104,39 @@ export class BadgesComponent implements OnInit {
 
     this.badgesStream.subscribe(
       (elem: BadgePagesBean) => {
-        this.badges = []
+        this.badges = [];
         elem.badges.forEach((bdg) => {
-          var levels: BadgeShieldsIOBean[] = []
-          var piechartData = new(PieChartDataBean)
-          piechartData.datasets.push(new(PieChartDatasetBean))
+          const levels: BadgeShieldsIOBean[] = [];
+          const piechartData = new (PieChartDataBean);
+          piechartData.datasets.push(new (PieChartDatasetBean));
+          piechartData.datasets[0].label = bdg.slug;
           bdg.levels.forEach((lvl) => {
             levels.push(<BadgeShieldsIOBean>{
               id: lvl.id,
               title: bdg.title,
               label: lvl.label,
               color: lvl.color,
-              comment: "-",
+              comment: '-',
               description: lvl.description,
               value: lvl.id,
-            })
-            piechartData.labels.push(lvl.label);
-            var val = bdg._stats[lvl.id];
+            });
+            piechartData.labels.push(`${lvl.label} (${lvl.id})`);
+            let val = bdg._stats[lvl.id];
             if (val === undefined) {
               val = 0;
             }
-            piechartData.datasets[0].data.push( val);
+            piechartData.datasets[0].data.push(val);
             piechartData.datasets[0].backgroundColor.push(lvl.color);
-          })
+            piechartData.datasets[0].levelID.push(lvl.id);
+          });
           this.badges.push(<BadgeUIBean>{
+            slug: bdg.slug,
             title: bdg.title,
             type: bdg.type,
             levels: levels,
             piechartData: piechartData,
           });
-        })
+        });
 
         this.metadata = {
           totalElements: elem.metadata.totalElements,

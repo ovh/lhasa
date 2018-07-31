@@ -67,7 +67,7 @@ export class AppEditComponent implements OnInit {
           this.application.repo = url[6].split(/\./)[0];
         }
         // Add support info
-        if (this.application.manifest.support == undefined ){
+        if (this.application.manifest.support === undefined ) {
           this.application.manifest.support = {
             name: '',
             email: '',
@@ -101,11 +101,9 @@ export class AppEditComponent implements OnInit {
    * add
    */
   protected add(author: PersonBean) {
-    if (this.application.manifest.authors == null){
-      this.application.manifest.authors = []  
+    if (this.application.manifest.authors == null) {
+      this.application.manifest.authors = [];
     }
-    
-    
     this.application.manifest.authors.push({
         email: null,
         name: undefined,
@@ -123,17 +121,16 @@ export class AppEditComponent implements OnInit {
     this.application.manifest.profile = this.application.domain;
     this.application.manifest.name = this.application.name;
     // load all applications from a content return
-    this.applicationsService.Update(`${this.application.domain}/${this.application.name}/versions/${this.application.version}`, 
+    this.applicationsService.Update(`${this.application.domain}/${this.application.name}/versions/${this.application.version}`,
     this.application).subscribe(
       (data: any) => {
         this.snackBar.open('Application Saved', 'Ok', {
           duration: 2000,
         });
         // redirect route qui va rafraichir le store
-        this.router.navigateByUrl(`/applications/${this.application.domain}/${this.application.name}/${this.application.version}`)
+        this.router.navigateByUrl(`/applications/${this.application.domain}/${this.application.name}/${this.application.version}`);
       },
       (data: any) => {
-        console.warn(data);
         this.snackBar.open(JSON.stringify(data, null, 2), 'Error', {
           duration: 10000,
         });
