@@ -47,6 +47,8 @@ func registerRoutes(group *fizz.RouterGroup,
 		fizz.ID("GraphAllActives"),
 		fizz.Summary("Find a page of node and all associated edge"),
 	}, graphapi.HandlerFindAllActive(graphRepo))
+	graphRoutes.GET("/:public_id", []fizz.OperationOption{fizz.Summary("Graph nodes for a single deployment")},
+		graph.HandlerGraph(graphRepo, depRepo))
 
 	domRoutes := group.Group("/domains", "domains", "Domains resource management")
 	domRoutes.GET("/", getOperationOptions("FindByPage", domRepo,
@@ -191,8 +193,6 @@ Only the field "properties" can ben patched, all other fields are immutable.`),
 	depRoutes.POST("/:public_id/add_link/:target_public_id", getOperationOptions("AddLink", depRepo,
 		fizz.Summary("Create a dependency link between two deployments"),
 	), handlers.HasOne(security.RoleAdmin), deployment.HandlerDepend(depRepo, depend))
-	depRoutes.GET("/:public_id/graph", []fizz.OperationOption{fizz.Summary("Find one Deployment")},
-		graph.HandlerGraph(graphRepo, depRepo))
 
 	badgeRoutes := group.Group("/badges", "badges", "Badges resource management")
 	badgeRoutes.GET("/", getOperationOptions("FindByPage", badgeRepo,

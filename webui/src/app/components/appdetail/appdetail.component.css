@@ -34,7 +34,6 @@ input[type="radio"]:checked+label {
   border-radius: 0 0.5em 0.5em 0;
 }
 
-
 .deploymentmenu .oui-icon-chevron-right {
   float: right;
 }
