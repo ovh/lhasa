@@ -22,7 +22,12 @@ func ApplicationDeployer(tm db.TransactionManager, depFactory RepositoryFactory)
 		err := tm.Transaction(func(db *gorm.DB) error {
 			depRepo := depFactory(db)
 			j, err := getProperties(dep, app.Domain, app.Name, app.Version, env.Slug)
-			dep.Properties.UnmarshalJSON(j)
+			if err != nil {
+				return err
+			}
+			if err := dep.Properties.UnmarshalJSON(j); err != nil {
+				return err
+			}
 			dep.EnvironmentID = env.ID
 			dep.ApplicationID = app.ID
 
