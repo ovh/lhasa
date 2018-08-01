@@ -29,6 +29,7 @@ const ContentBasePath = "/content"
 // BadgeBasePath is the URL base path for this resource
 const BadgeBasePath = "/badges"
 
+// FreeSearch is a keyword for the free text mode search mode for applications
 const FreeSearch = "freesearch"
 
 // Content define a content resource
