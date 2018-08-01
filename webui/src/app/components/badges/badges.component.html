@@ -1,8 +1,8 @@
 <app-oui-pagination #paginationtop [metadata]="metadata" (select)="onSelect($event)"></app-oui-pagination>
 <h1 class="oui-header_1 oui-header_underline header">{{ 'BADGES' | translate }}</h1>
 <div class="ui-g-4 ui-md-4 pad-tile" *ngFor="let badge of badges">
-  <p-card title="{{badge.title}}" subtitle="type: {{badge.type}}">
-    <p-chart type="pie" [data]="badge.piechartData" [options]="PieChartOptions"></p-chart>
+  <p-card title="{{ badge.title }}" subtitle="type: {{badge.type}}">
+    <p-chart id="{{ badge.slug }}" type="pie" [data]="badge.piechartData" [options]="PieChartOptions" (onDataSelect)="onPieChartClick($event)" width="150" height="150"></p-chart>
     <dl *ngFor="let level of badge.levels">
       <dt>{{level.id}}</dt>
       <dd>

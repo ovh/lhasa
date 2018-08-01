@@ -9,6 +9,8 @@ import { DataDeploymentService } from '../services/data-deployment.service';
 import { DataDomainService } from '../services/data-domain.service';
 import { LoadersStoreService } from '../stores/loader-store.service';
 import { ErrorsStoreService, ErrorBean, NewErrorAction } from '../stores/errors-store.service';
+import { Params } from '@angular/router/src/shared';
+import { HttpParams } from '@angular/common/http/src/params';
 
 @Injectable()
 export class ApplicationsResolver implements Resolve<ApplicationPagesBean> {
@@ -25,37 +27,22 @@ export class ApplicationsResolver implements Resolve<ApplicationPagesBean> {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<any> | Promise<any> | any {
-        let domain = '', search = '';
-        // If any domain on url use it
-        if (route.queryParams.domain) {
-            domain = '/' + route.queryParams.domain;
-        }
-        if (route.queryParams.search) {
-            search = route.queryParams.search;
-        }
-        // Select application
-        return this.selectApplications({
-            number: route.queryParams.page || 0,
-            size: 100
-        }, domain, search, new BehaviorSubject<any>('select all applications'));
+        return this.selectApplications( route.queryParams, new BehaviorSubject<any>('select all applications'));
     }
 
     /**
      * dispatch load domains
      * @param event
      */
-    public selectApplications(metadata: PageMetaData, domain: string, searchString: string, subject: Subject<any>): Subject<any> {
+    public selectApplications(params: Params, subject: Subject<any>): Subject<any> {
         this.loadersStoreService.notify(subject);
-        // load all domains
-        const meta: {
-            [key: string]: any | any[];
-        } = {
-                q: `{"search":"${searchString}"}`,
-                sort: 'domain',
-                size: metadata.size,
-                page: metadata.number
-            };
-        this.applicationsService.GetAllFromContent(domain, meta).subscribe(
+        const paramsClone = Object.assign({}, params);
+        paramsClone.sort = 'domain';
+        if (paramsClone.size === undefined) {
+            paramsClone.size = 100;
+        }
+        paramsClone.sort = 'domain';
+        this.applicationsService.GetAllFromContent('', paramsClone).subscribe(
             (data: ContentListResponse<ApplicationBean>) => {
                 this.applicationsStoreService.dispatch(
                     new LoadApplicationsAction({

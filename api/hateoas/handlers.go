@@ -1,9 +1,7 @@
 package hateoas
 
 import (
-	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/juju/errors"
@@ -32,10 +30,19 @@ func HandlerIndex(links ...ResourceLink) gin.HandlerFunc {
 func HandlerFindByPage(repository PageableRepository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context) (*PagedResources, error) {
 		pageable := Pageable{}
-		c.ShouldBindQuery(&pageable)
+		criteria := map[string]interface{}{}
+		if err := c.ShouldBindQuery(&pageable); err != nil {
+			return nil, err
+		}
 
-		// params and query are user to filter resultset
-		results, err := repository.FindPageBy(pageable, parsePathParamsAndQuery(c))
+		for k, v := range c.Request.URL.Query() {
+			criteria[k] = v[0]
+		}
+		delete(criteria, "page")
+		delete(criteria, "sort")
+		delete(criteria, "size")
+		delete(criteria, "indexedBy")
+		results, err := repository.FindPageBy(pageable, criteria)
 		if err != nil {
 			return nil, err
 		}
@@ -135,39 +142,6 @@ func parsePathParams(c *gin.Context) map[string]interface{} {
 	criteria := map[string]interface{}{}
 	for _, p := range c.Params {
 		criteria[p.Key] = p.Value
-	}
-	return criteria
-}
-
-// parse param and query of request
-func parsePathParamsAndQuery(c *gin.Context) map[string]interface{} {
-	criteria := parsePathParams(c)
-	pageable := Pageable{}
-	c.ShouldBindQuery(&pageable)
-
-	// scan for optionnal query
-	var q = map[string]interface{}{}
-	if len(pageable.Query) > 0 {
-		json.Unmarshal([]byte(pageable.Query), &q)
-	}
-
-	// Scan it
-	for k, v := range q {
-		if len(k) > 0 {
-			// only support simple fields, no check on jsonb expression
-			if !strings.Contains(k, ".") {
-				// Only support taking first occurrence
-				str, check := v.(string)
-				if !check {
-					value, _ := json.Marshal(v)
-					str = string(value)
-				}
-				criteria[unCamelCase(k)] = str
-			} else {
-				// Only support taking first occurrence
-				criteria[k] = v.(string)
-			}
-		}
 	}
 	return criteria
 }

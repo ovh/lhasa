@@ -13,7 +13,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { OuiMessageComponent } from '../../kit/oui-message/oui-message.component';
 import { OuiPaginationComponent } from '../../kit/oui-pagination/oui-pagination.component';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { Event } from '@angular/router/src/events';
 
 @Component({
   selector: 'app-applications',
@@ -41,6 +42,7 @@ export class ApplicationsComponent implements OnInit {
   public domain = '';
   public param = { target: '' };
   public searchString = '';
+  public keyUp = new Subject<Event>();
 
   protected orderedDomains = new Map<string, ApplicationBean[]>();
   public domains: DomainBean[] = [];
@@ -52,6 +54,17 @@ export class ApplicationsComponent implements OnInit {
     private applicationsResolver: ApplicationsResolver,
     private route: ActivatedRoute
   ) {
+
+    const subscription = this.keyUp
+      .map(event => event['target'].value)
+      .debounceTime(1000)
+      .distinctUntilChanged()
+      .flatMap(search => Observable.of(search).delay(500))
+      .subscribe((searchString: string) => {
+        this.searchString = searchString;
+        this.refreshApplications();
+      });
+
     /**
      * subscribe
      */
@@ -61,25 +74,21 @@ export class ApplicationsComponent implements OnInit {
     this.route
       .queryParams
       .subscribe(params => {
-        let changeDomain = false;
-        // Defaults to 0 if no query param provided.
-        this.page = +params['page'] || 0;
-        this.searchString = params['search'] || '';
-        // verify if filter by domain
-        if (!params['domain'] && this.domain !== '') {
-          changeDomain = true;
+        if (this.searchString !== '') {
+          return;
         }
-        if (params['domain']) {
-          this.domain = '/' + params['domain'];
-          this.param.target = params['domain'];
-        } else {
-          this.domain = '';
-          this.param.target = null;
+        for (const k of Object.keys(params)) {
+          if (k === 'page') {
+            this.page = +params[k];
+            continue;
+          }
+          if (k === 'freesearch') {
+            this.searchString += `${params[k]} `;
+            continue;
+          }
+          this.searchString += `${k}:${params[k]} `;
         }
-        // reload data
-        if (changeDomain) {
-          this.refreshApplications();
-        }
+        this.searchString.trim();
       });
   }
 
@@ -89,7 +98,7 @@ export class ApplicationsComponent implements OnInit {
       (element: ApplicationPagesBean) => {
         this.applications = element.applications;
         this.applications.forEach((app) => {
-          app.description = 'No description provided. Please fill the `description` field of the manifest.';
+          app.description = 'No description.';
           if (app.manifest && app.manifest.description) {
             app.description = (app.manifest.description.length > 200) ?
               (app.manifest.description.substr(0, 200) + '...') : (app.manifest.description);
@@ -138,21 +147,9 @@ export class ApplicationsComponent implements OnInit {
       number: event.data.page
     };
     // Change page
-    this.navigate(metadata, event.data.page);
-  }
-
-  /**
-   * change navigation
-   */
-  public navigate(metadata: PageMetaData, page: number) {
-    // navigate if needed
-    if (page !== this.page) {
-      // Refresh query params
-      this.router.navigate([], { queryParams: { page: page } });
-      this.applicationsResolver.selectApplications(metadata,
-        this.domain, this.searchString,
-        new BehaviorSubject<any>('select another page on domains'));
-      this.page = page;
+    if (this.page !== event.data.page) {
+      this.page = event.data.page;
+      this.refreshApplications();
     }
   }
 
@@ -171,15 +168,18 @@ export class ApplicationsComponent implements OnInit {
    */
   public refreshApplications() {
     // Reset nav
-    this.router.navigate([], { queryParams: { page: 0, search: this.searchString } });
-    return this.applicationsResolver.selectApplications({
-      number: 0,
-      size: 100
-    }, '', this.searchString, new BehaviorSubject<any>('refresh all applications'));
-  }
-
-  public onFilterKeyPressed(event: any) {
-    this.searchString = event.target.value;
-    this.refreshApplications();
+    const params = {};
+    this.searchString.split(' ').forEach((part: string) => {
+      if (part === '') { return; }
+      const blocks = part.split(':');
+      if (blocks.length === 2 && blocks[0] !== '' && blocks[1] !== '') {
+        params[blocks[0]] = blocks[1];
+        return;
+      }
+      params['freesearch'] = part;
+    });
+    params['page'] = this.page;
+    this.router.navigate([], { queryParams: params});
+    return this.applicationsResolver.selectApplications(params, new BehaviorSubject<any>('refresh all applications'));
   }
 }

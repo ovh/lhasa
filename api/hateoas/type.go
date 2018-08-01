@@ -67,7 +67,6 @@ type Pageable struct {
 	Page      int    `json:"page" form:"page"`
 	Size      int    `json:"size" form:"size"`
 	Sort      string `json:"sort" form:"sort"`
-	Query     string `json:"q" form:"q"`
 	IndexedBy string `json:"indexedBy" form:"indexedBy" default:""`
 }
 
