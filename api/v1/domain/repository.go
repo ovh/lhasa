@@ -52,11 +52,15 @@ func (repo *Repository) FindPageBy(pageable hateoas.Pageable, criteria map[strin
 	if err != nil {
 		return page, err
 	}
-	defer rows.Close()
-	rows.Next()
-	rows.Scan(&count)
-	page.TotalElements = count
-
+	defer func() {
+		_ = rows.Close()
+	}()
+	if rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return page, err
+		}
+		page.TotalElements = count
+	}
 	return page, nil
 }
 

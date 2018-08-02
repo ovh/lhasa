@@ -16,7 +16,9 @@ func Dependency(depRepo *Repository) Depend {
 		dependencies := make([]v1.DeploymentDependency, 0)
 		// Check current value
 		if src.Dependencies.RawMessage != nil {
-			json.Unmarshal(src.Dependencies.RawMessage, &dependencies)
+			if err := json.Unmarshal(src.Dependencies.RawMessage, &dependencies); err != nil {
+				return err
+			}
 		}
 		// Check if link already exist
 		var alreadyStored = false
@@ -31,10 +33,10 @@ func Dependency(depRepo *Repository) Depend {
 			return nil
 		}
 		dependencies = append(dependencies, v1.DeploymentDependency{TargetID: target.PublicID, Type: dependencyType})
-		var marshalErr error
-		src.Dependencies.RawMessage, marshalErr = json.Marshal(dependencies)
-		if marshalErr != nil {
-			return &(hateoas.InternalError{Message: marshalErr.Error(), Detail: src.PublicID})
+		var err error
+		src.Dependencies.RawMessage, err = json.Marshal(dependencies)
+		if err != nil {
+			return &(hateoas.InternalError{Message: err.Error(), Detail: src.PublicID})
 		}
 		return depRepo.Save(src)
 	}

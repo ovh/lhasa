@@ -1,4 +1,4 @@
-required = ["github.com/ovh/venom", "github.com/golang/lint/golint"]
+required = ["github.com/ovh/venom", "gopkg.in/alecthomas/gometalinter.v2"]
 
 [[constraint]]
   name = "github.com/gin-gonic/gin"

@@ -1,0 +1,29 @@
+{
+  "Enable": [
+    "vet",
+    "gotype",
+    "gotypex",
+    "deadcode",
+    "gocyclo",
+    "golint",
+    "varcheck",
+    "structcheck",
+    "maligned",
+    "errcheck",
+    "megacheck",
+    "ineffassign",
+    "interfacer",
+    "unconvert",
+    "goconst",
+    "gofmt",
+    "goimports",
+    "misspell"
+  ],
+  "Exclude": [
+    ".+-packr.go",
+    ".*_test.go"
+  ],
+  "Vendor": true,
+  "Test": true,
+  "Deadline": "5m"
+}

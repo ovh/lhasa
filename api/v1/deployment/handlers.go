@@ -22,7 +22,7 @@ type deploymentCreateRequest struct {
 }
 
 // HandlerDeploy deploy this application version to the given environment and removes old deployments
-func HandlerDeploy(appRepo *application.Repository, envRepo *environment.Repository, deployer Deployer) gin.HandlerFunc {
+func HandlerDeploy(appRepo application.FindOneByUniqueKey, envRepo *environment.Repository, deployer Deployer) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (*v1.Deployment, error) {
 		dep := request.Deployment
 		app, err := appRepo.FindOneByDomainNameVersion(request.Domain, request.Name, request.Version)
@@ -76,7 +76,7 @@ func HandlerDepend(depRepo *Repository, depend Depend) gin.HandlerFunc {
 }
 
 // HandlerFindDeployment finds deployment for a given application and environment
-func HandlerFindDeployment(appRepo *application.Repository, envRepo *environment.Repository, depRepo *Repository) gin.HandlerFunc {
+func HandlerFindDeployment(appRepo application.FindOneByUniqueKey, envRepo *environment.Repository, depRepo *Repository) gin.HandlerFunc {
 	return tonic.Handler(func(c *gin.Context, request *deploymentCreateRequest) (*v1.Deployment, error) {
 		app, err := appRepo.FindOneByDomainNameVersion(request.Domain, request.Name, request.Version)
 		if err != nil {

@@ -124,12 +124,6 @@
   version = "v0.2.3"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/golang/lint"
-  packages = ["golint"]
-  revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
-
-[[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
@@ -140,6 +134,12 @@
   name = "github.com/google/go-querystring"
   packages = ["query"]
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/google/shlex"
+  packages = ["."]
+  revision = "6f45313302b9c56850fc17f99e40caebce98c716"
 
 [[projects]]
   name = "github.com/imkira/go-interpol"
@@ -258,10 +258,27 @@
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
 
 [[projects]]
+  name = "github.com/nicksnyder/go-i18n"
+  packages = [
+    "i18n",
+    "i18n/bundle",
+    "i18n/language",
+    "i18n/translation"
+  ]
+  revision = "0dc1626d56435e9d605a29875701721c54bc9bbd"
+  version = "v1.10.0"
+
+[[projects]]
   name = "github.com/ovh/venom"
   packages = ["."]
   revision = "48c4509af9fc2638fb527b32101bfb70984b9202"
   version = "v0.16.0"
+
+[[projects]]
+  name = "github.com/pelletier/go-toml"
+  packages = ["."]
+  revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -399,12 +416,6 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/lint"
-  packages = ["."]
-  revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
-
-[[projects]]
-  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "idna",
@@ -443,21 +454,22 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "master"
-  name = "golang.org/x/tools"
-  packages = [
-    "go/ast/astutil",
-    "go/gcexportdata",
-    "go/internal/gcimporter",
-    "go/types/typeutil"
-  ]
-  revision = "a5b4c53f6e8bdcafa95a94671bf2d1203365858b"
+  name = "gopkg.in/alecthomas/gometalinter.v2"
+  packages = ["."]
+  revision = "a0a6cc517e763fe2cfe7618b819ec02fc11651f3"
+  version = "v2.0.6"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
   packages = ["."]
   revision = "947dcec5ba9c011838740e680966fd7087a71d0d"
   version = "v2.2.6"
+
+[[projects]]
+  branch = "v3-unstable"
+  name = "gopkg.in/alecthomas/kingpin.v3-unstable"
+  packages = ["."]
+  revision = "2b154cee082ef5c544fa8ea1750b9eb6581b0040"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v1"
@@ -486,6 +498,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "60f05497ed5bba3757bd77875a3e4a382b26d248a7d3c930effbe32855b894a7"
+  inputs-digest = "61afa71b5c8291086803d6844eacd79220a724b9d7cc5c7d97fde7f91ca2adf0"
   solver-name = "gps-cdcl"
   solver-version = 1

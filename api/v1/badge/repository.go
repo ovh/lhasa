@@ -84,7 +84,9 @@ func (repo *Repository) GatherStats(slug string, defaultLevelID string) (map[str
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	stats := map[string]int{}
 	for rows.Next() {
 		var value string

@@ -241,7 +241,7 @@ func (d *DeploymentGraph) GetEdges() []graphapi.ImplementEdge {
 	dependencies := []graphapi.ImplementEdge{}
 	if d.Dependencies != nil {
 		rawDependencies := []DeploymentDependency{}
-		json.Unmarshal(d.Dependencies, &rawDependencies)
+		_ = json.Unmarshal(d.Dependencies, &rawDependencies)
 		for _, entity := range rawDependencies {
 			uid, err := uuid.NewV4()
 			if err == nil {

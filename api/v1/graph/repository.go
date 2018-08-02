@@ -92,7 +92,9 @@ func (repo *Repository) FindByDeployment(publicID string) (*graphapi.Graph, erro
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	for rows.Next() {
 		entity := &v1.Deployment{}
 		if err := repo.db.ScanRows(rows, entity); err != nil {
