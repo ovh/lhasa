@@ -103,6 +103,7 @@ import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.
 import { DataEnvironmentService } from './services/data-environment.service';
 import { EnvironmentsStoreService } from './stores/environments-store.service';
 import { GraphComponent } from './widget/graph/graph.component';
+import { CytoGraphComponent } from './widget/cytograph/cytograph.component';
 import { BadgeWidgetComponent } from './widget/badgewidget/badgewidget.component';
 import { EnvChipComponent } from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
@@ -148,6 +149,7 @@ export function createTranslateLoader(http: HttpClient) {
     GraphBrowseComponent,
     DomainsBrowseComponent,
     GraphComponent,
+    CytoGraphComponent,
     BadgeWidgetComponent,
     AppEditComponent,
     AppdetailComponent,
