@@ -7,3 +7,4 @@ vault-file.json
 **/test_results.xml
 .cds
 .sherpa.json
+debug

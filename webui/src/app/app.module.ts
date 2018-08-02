@@ -130,6 +130,7 @@ import { HelpsStoreService } from './stores/help-store.service';
 import { ConfigStoreService } from './stores/config-store.service';
 import { ErrorsStoreService } from './stores/errors-store.service';
 import { HelpWidgetComponent } from './widget/help-widget/help-widget.component';
+import { CytoscapeModule } from 'ngx-cytoscape';
 
 export function getBaseUrl() {
   return document.getElementsByTagName('base')[0].href;
@@ -234,6 +235,8 @@ export function createTranslateLoader(http: HttpClient) {
     CarouselModule,
     TableModule,
     BlockUIModule,
+    /* Cytoscape network graph */
+    CytoscapeModule,
     // Local modules
     AppRoutingModule,
     ArchwizardModule,
