@@ -196,7 +196,7 @@ func (a *ApplicationVersionGraph) GetID() string {
 
 // GetName get all dependencies
 func (a *ApplicationVersionGraph) GetName() string {
-	return a.Domain + "/" + a.Name
+	return a.Name
 }
 
 // GetType get entity type
@@ -228,7 +228,7 @@ func (d *DeploymentGraph) GetID() string {
 
 // GetName get all dependencies
 func (d *DeploymentGraph) GetName() string {
-	return d.Application.GetName() + " [" + d.Environment.GetName() + "]"
+	return d.Application.GetName()
 }
 
 // GetType get entity type

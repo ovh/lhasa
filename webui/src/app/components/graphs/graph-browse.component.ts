@@ -1,81 +1,99 @@
-import { GraphsStoreService } from './../../stores/graphs-store.service';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { find } from 'lodash';
-
-import { GraphBean, GraphVis, NodeBean } from '../../models/graph/graph-bean';
-import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
-import { GraphComponent } from '../../widget/graph/graph.component';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { GraphBean, NodeBean, GraphVis } from '../../models/graph/graph-bean';
 import { Observable } from 'rxjs';
+import { AutoUnsubscribe } from '../../shared/decorator/autoUnsubscribe';
+import { GraphsStoreService } from './../../stores/graphs-store.service';
+import { CytoGraphComponent } from '../../widget/cytograph/cytograph.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-graph-browse',
   templateUrl: './graph-browse.component.html',
   styleUrls: [],
 })
+
 @AutoUnsubscribe()
-export class GraphBrowseComponent implements OnInit, AfterViewInit {
+export class GraphBrowseComponent implements OnInit {
 
-  /**
-   * internal streams and store
-   */
-  public display = false;
-  public nodes: NodeBean[] = [];
+  @ViewChild('cytograph') cytograph: CytoGraphComponent;
   protected deploymentStream: Observable<GraphBean>;
-
-  public deployments: GraphBean = {
-    nodes: [],
-    edges: [],
-    options: {}
-  };
-
-  public deploymentsVis: GraphVis = {
-    nodes: [],
-    edges: [],
-  };
-
-  public deploymentsVisOptions: {};
-
-  @ViewChild('deploymentsGraph') deploymentsGraph: GraphComponent;
+  private api: any;
 
   constructor(
-    private graphsStoreService: GraphsStoreService
+    private graphsStoreService: GraphsStoreService,
   ) {
-    /**
-     * subscribe
-     */
     this.deploymentStream = this.graphsStoreService.deployments();
   }
+
+  private _graphData: any = {
+    nodes: [],
+    edges: []
+  };
 
   ngOnInit() {
     this.deploymentStream.subscribe(
       (graph: GraphBean) => {
-        this.deployments = graph;
-        if (graph.nodes && graph.edges) {
-          // Compute data
-          this.deploymentsVis.nodes = [];
-          graph.nodes.forEach(node => {
-            this.deploymentsVis.nodes.push({
-              id: node.id,
-              label: node.name,
-              group: node.properties.environment.slug,
-              environment: node.properties.environment.slug,
-              domain: node.properties.application.domain,
-              application: node.properties.application.name,
-            });
-          });
-          // Compute data
-          this.deploymentsVis.edges = [];
-          graph.edges.forEach(edge => {
-            this.deploymentsVis.edges.push({
-              id: edge.id,
-              from: edge.from,
-              to: edge.to,
-              label: edge.type
-            });
-          });
+        const dejaVuDomains = {};
+        const dejaVuEnvironments = {};
+        const dejaVuNodes = {};
+        if (graph.nodes === undefined || graph.edges === undefined) {
+          return;
         }
-        // Compute data
-        this.deploymentsVisOptions = this.deployments.options;
+        graph.nodes.forEach((node, index) => {
+          if (index > 10000) {
+            return;
+          }
+          dejaVuNodes[node.id] = true;
+          const env = node.properties.environment.slug;
+          const domain = env + '/' + node.properties.application.domain;
+          if (dejaVuEnvironments[env] === undefined) {
+            this._graphData.nodes.push({
+              classes: 'environment',
+              data: {
+                id: env,
+                type: 'environment',
+                color: node.properties.environment.properties.color  || 'gray',
+                name: env,
+              }
+            });
+            dejaVuEnvironments[env] = true;
+          }
+          if (dejaVuDomains[domain] === undefined) {
+            this._graphData.nodes.push({
+              classes: 'domain',
+              data: {
+                id: domain,
+                name: node.properties.application.domain,
+                color: node.properties.environment.properties.color || 'gray',
+                type: 'domain',
+                parent: env,
+              }
+            });
+            dejaVuDomains[domain] = true;
+          }
+          this._graphData.nodes.push({
+            classes: 'application',
+            data: {
+              id: node.id,
+              name: node.name,
+              type: 'application',
+              domain: node.properties.application.domain,
+              parent: domain,
+            }
+          });
+        });
+        graph.edges.forEach(edge => {
+          if (dejaVuNodes[edge.from] === undefined || dejaVuNodes[edge.to] === undefined) {
+            return;
+          }
+          this._graphData.edges.push({
+            data: {
+              source: edge.from,
+              target: edge.to,
+            }
+          });
+        });
+        this.cytograph.load(this._graphData);
       },
       error => {
         console.error(error);
@@ -83,33 +101,5 @@ export class GraphBrowseComponent implements OnInit, AfterViewInit {
       () => {
       }
     );
-  }
-
-  ngAfterViewInit() {
-  }
-
-  /**
-   * event handler
-   */
-  public onEvent(event: any) {
-    if (event.type === 'selectNode') {
-      const nodes = <string[]> event.nodes;
-      this.nodes = [];
-      nodes.forEach(id => {
-        this.nodes.push(find(this.deployments.nodes, (item: NodeBean) => {
-          return item.id === id;
-        }));
-      });
-    }
-    if (event.type === 'doubleClick') {
-      this.display = true;
-    }
-  }
-
-  /**
-   * pretty
-   */
-  public pretty(data: any): string {
-    return JSON.stringify(data, null, 2);
   }
 }

@@ -88,12 +88,7 @@
         </div>
       </div>
       <div *ngIf="_selectedDeployment" class="deploymentpanel ui-g">
-        <div class="ui-g-8">
-          <p-card title="{{ 'NETWORK' | translate }}">
-            <app-graph #deploymentsGraph *ngIf="_selectedDeployment._graph" [graph]="_selectedDeployment._graph" [options]="'options-graph'" [configurable]="false" [height]="400" [cluster]="false" [warn]="false"></app-graph>
-          </p-card>
-        </div>
-        <dl class="intro ui-g-4" *ngIf="_selectedDeployment.properties.links">
+        <dl class="intro ui-g-12" *ngIf="_selectedDeployment.properties.links">
           <dt>{{ 'LINKS' | translate }}</dt>
           <dd>
             <ul class="nobullets intro">
@@ -101,14 +96,21 @@
                 <span class="link_label"> {{ link.label }}</span>
                 <span class="link_url">
                   <a class="oui-link oui-link_icon" href="{{ link.url }}" target="_blank">
-                {{ shortLink(link.url, 80) }}
+                    {{ shortLink(link.url, 80) }}
                     <span class="oui-icon oui-icon-external_link"></span>
-                </a>
+                  </a>
                 </span>
               </li>
             </ul>
           </dd>
         </dl>
+        <div class="ui-g-12">
+          <p-card title="{{ 'NETWORK' | translate }}">
+            <app-graph #deploymentsGraph *ngIf="_selectedDeployment._graph" [graph]="_selectedDeployment._graph" [options]="'options-graph'"
+              [configurable]="false" [height]="400" [cluster]="false" [warn]="false"></app-graph>
+          </p-card>
+        </div>
+
         <div class="ui-g-12">
           <p-card title="{{ 'OPENAPI_SPEC' | translate }}" styleClass="ui-g-12">
             <app-openapi-ui *ngIf="_selectedDeployment.properties && _selectedDeployment.properties.links && _selectedDeployment.properties.links['openapi.spec']"
@@ -116,7 +118,7 @@
             <span class="font-extra-light" *ngIf="!_selectedDeployment.properties || !_selectedDeployment.properties.links || !_selectedDeployment.properties.links['openapi.spec']">{{ 'NO_OPENAPI_API_URL_SPECIFIED' | translate }}</span>
           </p-card>
         </div>
-        <dl class="intro" class="ui-g-12">
+        <dl class="intro ui-g-12">
           <dt>{{ 'INTERNAL_ID' | translate }}</dt>
           <dd>{{ _selectedDeployment.id }}</dd>
           <dt>{{ 'CREATED_AT' | translate }}</dt>

@@ -103,6 +103,7 @@ import { ApplicationSortPipe, DomainSortPipe } from './pipes/pipes-applications.
 import { DataEnvironmentService } from './services/data-environment.service';
 import { EnvironmentsStoreService } from './stores/environments-store.service';
 import { GraphComponent } from './widget/graph/graph.component';
+import { CytoGraphComponent } from './widget/cytograph/cytograph.component';
 import { BadgeWidgetComponent } from './widget/badgewidget/badgewidget.component';
 import { EnvChipComponent } from './components/env-chip/env-chip.component';
 import { ApplicationResolver } from './resolver/resolve-app-detail';
@@ -130,6 +131,7 @@ import { HelpsStoreService } from './stores/help-store.service';
 import { ConfigStoreService } from './stores/config-store.service';
 import { ErrorsStoreService } from './stores/errors-store.service';
 import { HelpWidgetComponent } from './widget/help-widget/help-widget.component';
+import { CytoscapeModule } from 'ngx-cytoscape';
 
 export function getBaseUrl() {
   return document.getElementsByTagName('base')[0].href;
@@ -147,6 +149,7 @@ export function createTranslateLoader(http: HttpClient) {
     GraphBrowseComponent,
     DomainsBrowseComponent,
     GraphComponent,
+    CytoGraphComponent,
     BadgeWidgetComponent,
     AppEditComponent,
     AppdetailComponent,
@@ -234,6 +237,8 @@ export function createTranslateLoader(http: HttpClient) {
     CarouselModule,
     TableModule,
     BlockUIModule,
+    /* Cytoscape network graph */
+    CytoscapeModule,
     // Local modules
     AppRoutingModule,
     ArchwizardModule,
