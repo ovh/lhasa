@@ -105,20 +105,6 @@ export class AppdetailComponent implements OnInit {
     );
   }
 
-  getKeys(myMap: Map<string, string>): Array<Object> {
-    const res: Array<Object> = [];
-    if (!myMap) {
-      return res;
-    }
-    for (const key of Object.keys(myMap).sort()) {
-      res.push({
-        'label': key,
-        'url': myMap[key],
-      });
-    }
-    return res;
-  }
-
   shortLink(str: string, maxLen: number): string {
     str = str.replace('https://', '').replace('http://', '').replace('mailto:', '');
     if (str.length > maxLen) {
