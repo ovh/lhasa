@@ -39,13 +39,8 @@ var (
 	flagQuiet          = application.Flag("quiet", "Enables quiet mode.").Short('q').Envar("APPCATALOG_QUIET_MODE").Bool()
 	flagJSONOutput     = application.Flag("json", "Enables JSON output.").Envar("APPCATALOG_JSON_OUTPUT").Bool()
 	flagConfigFile     = application.Flag("config", "Json configuration file").Default(".config.json").Envar("APPCATALOG_CONFIG_FILE").File()
-	flagDBAlias        = application.Flag("db-alias", "Set alias to use in json configuration").Default("appcatalog-db").Envar("APPCATALOG_DB_ALIAS").String()
 
-	cmdVersion = application.Command(cmdCodeVersion, "Shows version number.")
-
-	cmdMigrate     = application.Command(cmdCodeMigrate, "Only run migrations and return (not for production use).")
-	cmdMigrateUp   = cmdMigrate.Command(cmdCodeMigrateUp, "Runs migrations upward (default).").Default()
-	cmdMigrateDown = cmdMigrate.Command(cmdCodeMigrateDown, "Runs migrations downward.")
+	cmdMigrate = application.Command(cmdCodeMigrate, "Only run migrations and return (not for production use).")
 
 	cmdStart             = application.Command(cmdCodeStart, "Starts application.").Default()
 	flagStartPort        = cmdStart.Flag("port", "Listening port for the application.").Short('p').Envar("APPCATALOG_PORT").Default("8081").Uint()
@@ -54,6 +49,13 @@ var (
 	flagServerUIBasePath = cmdStart.Flag("server-ui-base-path", "UI Base path as seen by the server").Envar("APPCATALOG_SERVER_UI_BASE_PATH").Default("/").String()
 	flagWebUIDir         = cmdStart.Flag("web-ui-dir", "Web UI Dir").Envar("LHASA_WEB_UI_DIR").Default("./webui").String()
 )
+
+func init() {
+	application.Command(cmdCodeVersion, "Shows version number.")
+
+	cmdMigrate.Command(cmdCodeMigrateUp, "Runs migrations upward (default).").Default()
+	cmdMigrate.Command(cmdCodeMigrateDown, "Runs migrations downward.")
+}
 
 func main() {
 	command, err := application.Parse(os.Args[1:])

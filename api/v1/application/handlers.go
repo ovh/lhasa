@@ -90,7 +90,9 @@ func HandlerPatch(repository *Repository) gin.HandlerFunc {
 			return err
 		}
 
-		release.Properties.UnmarshalJSON(properties)
+		if err := release.Properties.UnmarshalJSON(properties); err != nil {
+			return err
+		}
 
 		return repository.Save(release)
 	}, http.StatusNoContent)

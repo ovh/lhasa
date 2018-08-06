@@ -44,7 +44,9 @@ func ApplicationDeployer(tm db.TransactionManager, depFactory RepositoryFactory)
 			}
 			if len(prevs) > 0 {
 				prev := prevs[0]
-				prev.Properties.UnmarshalJSON(j)
+				if err := prev.Properties.UnmarshalJSON(j); err != nil {
+					return err
+				}
 				d = &prev
 				return depRepo.Save(prev)
 			}

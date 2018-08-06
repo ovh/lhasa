@@ -41,7 +41,9 @@ func NewRouter(tm db.TransactionManager, c config.Lhasa, version, hateoasBaseBat
 	gin.SetMode(ginMode)
 
 	router := fizz.New()
-	router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", "")
+	if err := router.Generator().OverrideDataType(reflect.TypeOf(&postgres.Jsonb{}), "object", ""); err != nil {
+		log.Warnf("was not able to override postgres jsonb datatype in openapi specification")
+	}
 	router.Use(handlers.LoggingMiddleware(c.LogHeaders, log), handlers.RecoveryWithLogger(log))
 
 	tonic.SetErrorHook(hateoas.ErrorHook(jujerr.ErrHook))

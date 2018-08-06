@@ -1,7 +1,6 @@
 package hateoas
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -23,10 +22,8 @@ func JSONBFilter(db *gorm.DB, criteria map[string]interface{}) *gorm.DB {
 		switch len(values) {
 		case 1:
 			db = db.Where(k+" (?)", values[0])
-			break
 		case 2:
 			db = db.Where(k+" (?,?)", values[0], values[1])
-			break
 		}
 	}
 	return db
@@ -39,10 +36,8 @@ func InlineFilter(db *gorm.DB, criteria map[string]interface{}) *gorm.DB {
 		switch len(values) {
 		case 1:
 			db = db.Where(k, values[0])
-			break
 		case 2:
 			db = db.Where(k, values[0], values[1])
-			break
 		}
 	}
 	return db
@@ -72,29 +67,6 @@ func CheckFilter(criteria map[string]interface{}) (map[string]interface{}, map[s
 		}
 	}
 	return standardCriterias, inlineCriterias, jsonbCriterias
-}
-
-// unCamelCase discover physical column name in database
-func unCamelCase(value string) string {
-	if strings.Contains(value, "->>") {
-		// on jsonb column don't un camel case field
-		return value
-	}
-	accu := ""
-	for i := 0; i < len(value); i = i + 1 {
-		switch value[i] {
-		case '_':
-			break
-		default:
-			// is already lower
-			if bytes.ToLower([]byte{value[i]})[0] == value[i] {
-				accu = accu + string(value[i])
-			} else {
-				accu = accu + "_" + string(bytes.ToLower([]byte{value[i]})[0])
-			}
-		}
-	}
-	return accu
 }
 
 // BaseURL returns the base path that has been used to access current resource

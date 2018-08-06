@@ -22,11 +22,6 @@ const (
 	RoleBadgeCreator      = "ROLE_BADGE_CREATOR"
 )
 
-// User is a human user
-type User struct {
-	name string
-}
-
 // UnmarshalJSON implements json.Unmarshaler interface
 func (p Policy) UnmarshalJSON(raw []byte) error {
 	var jsonPolicy map[Role]map[string][]string

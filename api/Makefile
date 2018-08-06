@@ -3,9 +3,8 @@ PKG := github.com/ovh/lhasa/api
 VERSION := $(shell git describe --always --tags --dirty)
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 PKG_LIST_COMMA := $(shell go list ${PKG}/... | grep -v /vendor/ | paste -s -d, -)
-GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/)
 PACKR = ${GOPATH}/bin/packr
-GO_LINT = ${GOPATH}/bin/golint
+GO_META_LINTER = ${GOPATH}/bin/gometalinter
 GO_COV_MERGE = ${GOPATH}/bin/gocovmerge
 GO_GOVERALLS = ${GOPATH}/bin/goveralls
 GO_GO2XUNIT = ${GOPATH}/bin/go2xunit
@@ -18,8 +17,8 @@ $(TARGET_DIR):
 	$(info create $(TARGET_DIR) directory)
 	@mkdir -p $(TARGET_DIR)
 
-$(GO_LINT):
-	go get -u github.com/golang/lint/golint
+$(GO_META_LINTER):
+	go get -u gopkg.in/alecthomas/gometalinter.v2
 
 $(GO_COV_MERGE):
 	go get -u github.com/wadey/gocovmerge
@@ -57,10 +56,9 @@ test-coverage:
 vet: install
 	@go vet ${PKG_LIST}
 
-lint: $(GO_LINT) install
-	@for file in ${GO_FILES} ;  do \
-		golint -set_exit_status $$file ; \
-	done
+lint: $(GO_META_LINTER) install
+	-gometalinter.v2 --install
+	gometalinter.v2 ./...
 
 static: vet lint
 	go build -i -v -o ${OUT}-v${VERSION} -tags netgo -ldflags="-extldflags \"-static\" -w -s -X main.version=${VERSION}" ${PKG}/app
