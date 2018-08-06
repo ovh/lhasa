@@ -37,11 +37,11 @@
             {{ 'LINKS' | translate }}
           </h5>
           <ul class="nobullets">
-            <li *ngFor="let link of getKeys(application.properties.links)">
-              <span class="link_label"> {{ link.label }}</span>
+            <li *ngFor="let link of application.properties.links | keyvalue">
+              <span class="link_label"> {{ link.key }}</span>
               <span class="link_url">
-                <a class="oui-link oui-link_icon" href="{{ link.url }}" target="_blank">
-                  {{ shortLink(link.url, 40) }}
+                <a class="oui-link oui-link_icon" href="{{ link.value }}" target="_blank">
+                  {{ shortLink(link.value, 40) }}
                   <span class="oui-icon oui-icon-external_link"></span>
                 </a>
               </span>
@@ -92,11 +92,11 @@
           <dt>{{ 'LINKS' | translate }}</dt>
           <dd>
             <ul class="nobullets intro">
-              <li *ngFor="let link of getKeys(_selectedDeployment.properties.links)">
-                <span class="link_label"> {{ link.label }}</span>
+              <li *ngFor="let link of _selectedDeployment.properties.links | keyvalue">
+                <span class="link_label"> {{ link.key }}</span>
                 <span class="link_url">
-                  <a class="oui-link oui-link_icon" href="{{ link.url }}" target="_blank">
-                    {{ shortLink(link.url, 80) }}
+                  <a class="oui-link oui-link_icon" href="{{ link.value }}" target="_blank">
+                    {{ shortLink(link.value, 80) }}
                     <span class="oui-icon oui-icon-external_link"></span>
                   </a>
                 </span>
