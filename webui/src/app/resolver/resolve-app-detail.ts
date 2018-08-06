@@ -59,7 +59,7 @@ export class ApplicationResolver implements Resolve<ApplicationBean> {
                         }
                         g.nodes.push({
                           id: node.id,
-                          label: node.name,
+                          label: `${node.properties.application.domain}/${node.name}`,
                           group: group,
                           environment: node.properties.environment.slug,
                           domain: node.properties.application.domain,
