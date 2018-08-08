@@ -5,6 +5,8 @@ span.badge {
     padding-left: 0.5em;
     padding-right: 0.5em;
     text-shadow: 0.1em 0.1em #01010145;
+    white-space:nowrap;
+    line-height: 2em;
 }
 
 span.left {
