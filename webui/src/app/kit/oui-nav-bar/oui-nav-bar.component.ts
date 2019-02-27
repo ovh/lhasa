@@ -42,12 +42,12 @@ export class OuiNavBarComponent implements OnInit {
   release() {
     each(this.items, (item) => {
       each(item.items, (subitem) => {
-        each(this.domHandler.find(this.el.nativeElement, '#button-' + subitem.id), (elem) => {
+        each(DomHandler.find(this.el.nativeElement, '#button-' + subitem.id), (elem) => {
           elem.expanded = false;
           elem.setAttribute('aria-expanded', 'false');
         });
       });
-      each(this.domHandler.find(this.el.nativeElement, '#button-' + item.id), (elem) => {
+      each(DomHandler.find(this.el.nativeElement, '#button-' + item.id), (elem) => {
         elem.expanded = false;
         elem.setAttribute('aria-expanded', 'false');
       });
@@ -56,7 +56,7 @@ export class OuiNavBarComponent implements OnInit {
 
   expand(item: UiKitMenuItem) {
     item.expanded = !item.expanded;
-    const elem = this.domHandler.findSingle(this.el.nativeElement, '#button-' + item.id);
+    const elem = DomHandler.findSingle(this.el.nativeElement, '#button-' + item.id);
     elem.setAttribute('aria-expanded', String(item.expanded));
   }
 }

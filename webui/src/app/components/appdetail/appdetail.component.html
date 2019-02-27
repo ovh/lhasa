@@ -105,14 +105,14 @@
           </dd>
         </dl>
         <div class="ui-g-12">
-          <p-card title="{{ 'NETWORK' | translate }}">
+          <p-card header="{{ 'NETWORK' | translate }}">
             <app-graph #deploymentsGraph *ngIf="_selectedDeployment._graph" [graph]="_selectedDeployment._graph" [options]="'options-graph'"
               [configurable]="false" [height]="400" [cluster]="false" [warn]="false"></app-graph>
           </p-card>
         </div>
 
         <div class="ui-g-12">
-          <p-card title="{{ 'OPENAPI_SPEC' | translate }}" styleClass="ui-g-12">
+          <p-card header="{{ 'OPENAPI_SPEC' | translate }}" styleClass="ui-g-12">
             <app-openapi-ui *ngIf="_selectedDeployment.properties && _selectedDeployment.properties.links && _selectedDeployment.properties.links['openapi.spec']"
               [url]="_selectedDeployment.properties.links['openapi.spec']"></app-openapi-ui>
             <span class="font-extra-light" *ngIf="!_selectedDeployment.properties || !_selectedDeployment.properties.links || !_selectedDeployment.properties.links['openapi.spec']">{{ 'NO_OPENAPI_API_URL_SPECIFIED' | translate }}</span>

@@ -32,7 +32,7 @@
               "node_modules/prismjs/themes/prism-okaidia.css"
             ],
             "scripts": [
-              "node_modules/cytoscape/dist/cytoscape.js",
+              "node_modules/cytoscape/dist/cytoscape.min.js",
               "node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js",
               "node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js",
               "node_modules/prismjs/prism.js",
@@ -86,7 +86,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [
-              "node_modules/cytoscape/dist/cytoscape.js",
+              "node_modules/cytoscape/dist/cytoscape.min.js",
               "node_modules/cytoscape-expand-collapse/cytoscape-expand-collapse.js",
               "node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js",
               "node_modules/prismjs/prism.js",
