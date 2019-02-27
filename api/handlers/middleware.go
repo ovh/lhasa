@@ -34,7 +34,7 @@ func RecoveryWithLogger(log logrus.FieldLogger) gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				if log != nil {
-					stack := stack(3)
+					stack := stack(3, log)
 					httprequest, _ := httputil.DumpRequest(c.Request, false)
 					log.WithField("error", err).
 						WithField("full_message", string(stack)).
@@ -49,7 +49,7 @@ func RecoveryWithLogger(log logrus.FieldLogger) gin.HandlerFunc {
 }
 
 // stack returns a nicely formatted stack frame, skipping skip frames.
-func stack(skip int) []byte {
+func stack(skip int, log logrus.FieldLogger) []byte {
 	buf := new(bytes.Buffer) // the returned data
 	// As we loop, we open files and read them. These variables record the currently
 	// loaded file.
@@ -61,7 +61,10 @@ func stack(skip int) []byte {
 			break
 		}
 		// Print this much at least.  If we can't find the source, it won't show.
-		fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
+		_, err := fmt.Fprintf(buf, "%s:%d (0x%x)\n", file, line, pc)
+		if err != nil {
+			log.WithError(err).Warn("could not Fprintf stack")
+		}
 		if file != lastFile {
 			data, err := ioutil.ReadFile(file)
 			if err != nil {
@@ -70,7 +73,10 @@ func stack(skip int) []byte {
 			lines = bytes.Split(data, []byte{'\n'})
 			lastFile = file
 		}
-		fmt.Fprintf(buf, "\t%s: %s\n", function(pc), source(lines, line))
+		_, err = fmt.Fprintf(buf, "\t%s: %s\n", function(pc), source(lines, line))
+		if err != nil {
+			log.WithError(err).Warn("could not Fprintf stack")
+		}
 	}
 	return buf.Bytes()
 }
